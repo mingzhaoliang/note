@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { AlignRightIcon } from "lucide-react";
 
 export default function NavDropdown() {
@@ -18,7 +18,11 @@ export default function NavDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-60 p-2 font-medium">
         <DropdownMenuItem className="p-3" asChild>
-          <Link to="/logout">Log out</Link>
+          <Form method="post" action="/logout">
+            <button type="submit" className="w-full h-full flex-start">
+              Log out
+            </button>
+          </Form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

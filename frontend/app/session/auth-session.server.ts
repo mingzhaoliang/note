@@ -3,7 +3,7 @@ import { createCookieSessionStorage } from "@remix-run/node";
 
 const isProduction = envConfig.NODE_ENV === "production";
 
-const authSessionStorage = createCookieSessionStorage({
+const { getSession, commitSession, destroySession } = createCookieSessionStorage({
   cookie: {
     name: "auth",
     path: "/",
@@ -16,18 +16,25 @@ const authSessionStorage = createCookieSessionStorage({
 });
 
 const getAuthSession = async (request: Request) => {
-  const session = await authSessionStorage.getSession(request.headers.get("Cookie"));
+  const session = await getSession(request.headers.get("Cookie"));
 
   const authSessionId = session.get("authSession");
   return authSessionId;
 };
 
 const setAuthSession = async (sessionId: string) => {
-  const session = await authSessionStorage.getSession();
+  const session = await getSession();
   session.set("authSession", sessionId);
 
-  const header = await authSessionStorage.commitSession(session);
+  const header = await commitSession(session);
   return header;
 };
 
-export { getAuthSession, setAuthSession };
+const destroyAuthSession = async (request: Request) => {
+  const session = await getSession(request.headers.get("Cookie"));
+
+  const header = await destroySession(session);
+  return header;
+};
+
+export { getAuthSession, setAuthSession, destroyAuthSession };
