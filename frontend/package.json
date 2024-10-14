@@ -5,10 +5,23 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
-    "dev": "node ./server/index.js",
+    "dev": "run-p dev:*",
+    "dev:remix": "node ./server/index.js",
+    "dev:svg": "run-s icons icons:watch",
+    "icons": "npx @svgr/cli --filename-case kebab --out-dir app/components/icons -- app/assets/icons",
+    "icons:watch": "npm-watch icons",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "cross-env NODE_ENV=production node ./server/index.js",
     "typecheck": "tsc"
+  },
+  "watch": {
+    "icons": {
+      "patterns": [
+        "app/assets/icons"
+      ],
+      "extensions": "svg",
+      "quiet": false
+    }
   },
   "dependencies": {
     "@remix-run/express": "^2.13.1",
@@ -32,6 +45,10 @@
   },
   "devDependencies": {
     "@remix-run/dev": "^2.13.1",
+    "@svgr/cli": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
+    "@svgr/plugin-prettier": "^8.1.0",
+    "@svgr/plugin-svgo": "^8.1.0",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.20",
     "@types/morgan": "^1.9.9",
@@ -46,6 +63,8 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "npm-run-all": "^4.1.5",
+    "npm-watch": "^0.13.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.1.6",
