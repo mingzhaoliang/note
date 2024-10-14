@@ -1,5 +1,5 @@
 import { hashPassword } from "@/lib/utils/password.util.js";
-import { Account } from "@/models/account.model.js";
+import { Account, AccountDoc } from "@/models/account.model.js";
 import { Profile, ProfileDoc } from "@/models/profile.model.js";
 import { User, UserDoc } from "@/models/user.model.js";
 import { generateIdFromEntropySize } from "lucia";
@@ -83,4 +83,18 @@ const findUser = async (filter: FilterQuery<UserDoc> = {}): Promise<UserDoc | nu
   }
 };
 
-export { createUser, findUser };
+const findAccount = async (accountId: {
+  providerId: string;
+  providerUserId: string;
+}): Promise<AccountDoc | null> => {
+  try {
+    const account = await Account.findOne({ _id: accountId });
+
+    return account;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the account.");
+  }
+};
+
+export { createUser, findAccount, findUser };

@@ -6,6 +6,7 @@ const envConfigSchema = z.object({
   MONGO_URI: z.string(),
   OAUTH_GOOGLE_CLIENT_ID: z.string(),
   OAUTH_GOOGLE_CLIENT_SECRET: z.string(),
+  APP_URL: z.string(),
 });
 
 const envConfig = envConfigSchema.parse(process.env);
