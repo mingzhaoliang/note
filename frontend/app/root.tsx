@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { PreventFlashOnWrongTheme, Theme, ThemeProvider, useTheme } from "remix-themes";
 import { themeSessionResolver } from "./session/theme-session.server";
 
+import { Toaster } from "./components/ui/toaster";
 import "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -67,6 +68,7 @@ function App() {
   return (
     <Document theme={theme} ssrTheme={Boolean(data.theme)}>
       <Outlet />
+      <Toaster />
     </Document>
   );
 }
