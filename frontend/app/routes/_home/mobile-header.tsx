@@ -1,7 +1,7 @@
 import Mark from "@/components/common/mark";
 import { Button } from "@/components/ui/button";
 import { Link } from "@remix-run/react";
-import { LogInIcon } from "lucide-react";
+import { AlignRightIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
 
 type MobileHeaderProps = {
@@ -16,7 +16,7 @@ export default function MobileHeader({ isAuthenticated }: MobileHeaderProps) {
           <Mark />
         </Link>
 
-        {isAuthenticated && <NavDropdown />}
+        {isAuthenticated && <NavDropdown triggerIcon={<AlignRightIcon />} />}
 
         {!isAuthenticated && (
           <Button variant="ghost" size="icon" className="rounded-full" asChild>

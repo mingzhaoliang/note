@@ -29,6 +29,7 @@ body {
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --inactive: 0, 0%, 83%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
@@ -57,6 +58,7 @@ body {
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --inactive: 0 0% 25%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
@@ -91,5 +93,17 @@ body {
   }
   .header-mobile {
     @apply sticky top-0 z-50 md:hidden w-full;
+  }
+
+  .sidebar {
+    @apply fixed top-0 left-0 z-50 flex-between flex-col py-10 w-20 h-full min-h-[480px];
+  }
+
+  .navbar {
+    @apply flex-1 w-full flex-center flex-col gap-y-1 z-50;
+  }
+
+  .navbar-mobile {
+    @apply grid auto-cols-fr grid-flow-col justify-items-center fixed bottom-0 left-0 right-0 z-10 h-16;
   }
 }
