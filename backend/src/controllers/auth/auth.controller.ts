@@ -84,6 +84,17 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+const logout = async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.body;
+    await lucia.invalidateSession(sessionId);
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
 const resetPassword = async (req: Request, res: Response) => {
   try {
     const { identifier } = req.body;
@@ -132,4 +143,4 @@ const verifyPasswordResetToken = async (req: Request, res: Response) => {
   }
 };
 
-export { login, resetPassword, signup, validateSession, verifyPasswordResetToken };
+export { login, logout, resetPassword, signup, validateSession, verifyPasswordResetToken };
