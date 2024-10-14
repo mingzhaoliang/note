@@ -1,4 +1,4 @@
-import { createAuthSession } from "@/lib/lucia/auth.js";
+import { createAuthSession, lucia } from "@/lib/lucia/auth.js";
 import { hashPassword, verifyPassword } from "@/lib/utils/password.util.js";
 import { PasswordReset } from "@/models/password-reset.model.js";
 import { LoginSchema } from "@/schemas/auth/login.schema.js";
@@ -14,6 +14,27 @@ import { startSession } from "mongoose";
 import { isWithinExpirationDate } from "oslo";
 import { sha256 } from "oslo/crypto";
 import { encodeHex } from "oslo/encoding";
+
+const validateSession = async (req: Request, res: Response) => {
+  let sessionId = req.query.sessionId as string;
+
+  const { session, user } = await lucia.validateSession(sessionId);
+
+  if (!session) {
+    res.status(401).end();
+    return;
+  }
+
+  let newSessionId = null;
+  if (session.fresh) {
+    await lucia.invalidateSession(sessionId);
+    const newSessionCookie = lucia.createSessionCookie(session.id);
+
+    newSessionId = newSessionCookie.value;
+  }
+
+  res.status(200).json({ user, newSessionId });
+};
 
 const signup = async (req: Request, res: Response) => {
   try {
@@ -111,4 +132,4 @@ const verifyPasswordResetToken = async (req: Request, res: Response) => {
   }
 };
 
-export { login, resetPassword, signup, verifyPasswordResetToken };
+export { login, resetPassword, signup, validateSession, verifyPasswordResetToken };
