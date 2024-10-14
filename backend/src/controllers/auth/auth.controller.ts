@@ -1,6 +1,8 @@
 import { createAuthSession } from "@/lib/lucia/auth.js";
+import { hashPassword, verifyPassword } from "@/lib/utils/password.util.js";
+import { LoginSchema } from "@/schemas/auth/login.schema.js";
 import { SignupSchema } from "@/schemas/auth/signup.schema.js";
-import { createUser } from "@/services/db/auth.service.js";
+import { createUser, findUser } from "@/services/db/auth.service.js";
 import { Request, Response } from "express";
 import { startSession } from "mongoose";
 
@@ -25,4 +27,31 @@ const signup = async (req: Request, res: Response) => {
   }
 };
 
-export { signup };
+const login = async (req: Request, res: Response) => {
+  const { identifier, password } = req.body as LoginSchema;
+
+  try {
+    const existingUser = await findUser({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
+
+    const validPassword = existingUser?.passwordHash
+      ? await verifyPassword(existingUser.passwordHash, password)
+      : await (async function () {
+          await hashPassword(password);
+          return false;
+        })();
+
+    if (!existingUser || !validPassword) {
+      res.status(400).json({ error: "Incorrect password." });
+    } else {
+      const sessionId = await createAuthSession(existingUser._id);
+
+      res.status(200).json({ sessionId });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export { signup, login };
