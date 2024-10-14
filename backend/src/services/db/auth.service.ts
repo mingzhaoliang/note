@@ -1,9 +1,13 @@
 import { hashPassword } from "@/lib/utils/password.util.js";
 import { Account, AccountDoc } from "@/models/account.model.js";
+import { PasswordReset } from "@/models/password-reset.model.js";
 import { Profile, ProfileDoc } from "@/models/profile.model.js";
 import { User, UserDoc } from "@/models/user.model.js";
 import { generateIdFromEntropySize } from "lucia";
 import { FilterQuery, startSession } from "mongoose";
+import { createDate, TimeSpan } from "oslo";
+import { sha256 } from "oslo/crypto";
+import { encodeHex } from "oslo/encoding";
 
 interface CreateUserArgs {
   user: {
@@ -97,4 +101,29 @@ const findAccount = async (accountId: {
   }
 };
 
-export { createUser, findAccount, findUser };
+const createPasswordResetToken = async (userId: string): Promise<string> => {
+  try {
+    // Invalidate all existing tokens
+    await PasswordReset.deleteMany({ userId });
+    const tokenId = generateIdFromEntropySize(25);
+    const tokenHash = encodeHex(await sha256(new TextEncoder().encode(tokenId)));
+
+    await PasswordReset.create({ tokenHash, userId, expiresAt: createDate(new TimeSpan(2, "h")) });
+
+    return tokenId;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to create a password reset token.");
+  }
+};
+
+const updatePassword = async (userId: string, password: string): Promise<void> => {
+  try {
+    await User.updateOne({ _id: userId }, { $set: { passwordHash: await hashPassword(password) } });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to update the password.");
+  }
+};
+
+export { createPasswordResetToken, createUser, findAccount, findUser, updatePassword };
