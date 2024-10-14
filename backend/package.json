@@ -1,0 +1,45 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run watch-compile\" \"npm run watch-dev\" \"tsc --noEmit -w\"",
+    "watch-dev": "nodemon -w \"dist/**/*\" -e js ./dist/index.js",
+    "watch-compile": "swc src -w -d dist --strip-leading-paths",
+    "build": "tsc --noEmit && swc src -d dist --strip-leading-paths",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@lucia-auth/adapter-mongodb": "^1.0.3",
+    "@node-rs/argon2": "^2.0.0",
+    "arctic": "^1.9.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "lucia": "^3.2.1",
+    "mongoose": "^8.7.1",
+    "oslo": "^1.2.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.4.1-nightly.20240914",
+    "@swc/core": "^1.7.35",
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.5",
+    "chokidar": "^3.6.0",
+    "concurrently": "^9.0.1",
+    "nodemon": "^3.1.7",
+    "typescript": "^5.6.3"
+  }
+}
