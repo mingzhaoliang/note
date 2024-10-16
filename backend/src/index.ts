@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import envConfig from "./config/env.config.js";
-import connectDB from "./lib/db/connectDB.js";
+import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
 
 const { PORT } = envConfig;

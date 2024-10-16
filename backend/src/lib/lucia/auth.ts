@@ -1,13 +1,10 @@
 import envConfig from "@/config/env.config.js";
-import { UserDoc } from "@/models/user.model.js";
-import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
+import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+import { Prisma } from "@prisma/client";
 import { Lucia } from "lucia";
-import mongoose from "mongoose";
+import { prisma } from "../db/prisma.js";
 
-const adapter = new MongodbAdapter(
-  mongoose.connection.collection("sessions"),
-  mongoose.connection.collection("users")
-);
+const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -22,7 +19,6 @@ const lucia = new Lucia(adapter, {
 });
 
 const createAuthSession = async (userId: string) => {
-  await lucia.invalidateUserSessions(userId);
   const session = await lucia.createSession(userId, {});
 
   return session.id;
@@ -31,7 +27,7 @@ const createAuthSession = async (userId: string) => {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Omit<UserDoc, "_id">;
+    DatabaseUserAttributes: Prisma.UserSelect;
   }
 }
 

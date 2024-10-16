@@ -1,16 +1,16 @@
 import { createAuthSession, lucia } from "@/lib/lucia/auth.js";
 import { hashPassword, verifyPassword } from "@/lib/utils/password.util.js";
-import { PasswordReset } from "@/models/password-reset.model.js";
 import { LoginSchema } from "@/schemas/auth/login.schema.js";
 import { SignupSchema } from "@/schemas/auth/signup.schema.js";
 import {
   createPasswordResetToken,
   createUser,
+  deletePasswordResetToken,
+  findPasswordResetToken,
   findUser,
   updatePassword,
-} from "@/services/db/auth.service.js";
+} from "@/services/neon/auth.service.js";
 import { Request, Response } from "express";
-import { startSession } from "mongoose";
 import { isWithinExpirationDate } from "oslo";
 import { sha256 } from "oslo/crypto";
 import { encodeHex } from "oslo/encoding";
@@ -40,9 +40,6 @@ const signup = async (req: Request, res: Response) => {
   try {
     const { fullName, username, email, password } = req.body as SignupSchema;
 
-    const session = await startSession();
-    session.startTransaction();
-
     const userId = await createUser({ user: { fullName, username, email, password } });
 
     const sessionId = await createAuthSession(userId);
@@ -61,9 +58,7 @@ const login = async (req: Request, res: Response) => {
   const { identifier, password } = req.body as LoginSchema;
 
   try {
-    const existingUser = await findUser({
-      $or: [{ email: identifier }, { username: identifier }],
-    });
+    const existingUser = await findUser({ email: identifier, username: identifier });
 
     const validPassword = existingUser?.passwordHash
       ? await verifyPassword(existingUser.passwordHash, password)
@@ -75,7 +70,7 @@ const login = async (req: Request, res: Response) => {
     if (!existingUser || !validPassword) {
       res.status(400).json({ error: "Incorrect password." });
     } else {
-      const sessionId = await createAuthSession(existingUser._id);
+      const sessionId = await createAuthSession(existingUser.id);
 
       res.status(200).json({ sessionId });
     }
@@ -98,16 +93,14 @@ const logout = async (req: Request, res: Response) => {
 const resetPassword = async (req: Request, res: Response) => {
   try {
     const { identifier } = req.body;
-    const user = await findUser({
-      $or: [{ email: identifier }, { username: identifier }],
-    });
+    const user = await findUser({ email: identifier, username: identifier });
 
     if (!user) {
       res.status(400).end();
       return;
     }
 
-    const verificationToken = await createPasswordResetToken(user._id);
+    const verificationToken = await createPasswordResetToken(user.id);
 
     res.status(200).json({ email: user.email, verificationToken });
   } catch (error) {
@@ -122,14 +115,14 @@ const verifyPasswordResetToken = async (req: Request, res: Response) => {
     const { token } = req.params;
 
     const tokenHash = encodeHex(await sha256(new TextEncoder().encode(token)));
-    const storedToken = await PasswordReset.findOne({ tokenHash });
+    const storedToken = await findPasswordResetToken(tokenHash);
 
     if (!storedToken || !isWithinExpirationDate(storedToken.expiresAt)) {
       res.status(400).end();
       return;
     }
 
-    await PasswordReset.deleteOne({ tokenHash });
+    await deletePasswordResetToken(tokenHash);
 
     const { userId } = storedToken;
     await updatePassword(userId, password);

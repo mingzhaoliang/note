@@ -1,0 +1,28 @@
+model Profile {
+  id        String    @id @default(cuid())
+  userId    String
+  username  String
+  name      String
+  avatar    String?
+  bio       String?
+  follower  Follows[] @relation("follower")
+  following Follows[] @relation("following")
+  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+
+  user User @relation(references: [id, username], fields: [userId, username], onDelete: Cascade)
+
+  @@unique([userId, username])
+}
+
+model Follows {
+  followerId  String
+  followingId String
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  follower  Profile @relation("follower", references: [id], fields: [followerId], onDelete: Cascade)
+  following Profile @relation("following", references: [id], fields: [followingId], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}

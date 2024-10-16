@@ -1,6 +1,6 @@
 import { createAuthSession } from "@/lib/lucia/auth.js";
 import { google } from "@/lib/lucia/providers/google.js";
-import { createUser, findAccount } from "@/services/db/auth.service.js";
+import { createUser, findAccount } from "@/services/neon/auth.service.js";
 import { generateCodeVerifier, generateState, OAuth2RequestError } from "arctic";
 import { Request, Response } from "express";
 import { alphabet, generateRandomString } from "oslo/crypto";
