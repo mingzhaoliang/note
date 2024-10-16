@@ -106,4 +106,20 @@ body {
   .navbar-mobile {
     @apply grid auto-cols-fr grid-flow-col justify-items-center fixed bottom-0 left-0 right-0 z-10 h-16;
   }
+
+  .hide-ring {
+    @apply focus-visible:ring-0 focus-visible:ring-offset-0;
+  }
+
+  .clickable {
+    @apply cursor-pointer text-inactive hover:text-primary transition-colors;
+  }
+
+  .no-highlight {
+    @apply !outline-none !ring-0 !ring-offset-0;
+  }
+
+  .masked-input {
+    @apply bg-transparent p-0 border-none no-highlight;
+  }
 }

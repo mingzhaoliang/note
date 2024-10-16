@@ -1,3 +1,4 @@
+export { default as GalleryAdd } from "./gallery-add";
 export { default as GoogleG } from "./google-g";
 export { default as HomeFilled } from "./home-filled";
 export { default as Home } from "./home";
