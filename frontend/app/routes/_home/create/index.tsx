@@ -1,5 +1,6 @@
 import { uploadImage } from "@/service/.server/cloudinary.service";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { redirectIfUnauthenticated } from "@/session/guard.server";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -28,6 +29,12 @@ export default function CreatePost() {
       )}
     </>
   );
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await redirectIfUnauthenticated(request);
+
+  return null;
 }
 
 export async function action({ request }: ActionFunctionArgs) {

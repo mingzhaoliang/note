@@ -1,6 +1,6 @@
 import envConfig from "@/config/env.config.server";
-import { redirect } from "@remix-run/node";
-import { getAuthSession, setAuthSession } from "./auth-session.server";
+import { replace } from "@remix-run/node";
+import { destroyAuthSession, getAuthSession, setAuthSession } from "./auth-session.server";
 
 const requireUser = async (request: Request) => {
   const sessionId = await getAuthSession(request);
@@ -26,7 +26,17 @@ const requireUser = async (request: Request) => {
 const redirectIfAuthenticated = async (request: Request, path?: string) => {
   const { authHeader, user } = await requireUser(request);
   if (user)
-    throw redirect(path ?? "/", { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
+    throw replace(path ?? "/", { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
 };
 
-export { redirectIfAuthenticated, requireUser };
+const redirectIfUnauthenticated = async (request: Request, path?: string) => {
+  const { authHeader, user } = await requireUser(request);
+  if (!user)
+    throw replace(path ?? "/login", {
+      headers: { "Set-Cookie": await destroyAuthSession(request) },
+    });
+
+  return { authHeader, user };
+};
+
+export { redirectIfAuthenticated, redirectIfUnauthenticated, requireUser };
