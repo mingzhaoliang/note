@@ -4,7 +4,7 @@ import { SeparatorWithText } from "@/components/ui/separator-with-text";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { sendPasswordResetToken } from "@/service/email/password-reset.service";
+import { sendPasswordResetToken } from "@/service/.server/email/password-reset.service";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfAuthenticated } from "@/session/guard.server";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
