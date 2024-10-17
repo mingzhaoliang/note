@@ -14,7 +14,7 @@ export default function Sidebar({ isAuthenticated }: SidebarProps) {
   return (
     <nav className="sidebar">
       <Logo className="hidden md:block shrink-0 w-8 h-8 hover:scale-105 transition-transform" />
-      <Navbar />
+      <Navbar isAuthenticated={isAuthenticated} />
       <Slot className="hidden md:block">
         {isAuthenticated ? (
           <NavDropdown triggerIcon={<AlignLeftIcon />} />

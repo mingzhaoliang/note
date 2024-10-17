@@ -2,19 +2,21 @@ import { GalleryAdd } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, useSubmit } from "@remix-run/react";
 import { HashIcon, MapPinIcon } from "lucide-react";
 import { useRef } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import PostImagesSection from "./post-images-section";
 import PostTagsSection, { PostTagsSectionRef } from "./post-tags-section";
 
 export default function PostForm({ className }: React.ComponentProps<"form">) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
+  const { toast } = useToast();
 
   const form = useForm<PostFormSchema>({
     resolver: zodResolver(postFormSchema),
@@ -41,12 +43,14 @@ export default function PostForm({ className }: React.ComponentProps<"form">) {
   const onSubmit: SubmitHandler<PostFormSchema> = (data, event) => {
     submit(event?.target, { method: "POST", action: "/create", encType: "multipart/form-data" });
   };
+  const onError: SubmitErrorHandler<PostFormSchema> = (error) =>
+    toast({ variant: "primary", title: Object.values(error)[0].message });
 
   return (
     <FormProvider {...form}>
       <Form
         className={cn("max-md:pb-4 flex flex-col gap-4", className)}
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, onError)}
       >
         <PostImagesSection ref={fileInputRef} name="images" />
 

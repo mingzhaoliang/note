@@ -1,11 +1,14 @@
+import envConfig from "@/config/env.config.server";
 import { uploadImage } from "@/service/.server/cloudinary.service";
-import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
+import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
+import { ActionFunctionArgs, json, LoaderFunctionArgs, replace } from "@remix-run/node";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import DialogMode from "./dialog-mode";
 import DrawerMode from "./drawer-mode";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreatePost() {
   const [open, setOpen] = useState(true);
@@ -13,12 +16,20 @@ export default function CreatePost() {
   const navigate = useNavigate();
   const location = useLocation();
   const referrer = location.state?.referrer || "/";
+  const { toast } = useToast();
+  const loaderData = useLoaderData<typeof loader>();
 
   useEffect(() => {
     if (!open) {
       navigate(referrer, { replace: true, state: { referrer: null } });
     }
   }, [open, navigate, referrer]);
+
+  useEffect(() => {
+    if (loaderData.message) {
+      toast({ variant: "primary", title: loaderData.message });
+    }
+  }, [loaderData]);
 
   return (
     <>
@@ -34,15 +45,40 @@ export default function CreatePost() {
 export async function loader({ request }: LoaderFunctionArgs) {
   await redirectIfUnauthenticated(request);
 
-  return null;
+  const baseSession = await getBaseSession(request.headers.get("Cookie"));
+  const message: string | null = baseSession.get("message") || null;
+
+  return json({ message }, { headers: { "Set-Cookie": await commitBaseSession(baseSession) } });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const payload = await getPayload(formData);
 
-  // TODO - submit form data
-  return null;
+  const { authHeader, user } = await requireUser(request);
+  payload.userId = user.id;
+
+  const response = await fetch(`${envConfig.API_URL}/post/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const { error } = await response.json();
+
+    const baseSession = await getBaseSession(request.headers.get("Cookie"));
+    baseSession.flash("message", error);
+
+    return json(
+      {},
+      { status: 400, headers: { "Set-Cookie": await commitBaseSession(baseSession) } }
+    );
+  }
+
+  return replace("/", { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
 }
 
 const uploadHandler = async (data: File) => {
