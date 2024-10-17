@@ -43,4 +43,63 @@ const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => 
   }
 };
 
-export { createPost };
+type getInfinitePostsArgs = {
+  lastCursor?: string;
+  take?: number;
+};
+
+const getFeed = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
+  try {
+    const posts = await prisma.post.findMany({
+      take,
+      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        profile: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        images: {
+          select: {
+            publicId: true,
+          },
+        },
+        tags: {
+          select: {
+            tag: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        likes: {
+          select: {
+            profileId: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return posts;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the posts.");
+  }
+};
+
+export { createPost, getFeed };
