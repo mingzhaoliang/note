@@ -5,6 +5,7 @@ import helmet from "helmet";
 import envConfig from "./config/env.config.js";
 import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
+import postRoute from "./routes/post/post.route.js";
 
 const { PORT } = envConfig;
 
@@ -21,6 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoute);
+
+app.use("/api/post", postRoute);
 
 app.get("/health", (req, res) => {
   res.status(200).send("OK");

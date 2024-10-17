@@ -1,0 +1,69 @@
+model Post {
+  id        String        @id @default(cuid())
+  profileId String
+  profile   Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  text      String
+  images    PostImage[]
+  tags      PostTag[]
+  likes     PostLike[]
+  comments  PostComment[]
+  updatedAt DateTime      @updatedAt
+  createdAt DateTime      @default(now())
+}
+
+model PostImage {
+  publicId     String   @id
+  type         String
+  resourceType String
+  version      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  posts PostTag[]
+}
+
+model PostTag {
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@id([postId, tagId])
+}
+
+model PostLike {
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@id([profileId, postId])
+}
+
+model PostComment {
+  id        String        @id @default(cuid())
+  postId    String
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  text      String
+  profileId String
+  profile   Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    PostComment?  @relation("nestedComments", fields: [parentId], references: [id])
+  children  PostComment[] @relation("nestedComments")
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
