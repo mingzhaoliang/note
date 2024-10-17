@@ -2,6 +2,7 @@ import { GalleryAdd } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MAXIMUM_IMAGES } from "@/config/post.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
@@ -26,6 +27,8 @@ export default function PostForm({ className }: React.ComponentProps<"form">) {
       tags: [],
     },
   });
+
+  const imageCount = form.watch("images").length;
 
   const handleImageUpload = () => {
     if (fileInputRef.current) {
@@ -74,7 +77,14 @@ export default function PostForm({ className }: React.ComponentProps<"form">) {
           />
           <PostTagsSection ref={tagInputRef} name="tags" />
           <div className="flex gap-x-4">
-            <GalleryAdd className="w-6 h-6 clickable" onClick={handleImageUpload} />
+            <button
+              type="button"
+              disabled={imageCount >= MAXIMUM_IMAGES}
+              className="clickable disabled:unavailable"
+              onClick={handleImageUpload}
+            >
+              <GalleryAdd className="w-6 h-6" />
+            </button>
             <HashIcon className="w-6 h-6 clickable" onClick={handleTagEdit} />
             <MapPinIcon className="w-6 h-6 clickable" />
           </div>

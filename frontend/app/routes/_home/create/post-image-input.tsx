@@ -31,7 +31,7 @@ export default function PostImageInput({ index, name, remove }: PostImageInputPr
       name={`${name}.${index}`}
       render={({ field: { name } }) => (
         <FormItem>
-          <div className="relative w-24 h-24 rounded-xl overflow-hidden">
+          <div className="relative w-36 h-36 rounded-xl overflow-hidden">
             <img src={preview} alt="preview" className="w-full h-full object-cover" />
             <Button
               variant="secondary"

@@ -20,7 +20,7 @@ export default function DialogMode({ open, setOpen }: DialogModeProps) {
           <DialogTitle>Create Note</DialogTitle>
           <DialogDescription>Share your thoughts with the world.</DialogDescription>
         </DialogHeader>
-        <PostForm />
+        <PostForm className="w-[590px]" />
       </DialogContent>
     </Dialog>
   );

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { forwardRef } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import PostImageInput from "./post-image-input";
+import { MAXIMUM_IMAGES } from "@/config/post.config";
 
 type PostImagesSectionProps = {
   name: string;
@@ -17,12 +18,12 @@ const PostImagesSection = forwardRef<HTMLInputElement, PostImagesSectionProps>(
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (files) {
-        append(Array.from(files));
+        append(Array.from(files).slice(0, MAXIMUM_IMAGES - fields.length));
       }
     };
 
     return (
-      <div>
+      <div className="">
         <Input
           ref={ref}
           type="file"
@@ -35,7 +36,7 @@ const PostImagesSection = forwardRef<HTMLInputElement, PostImagesSectionProps>(
           control={control}
           name={name}
           render={() => (
-            <FormItem className="space-y-0 flex gap-3">
+            <FormItem className="space-y-0 flex gap-3 overflow-scroll">
               {fields.map((field, index) => (
                 <PostImageInput
                   key={field.id}
