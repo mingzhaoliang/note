@@ -1,6 +1,5 @@
 import Logo from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
-import { Slot } from "@radix-ui/react-slot";
 import { Link } from "@remix-run/react";
 import { AlignLeftIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
@@ -12,10 +11,10 @@ type SidebarProps = {
 
 export default function Sidebar({ isAuthenticated }: SidebarProps) {
   return (
-    <nav className="sidebar">
+    <div className="sidebar-mobile md:sidebar">
       <Logo className="hidden md:block shrink-0 w-8 h-8 hover:scale-105 transition-transform" />
       <Navbar isAuthenticated={isAuthenticated} />
-      <Slot className="hidden md:block">
+      <div className="hidden md:block">
         {isAuthenticated ? (
           <NavDropdown triggerIcon={<AlignLeftIcon />} />
         ) : (
@@ -25,7 +24,7 @@ export default function Sidebar({ isAuthenticated }: SidebarProps) {
             </Link>
           </Button>
         )}
-      </Slot>
-    </nav>
+      </div>
+    </div>
   );
 }

@@ -91,6 +91,7 @@ body {
   .flex-start {
     @apply flex justify-start items-center;
   }
+
   .header-mobile {
     @apply sticky top-0 z-50 md:hidden w-full;
   }
@@ -99,12 +100,16 @@ body {
     @apply fixed top-0 left-0 z-50 flex-between flex-col py-10 w-20 h-full min-h-[480px];
   }
 
+  .sidebar-mobile {
+    @apply fixed bottom-0 left-0 right-0 z-50 h-16;
+  }
+
   .navbar {
     @apply flex-1 w-full flex-center flex-col gap-y-1 z-50;
   }
 
   .navbar-mobile {
-    @apply grid auto-cols-fr grid-flow-col justify-items-center fixed bottom-0 left-0 right-0 z-10 h-16;
+    @apply grid auto-cols-fr grid-flow-col;
   }
 
   .hide-ring {
