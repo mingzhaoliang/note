@@ -27,8 +27,10 @@ type PostLikeProps = {
 
 const PostLike = ({ postId, hasLiked, count }: PostLikeProps) => {
   const fetcher = useFetcher();
+  const isSubmitting = fetcher.formData?.get("_action") === "like";
 
-  const Icon = hasLiked ? LikeFilled : Like;
+  const Icon = (isSubmitting ? !hasLiked : hasLiked) ? LikeFilled : Like;
+  const updatedCount = isSubmitting ? (hasLiked ? count - 1 : count + 1) : count;
 
   return (
     <div className="flex items-center space-x-2">
@@ -38,7 +40,9 @@ const PostLike = ({ postId, hasLiked, count }: PostLikeProps) => {
           <Icon className="text-inactive w-5 h-5" />
         </button>
       </fetcher.Form>
-      <div className="min-w-3">{count > 0 && <p className="text-inactive text-sm">{count}</p>}</div>
+      <div className="min-w-3">
+        {updatedCount > 0 && <p className="text-inactive text-sm">{updatedCount}</p>}
+      </div>
     </div>
   );
 };

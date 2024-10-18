@@ -52,5 +52,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const { _action, ...payload } = Object.fromEntries(formData);
+  const { user } = await requireUser(request);
+
+  let response = null;
+
+  switch (_action) {
+    case "like":
+      response = await fetch(`${envConfig.API_URL}/post/like`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: payload.postId,
+          profileId: user.id,
+        }),
+      });
+  }
+
+  if (!response || !response.ok) {
+    const baseSession = await getBaseSession(request.headers.get("Cookie"));
+    baseSession.flash("message", "Oops! Something went wrong.");
+
+    return json(
+      {},
+      { status: 400, headers: { "Set-Cookie": await commitBaseSession(baseSession) } }
+    );
+  }
+
   return null;
 }
