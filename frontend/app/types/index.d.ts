@@ -21,4 +21,20 @@ type CloudinaryAsset = {
   api_key: string;
 };
 
-export type { CloudinaryAsset };
+type Post = {
+  id: string;
+  text: string;
+  createdAt: string;
+  profile: {
+    id: string;
+    username: string;
+    name: string;
+    avatar: string;
+  };
+  images: string[];
+  tags: string[];
+  likes: string[];
+  commentCount: number;
+};
+
+export type { CloudinaryAsset, Post };
