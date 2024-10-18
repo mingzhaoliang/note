@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/db/prisma.js";
 
-const findProfile = async (userId: string) => {
+const findProfile = async (id: string) => {
   try {
-    const profile = await prisma.profile.findFirst({ where: { userId } });
+    const profile = await prisma.profile.findUnique({ where: { id } });
 
     return profile;
   } catch (error) {

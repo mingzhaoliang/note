@@ -1,8 +1,7 @@
 model Profile {
-  id        String        @id @default(cuid())
-  user      User          @relation(references: [id, username], fields: [userId, username], onDelete: Cascade)
-  userId    String
+  id        String        @id
   username  String
+  user      User          @relation(references: [id, username], fields: [id, username], onDelete: Cascade)
   name      String
   avatar    String?
   bio       String?
@@ -11,22 +10,20 @@ model Profile {
   likes     PostLike[]
   posts     Post[]
   comments  PostComment[]
+  updatedAt DateTime      @updatedAt
+  createdAt DateTime      @default(now())
 
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
-
-  @@unique([userId, username])
-  @@index([userId, username])
+  @@unique([id, username])
+  @@index([username])
 }
 
 model Follows {
   followerId  String
+  follower    Profile  @relation("follower", references: [id], fields: [followerId], onDelete: Cascade)
   followingId String
+  following   Profile  @relation("following", references: [id], fields: [followingId], onDelete: Cascade)
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
-
-  follower  Profile @relation("follower", references: [id], fields: [followerId], onDelete: Cascade)
-  following Profile @relation("following", references: [id], fields: [followingId], onDelete: Cascade)
 
   @@id([followerId, followingId])
 }
