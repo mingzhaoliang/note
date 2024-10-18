@@ -112,6 +112,10 @@ body {
     @apply grid auto-cols-fr grid-flow-col;
   }
 
+  .blur-background {
+    @apply bg-primary-foreground/80 backdrop-blur saturate-200;
+  }
+
   .hide-ring {
     @apply focus-visible:ring-0 focus-visible:ring-offset-0;
   }

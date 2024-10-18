@@ -10,7 +10,7 @@ type MobileHeaderProps = {
 
 export default function MobileHeader({ isAuthenticated }: MobileHeaderProps) {
   return (
-    <section className="header-mobile">
+    <section className="blur-background header-mobile">
       <div className="flex-between px-5 py-4">
         <Link to="/">
           <Mark />
