@@ -11,4 +11,17 @@ const findProfile = async (id: string) => {
   }
 };
 
-export { findProfile };
+const getLikedPost = async (profileId: string, postId: string) => {
+  try {
+    const likedPost = await prisma.postLike.findUnique({
+      where: { profileId_postId: { profileId, postId } },
+    });
+
+    return likedPost;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get liked posts.");
+  }
+};
+
+export { findProfile, getLikedPost };

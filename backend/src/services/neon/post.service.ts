@@ -102,4 +102,39 @@ const getFeed = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
   }
 };
 
-export { createPost, getFeed };
+type PostActionArgs = {
+  postId: string;
+  profileId: string;
+};
+
+const likePost = async ({ postId, profileId }: PostActionArgs) => {
+  try {
+    await prisma.postLike.create({
+      data: {
+        postId,
+        profileId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to like the post.");
+  }
+};
+
+const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
+  try {
+    await prisma.postLike.delete({
+      where: {
+        profileId_postId: {
+          postId,
+          profileId,
+        },
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to cancel like the post.");
+  }
+};
+
+export { unLikePost, createPost, getFeed, likePost };
