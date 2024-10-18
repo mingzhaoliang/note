@@ -52,7 +52,7 @@ export default function LoginForm() {
   return (
     <FormProvider {...form}>
       <Form
-        className="p-6 w-full max-w-sm sm:max-w-[420px] flex flex-col space-y-4"
+        className="w-full max-w-sm sm:max-w-[420px] flex flex-col space-y-4"
         onSubmit={form.handleSubmit(onSubmit, onError)}
       >
         <p className="font-semibold text-center">Log in to your account</p>
@@ -101,7 +101,7 @@ export default function LoginForm() {
         <SeparatorWithText text="or" />
         <GoogleButton />
       </Form>
-      <div className="p-8 flex-1 flex items-end">
+      <div className="pt-8 flex-1">
         <Link to={`/signup`} replace className="text-sm text-muted-foreground hover:text-primary">
           Don&apos;t have an account? Sign up
         </Link>

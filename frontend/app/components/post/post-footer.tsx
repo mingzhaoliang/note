@@ -1,5 +1,7 @@
 import { Comment, Like, LikeFilled } from "@/components/icons";
+import { Slot } from "@radix-ui/react-slot";
 import { useFetcher } from "@remix-run/react";
+import LoginModal from "../auth/login-modal";
 
 type PostFooterProps = {
   postId: string;
@@ -13,8 +15,37 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
 
   return (
     <div className="mt-6 flex items-center gap-x-2">
-      <PostLike postId={postId} hasLiked={hasLiked} count={likes.length} />
-      <Comment className="text-inactive w-5 h-5" />
+      {userId && (
+        <>
+          <PostLike postId={postId} hasLiked={hasLiked} count={likes.length} />
+          <Comment className="text-inactive w-5 h-5" />
+        </>
+      )}
+      {!userId && (
+        <>
+          <PostStats count={likes.length}>
+            <Like />
+          </PostStats>
+          <PostStats count={commentCount}>
+            <Comment />
+          </PostStats>
+        </>
+      )}
+    </div>
+  );
+};
+
+type PostStatsProps = {
+  count: number;
+};
+
+const PostStats = ({ children, count }: React.PropsWithChildren<PostStatsProps>) => {
+  return (
+    <div className="flex items-center space-x-2">
+      <LoginModal>
+        <Slot className="text-inactive w-5 h-5">{children}</Slot>
+      </LoginModal>
+      <div className="min-w-3">{count > 0 && <p className="text-inactive text-sm">{count}</p>}</div>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { cloudinary } from "@/service/.server/cloudinary.service";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { requireUser } from "@/session/guard.server";
 import { Post } from "@/types";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export default function Index() {
@@ -52,9 +52,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const { user } = await requireUser(request);
+  if (!user) return redirect("/login");
+
   const formData = await request.formData();
   const { _action, ...payload } = Object.fromEntries(formData);
-  const { user } = await requireUser(request);
 
   let response = null;
 
