@@ -70,6 +70,19 @@ export async function action({ request }: ActionFunctionArgs) {
           profileId: user.id,
         }),
       });
+      break;
+    case "delete":
+      response = await fetch(`${envConfig.API_URL}/post/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: payload.postId,
+          profileId: user.id,
+        }),
+      });
+      break;
   }
 
   if (!response || !response.ok) {
