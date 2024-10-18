@@ -1,4 +1,10 @@
-import { unLikePost, createPost, getFeed, likePost } from "@/services/neon/post.service.js";
+import {
+  unLikePost,
+  createPost,
+  deletePost,
+  getFeed,
+  likePost,
+} from "@/services/neon/post.service.js";
 import { getLikedPost } from "@/services/neon/profile.service.js";
 import { Request, Response } from "express";
 
@@ -27,6 +33,17 @@ const getFeedController = async (req: Request, res: Response) => {
   }
 };
 
+const deletePostController = async (req: Request, res: Response) => {
+  try {
+    const { postId, profileId } = req.body;
+    await deletePost({ postId, profileId });
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 const likePostController = async (req: Request, res: Response) => {
   try {
     const { postId, profileId } = req.body;
@@ -45,4 +62,4 @@ const likePostController = async (req: Request, res: Response) => {
   }
 };
 
-export { createPostController, getFeedController, likePostController };
+export { createPostController, deletePostController, getFeedController, likePostController };

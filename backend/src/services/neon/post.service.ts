@@ -137,4 +137,13 @@ const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
   }
 };
 
-export { unLikePost, createPost, getFeed, likePost };
+const deletePost = async ({ postId, profileId }: PostActionArgs) => {
+  try {
+    await prisma.post.delete({ where: { id: postId, profileId } });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete the post.");
+  }
+};
+
+export { createPost, deletePost, getFeed, likePost, unLikePost };
