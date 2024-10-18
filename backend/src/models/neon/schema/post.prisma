@@ -9,6 +9,8 @@ model Post {
   comments  PostComment[]
   updatedAt DateTime      @updatedAt
   createdAt DateTime      @default(now())
+
+  @@index([profileId])
 }
 
 model PostImage {
