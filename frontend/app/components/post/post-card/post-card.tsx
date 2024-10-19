@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Post } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import PostDropdown from "./post-dropdown";
 import PostFooter from "./post-footer";
 import PostImages from "./post-images";

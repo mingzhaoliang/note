@@ -1,4 +1,4 @@
-import PostCard from "@/components/post/post-card";
+import PostCard from "@/components/post/post-card/post-card";
 import envConfig from "@/config/env.config.server";
 import { cloudinary } from "@/service/.server/cloudinary.service";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";

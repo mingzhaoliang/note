@@ -1,7 +1,7 @@
+import LoginModal from "@/components/auth/login-modal";
 import { Comment, Like, LikeFilled } from "@/components/icons";
 import { Slot } from "@radix-ui/react-slot";
 import { useFetcher } from "@remix-run/react";
-import LoginModal from "../auth/login-modal";
 
 type PostFooterProps = {
   postId: string;

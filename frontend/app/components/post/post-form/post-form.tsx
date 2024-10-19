@@ -7,14 +7,20 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, useSubmit } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { HashIcon, MapPinIcon } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import PostImagesSection from "./post-images-section";
 import PostTagsSection, { PostTagsSectionRef } from "./post-tags-section";
 
-export default function PostForm({ className }: React.ComponentProps<"form">) {
+type PostFormProps = {
+  className?: string;
+  setOpen: (open: boolean) => void;
+};
+
+export default function PostForm({ className, setOpen }: PostFormProps) {
+  const fetcher = useFetcher();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
@@ -42,16 +48,39 @@ export default function PostForm({ className }: React.ComponentProps<"form">) {
     tagInputRef.current?.append();
   };
 
-  const submit = useSubmit();
   const onSubmit: SubmitHandler<PostFormSchema> = (data, event) => {
-    submit(event?.target, { method: "POST", action: "/create", encType: "multipart/form-data" });
+    fetcher.submit(event?.target, {
+      method: "POST",
+      action: "/create",
+      encType: "multipart/form-data",
+    });
   };
   const onError: SubmitErrorHandler<PostFormSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
+  useEffect(() => {
+    if (fetcher.state !== "idle") return;
+
+    const loaderData = fetcher.data as any;
+
+    if (!loaderData || !Object.hasOwn(loaderData, "message")) {
+      fetcher.load("/create");
+    }
+
+    if (!loaderData?.message) return;
+
+    switch (loaderData.message) {
+      case "success":
+        setOpen(false);
+        break;
+      default:
+        toast({ variant: "primary", title: loaderData.message });
+    }
+  }, [fetcher, toast]);
+
   return (
     <FormProvider {...form}>
-      <Form
+      <fetcher.Form
         className={cn("max-md:pb-4 flex flex-col gap-4", className)}
         onSubmit={form.handleSubmit(onSubmit, onError)}
       >
@@ -90,11 +119,11 @@ export default function PostForm({ className }: React.ComponentProps<"form">) {
           </div>
         </div>
         <div className="flex justify-end">
-          <Button variant="outline" type="submit" className="rounded-xl">
+          <Button variant="outline" type="submit" className="rounded-xl bg-primary-foreground">
             Post
           </Button>
         </div>
-      </Form>
+      </fetcher.Form>
     </FormProvider>
   );
 }
