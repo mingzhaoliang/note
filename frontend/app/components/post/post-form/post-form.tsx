@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 import { HashIcon, MapPinIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
@@ -24,6 +24,7 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<PostFormSchema>({
     resolver: zodResolver(postFormSchema),
@@ -49,34 +50,21 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
   };
 
   const onSubmit: SubmitHandler<PostFormSchema> = (data, event) => {
-    fetcher.submit(event?.target, {
+    const formData = new FormData(event?.target);
+    formData.append("_action", "create");
+
+    fetcher.submit(formData, {
       method: "POST",
-      action: "/create",
+      action: "/?index",
       encType: "multipart/form-data",
     });
+
+    setOpen(false);
+
+    navigate("/");
   };
   const onError: SubmitErrorHandler<PostFormSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
-
-  useEffect(() => {
-    if (fetcher.state !== "idle") return;
-
-    const loaderData = fetcher.data as any;
-
-    if (!loaderData || !Object.hasOwn(loaderData, "message")) {
-      fetcher.load("/create");
-    }
-
-    if (!loaderData?.message) return;
-
-    switch (loaderData.message) {
-      case "success":
-        setOpen(false);
-        break;
-      default:
-        toast({ variant: "primary", title: loaderData.message });
-    }
-  }, [fetcher, toast]);
 
   return (
     <FormProvider {...form}>

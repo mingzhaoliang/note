@@ -1,4 +1,5 @@
-import { Link, useLocation } from "@remix-run/react";
+import LoginModal from "@/components/auth/login-modal";
+import CreatePostDialog from "@/components/post/create-post-dialog";
 import { PlusIcon } from "lucide-react";
 import NavIcon from "./nav-icon";
 
@@ -7,19 +8,18 @@ type CreatePostButtonProps = {
 };
 
 export default function CreatePostButton({ isAuthenticated }: CreatePostButtonProps) {
-  const location = useLocation();
+  const postButton = (
+    <NavIcon
+      Icon={PlusIcon}
+      className="text-muted-foreground group-hover:text-primary hover:bg-secondary"
+      still
+    />
+  );
 
   return (
-    <Link
-      to={isAuthenticated ? "/create" : "/login"}
-      state={{ referrer: location.pathname }}
-      className="w-full flex-center"
-    >
-      <NavIcon
-        Icon={PlusIcon}
-        className="text-muted-foreground group-hover:text-primary hover:bg-secondary"
-        still
-      />
-    </Link>
+    <>
+      {isAuthenticated && <CreatePostDialog trigger={postButton} />}
+      {!isAuthenticated && <LoginModal>{postButton}</LoginModal>}
+    </>
   );
 }

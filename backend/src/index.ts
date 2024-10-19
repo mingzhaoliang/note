@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express from "express";
+import fileUpload from "express-fileupload";
 import helmet from "helmet";
 import envConfig from "./config/env.config.js";
 import { connectDB } from "./lib/db/prisma.js";
@@ -20,6 +21,15 @@ app.use(helmet());
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    limits: { fileSize: 5 * 1024 * 1024, files: 9 },
+    abortOnLimit: true,
+    responseOnLimit: "File size limit exceeded.",
+  })
+);
 
 app.use("/api/auth", authRoute);
 
