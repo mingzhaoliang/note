@@ -135,4 +135,12 @@ body {
   .masked-input {
     @apply bg-transparent p-0 border-none no-highlight;
   }
+
+  .editor-input {
+    @apply relative min-h-10 outline-none resize-none caret-primary py-2 text-sm;
+  }
+
+  .editor-placeholder {
+    @apply absolute top-2 text-sm text-muted-foreground pointer-events-none;
+  }
 }

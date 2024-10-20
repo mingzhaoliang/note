@@ -3,6 +3,7 @@ import { Comment, Like, LikeFilled } from "@/components/icons";
 import { useFeed } from "@/store/feed.context";
 import { Slot } from "@radix-ui/react-slot";
 import { useFetcher } from "@remix-run/react";
+import PostComment from "./post-comment";
 
 type PostFooterProps = {
   postId: string;
@@ -19,7 +20,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
       {userId && (
         <>
           <PostLike userId={userId} postId={postId} hasLiked={hasLiked} count={likes.length} />
-          <Comment className="text-inactive w-5 h-5" />
+          <PostComment postId={postId} count={commentCount} />
         </>
       )}
       {!userId && (

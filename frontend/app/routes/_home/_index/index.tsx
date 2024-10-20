@@ -46,6 +46,15 @@ export default function Index() {
           if (postIndex === -1) break;
           draft[postIndex].likes = loadedPosts[0].likes;
           break;
+        case "comment":
+          // No need to update if mutation succeeded
+          if (!formState.message) break;
+
+          // Restore comment count if mutation failed
+          const targetPost = draft.findIndex((post) => post.id === formState.postId);
+          if (targetPost === -1) break;
+          draft[targetPost].commentCount -= 1;
+          break;
         case "delete":
           // Do nothing - undeleted posts will be loaded again upon refresh
           break;
@@ -105,6 +114,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       if (formState.message) {
         response = await fetch(`${envConfig.API_URL}/post/${formState.postId}`);
       }
+      break;
+    case "comment":
+      // No need to fetch comment count
       break;
     default:
       response = await fetch(`${envConfig.API_URL}/post/feed`);
@@ -166,16 +178,13 @@ export async function action({ request }: ActionFunctionArgs) {
       });
       break;
     case "like":
-      response = await fetch(`${envConfig.API_URL}/post/like`, {
-        method: "POST",
-        body: formData,
-      });
-      break;
     case "delete":
-      response = await fetch(`${envConfig.API_URL}/post/delete`, {
+    case "comment":
+      response = await fetch(`${envConfig.API_URL}/post/${_action}`, {
         method: "POST",
         body: formData,
       });
+
       break;
   }
 
