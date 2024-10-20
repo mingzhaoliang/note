@@ -1,6 +1,7 @@
 import {
   createPostController,
   deletePostController,
+  findPostController,
   getFeedController,
   likePostController,
 } from "@/controllers/post/post.controller.js";
@@ -18,5 +19,7 @@ router.get("/feed", getFeedController);
 router.post("/like", validateData(postActionSchema), likePostController);
 
 router.post("/delete", validateData(postActionSchema), deletePostController);
+
+router.get("/:postId", findPostController);
 
 export default router;

@@ -146,4 +146,66 @@ const deletePost = async ({ postId, profileId }: PostActionArgs) => {
   }
 };
 
-export { createPost, deletePost, getFeed, likePost, unLikePost };
+const findPost = async (postId: string) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: {
+        id: true,
+        text: true,
+        updatedAt: true,
+        createdAt: true,
+        profile: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        images: {
+          select: {
+            publicId: true,
+          },
+        },
+        tags: {
+          select: {
+            tag: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        likes: {
+          select: {
+            profileId: true,
+          },
+        },
+        comments: {
+          select: {
+            id: true,
+            text: true,
+            createdAt: true,
+            profile: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                avatar: true,
+              },
+            },
+            parentId: true,
+          },
+        },
+      },
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the post.");
+  }
+};
+
+export { createPost, deletePost, getFeed, likePost, unLikePost, findPost };

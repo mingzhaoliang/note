@@ -3,6 +3,7 @@ import { uploadImage } from "@/services/apis/cloudinary.service.js";
 import {
   createPost,
   deletePost,
+  findPost,
   getFeed,
   likePost,
   unLikePost,
@@ -89,4 +90,22 @@ const likePostController = async (req: Request, res: Response) => {
   }
 };
 
-export { createPostController, deletePostController, getFeedController, likePostController };
+const findPostController = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params as { postId: string };
+    const post = await findPost(postId);
+
+    res.status(200).json({ post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal server error.");
+  }
+};
+
+export {
+  createPostController,
+  deletePostController,
+  getFeedController,
+  findPostController,
+  likePostController,
+};
