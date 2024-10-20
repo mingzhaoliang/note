@@ -2,6 +2,7 @@ import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
 import {
+  commentPost,
   createPost,
   deletePost,
   findPost,
@@ -105,10 +106,23 @@ const findPostController = async (req: Request, res: Response) => {
   }
 };
 
+const commentPostController = async (req: Request, res: Response) => {
+  try {
+    const { profileId, postId, parentId, text, createdAt } = req.body;
+
+    const postComment = await commentPost({ postId, parentId, profileId, text, createdAt });
+    res.status(200).json({ postId: postComment.postId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 export {
+  commentPostController,
   createPostController,
   deletePostController,
-  getFeedController,
   findPostController,
+  getFeedController,
   likePostController,
 };

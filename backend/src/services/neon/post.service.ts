@@ -218,4 +218,31 @@ const findPost = async (postId: string) => {
   }
 };
 
-export { createPost, deletePost, getFeed, likePost, unLikePost, findPost };
+type CommentPostArgs = {
+  postId: string;
+  profileId: string;
+  text: string;
+  parentId: string | undefined;
+  createdAt: Date;
+};
+
+const commentPost = async ({ postId, profileId, text, parentId, createdAt }: CommentPostArgs) => {
+  try {
+    const postComment = await prisma.postComment.create({
+      data: {
+        profileId,
+        postId,
+        parentId: parentId ?? Prisma.skip,
+        text,
+        createdAt,
+      },
+    });
+
+    return postComment;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to comment the post.");
+  }
+};
+
+export { commentPost, createPost, deletePost, findPost, getFeed, likePost, unLikePost };
