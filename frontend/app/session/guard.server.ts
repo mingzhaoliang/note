@@ -1,8 +1,11 @@
 import envConfig from "@/config/env.config.server";
 import { replace } from "@remix-run/node";
 import { destroyAuthSession, getAuthSession, setAuthSession } from "./auth-session.server";
+import { User } from "@/types";
 
-const requireUser = async (request: Request) => {
+const requireUser = async (
+  request: Request
+): Promise<{ authHeader: string | null; user: User | null }> => {
   const sessionId = await getAuthSession(request);
   if (!sessionId) {
     return { authHeader: null, user: null };

@@ -21,6 +21,14 @@ type CloudinaryAsset = {
   api_key: string;
 };
 
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  name: string;
+  avatar: string;
+};
+
 type Post = {
   id: string;
   text: string;
@@ -37,4 +45,4 @@ type Post = {
   commentCount: number;
 };
 
-export type { CloudinaryAsset, Post };
+export type { CloudinaryAsset, Post, User };
