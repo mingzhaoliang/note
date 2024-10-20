@@ -56,7 +56,19 @@ const getFeedController = async (req: Request, res: Response) => {
     const { lastPostId } = req.query as { lastPostId: string | undefined };
     const posts = await getFeed({ lastCursor: lastPostId });
 
-    res.status(200).json({ posts });
+    const postsDto = posts.map((post) => ({
+      ...post,
+      profile: {
+        ...post.profile,
+        avatar: post.profile.avatar ? post.profile.avatar : null,
+      },
+      tags: post.tags.map(({ tag: { name } }) => name),
+      images: post.images.map(({ publicId }) => publicId),
+      likes: post.likes.map(({ profileId }) => profileId),
+      commentCount: post._count.comments,
+    }));
+
+    res.status(200).json({ posts: postsDto });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -99,7 +111,30 @@ const findPostController = async (req: Request, res: Response) => {
     const { postId } = req.params as { postId: string };
     const post = await findPost(postId);
 
-    res.status(200).json({ post });
+    if (!post) {
+      res.status(404).json("Post not found.");
+      return;
+    }
+
+    const postDto = {
+      ...post,
+      profile: {
+        ...post.profile,
+        avatar: post.profile.avatar ? post.profile.avatar : null,
+      },
+      tags: post.tags.map(({ tag: { name } }) => name),
+      images: post.images.map(({ publicId }) => publicId),
+      likes: post.likes.map(({ profileId }: any) => profileId),
+      comments: post.comments.map((comment) => ({
+        ...comment,
+        profile: {
+          ...comment.profile,
+          avatar: comment.profile.avatar ? comment.profile.avatar : null,
+        },
+      })),
+    };
+
+    res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");

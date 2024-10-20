@@ -1,3 +1,4 @@
+import CldImage from "@/components/common/cld-image";
 import {
   Carousel,
   CarouselContent,
@@ -39,7 +40,17 @@ export default function PostImages({ images }: PostImagesProps) {
         {images.map((url) => (
           <CarouselItem key={url}>
             <div className="w-full h-full max-h-96 rounded-2xl overflow-hidden">
-              <img src={url} alt="post" className="w-full h-full object-cover" />
+              <CldImage
+                src={url}
+                alt=""
+                responsive={[
+                  { size: { width: 310, height: 190 }, maxWidth: 768 },
+                  { size: { width: 620, height: 380 } },
+                ]}
+                dprVariants={[1, 3, 5]}
+                placeholder="blur"
+                fill
+              />
             </div>
           </CarouselItem>
         ))}

@@ -135,14 +135,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     postsDto = posts.map((post: any) => ({
       ...post,
-      profile: {
-        ...post.profile,
-        avatar: post.profile.avatar ? cloudinary.url(post.profile.avatar) : null,
-      },
-      tags: post.tags.map(({ tag: { name } }: any) => name),
-      images: post.images.map(({ publicId }: any) => cloudinary.url(publicId)),
-      likes: post.likes.map(({ profileId }: any) => profileId),
-      commentCount: post._count?.comments ?? post.comments?.length ?? 0,
+      commentCount: post.commentCount ?? post.comments?.length ?? 0,
     }));
   }
 

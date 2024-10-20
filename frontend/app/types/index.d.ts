@@ -45,4 +45,17 @@ type Post = {
   commentCount: number;
 };
 
+type PostComment = {
+  id: string;
+  text: string;
+  createdAt: Date;
+  parentId: string | null;
+  profile: {
+    avatar: string | null;
+    id: string;
+    username: string;
+    name: string;
+  };
+};
+
 export type { CloudinaryAsset, Post, User };

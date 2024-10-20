@@ -6,6 +6,7 @@ import { themeSessionResolver } from "./session/theme-session.server";
 
 import { Toaster } from "./components/ui/toaster";
 import "./tailwind.css";
+import envConfig from "./config/env.config.server";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,6 +25,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
+    ENV: {
+      CLOUDINARY_CLOUD_NAME: envConfig.CLOUDINARY_CLOUD_NAME,
+    },
   };
 }
 
@@ -40,9 +44,10 @@ export default function AppWithProviders() {
 type DocumentProps = {
   theme?: Theme | null;
   ssrTheme?: boolean;
+  ENV?: Record<string, unknown>;
 };
 
-function Document({ children, theme, ssrTheme }: React.PropsWithChildren<DocumentProps>) {
+function Document({ children, theme, ssrTheme, ENV }: React.PropsWithChildren<DocumentProps>) {
   return (
     <html lang="en" className={clsx(theme)}>
       <head>
@@ -57,6 +62,11 @@ function Document({ children, theme, ssrTheme }: React.PropsWithChildren<Documen
         <ScrollRestoration
           getKey={(location) => (location.pathname === "/" ? location.pathname : location.key)}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(ENV)}`,
+          }}
+        />
         <Scripts />
       </body>
     </html>
@@ -68,9 +78,17 @@ function App() {
   const [theme] = useTheme();
 
   return (
-    <Document theme={theme} ssrTheme={Boolean(data.theme)}>
+    <Document theme={theme} ssrTheme={Boolean(data.theme)} ENV={data.ENV}>
       <Outlet />
       <Toaster />
     </Document>
   );
+}
+
+declare global {
+  interface Window {
+    ENV: {
+      CLOUDINARY_CLOUD_NAME: string;
+    };
+  }
 }
