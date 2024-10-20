@@ -7,11 +7,12 @@ type CreatePostArgs = {
   text: string;
   images: ImageSchema[] | undefined;
   tags: string[] | undefined;
+  createdAt: Date;
 };
 
-const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => {
+const createPost = async ({ profileId, text, images, tags, createdAt }: CreatePostArgs) => {
   try {
-    await prisma.post.create({
+    const post = await prisma.post.create({
       data: {
         profileId,
         text,
@@ -35,8 +36,11 @@ const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => 
               },
             })) ?? Prisma.skip,
         },
+        createdAt,
       },
     });
+
+    return post;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to create the post.");
@@ -109,12 +113,14 @@ type PostActionArgs = {
 
 const likePost = async ({ postId, profileId }: PostActionArgs) => {
   try {
-    await prisma.postLike.create({
+    const postLike = await prisma.postLike.create({
       data: {
         postId,
         profileId,
       },
     });
+
+    return postLike;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to like the post.");
@@ -123,7 +129,7 @@ const likePost = async ({ postId, profileId }: PostActionArgs) => {
 
 const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
   try {
-    await prisma.postLike.delete({
+    const postLike = await prisma.postLike.delete({
       where: {
         profileId_postId: {
           postId,
@@ -131,6 +137,8 @@ const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
         },
       },
     });
+
+    return postLike;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to cancel like the post.");
@@ -139,7 +147,9 @@ const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
 
 const deletePost = async ({ postId, profileId }: PostActionArgs) => {
   try {
-    await prisma.post.delete({ where: { id: postId, profileId } });
+    const deletedPost = await prisma.post.delete({ where: { id: postId, profileId } });
+
+    return deletedPost;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to delete the post.");

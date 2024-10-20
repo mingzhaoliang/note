@@ -1,3 +1,4 @@
+import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
 import {
@@ -15,7 +16,7 @@ import fs from "fs";
 
 const createPostController = async (req: Request, res: Response) => {
   try {
-    const { profileId, text, tags } = req.body;
+    const { profileId, text, tags, createdAt } = req.body as CreatePostSchema;
 
     const imagePaths = Object.values((req.files ?? {}) as any).map((file: any) => {
       if (!["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.mimetype)) {
@@ -40,9 +41,9 @@ const createPostController = async (req: Request, res: Response) => {
       fs.unlinkSync(imagePath);
     }
 
-    await createPost({ profileId, text, images, tags });
+    const { id } = await createPost({ profileId, text, images, tags, createdAt });
 
-    res.status(200).end();
+    res.status(200).json({ postId: id });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -64,8 +65,8 @@ const getFeedController = async (req: Request, res: Response) => {
 const deletePostController = async (req: Request, res: Response) => {
   try {
     const { postId, profileId } = req.body;
-    await deletePost({ postId, profileId });
-    res.status(200).end();
+    const { id } = await deletePost({ postId, profileId });
+    res.status(200).json({ postId: id });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -77,13 +78,15 @@ const likePostController = async (req: Request, res: Response) => {
     const { postId, profileId } = req.body;
     const isLiked = (await getLikedPost(profileId, postId)) !== null;
 
+    let postLike;
+
     if (isLiked) {
-      await unLikePost({ postId, profileId });
+      postLike = await unLikePost({ postId, profileId });
     } else {
-      await likePost({ postId, profileId });
+      postLike = await likePost({ postId, profileId });
     }
 
-    res.status(200).end();
+    res.status(200).json({ postId: postLike.postId });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
