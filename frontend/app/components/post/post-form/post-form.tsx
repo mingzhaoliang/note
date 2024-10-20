@@ -6,10 +6,12 @@ import { MAXIMUM_IMAGES } from "@/config/post.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
+import { useFeed } from "@/store/feed.context";
+import { useSession } from "@/store/session.context";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFetcher, useNavigate } from "@remix-run/react";
 import { HashIcon, MapPinIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import PostImagesSection from "./post-images-section";
 import PostTagsSection, { PostTagsSectionRef } from "./post-tags-section";
@@ -24,6 +26,8 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
+  const { setPosts } = useFeed();
+  const { user } = useSession();
   const navigate = useNavigate();
 
   const form = useForm<PostFormSchema>({
@@ -50,8 +54,30 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
   };
 
   const onSubmit: SubmitHandler<PostFormSchema> = (data, event) => {
+    if (!user) return navigate("/login");
+
     const formData = new FormData(event?.target);
+
+    const createdAt = new Date().toISOString();
+    formData.append("createdAt", createdAt);
     formData.append("_action", "create");
+
+    setPosts((draft) => {
+      draft.unshift({
+        ...data,
+        id: "tmp-" + Math.random().toString(36).substring(2, 9),
+        createdAt,
+        profile: {
+          id: user.id,
+          username: user.username,
+          name: user.name,
+          avatar: user.avatar,
+        },
+        commentCount: 0,
+        likes: [],
+        images: data.images.map((image) => URL.createObjectURL(image)),
+      });
+    });
 
     fetcher.submit(formData, {
       method: "POST",

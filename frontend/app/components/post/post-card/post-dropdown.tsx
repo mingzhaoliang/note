@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -16,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Form } from "@remix-run/react";
 import { EllipsisIcon } from "lucide-react";
+import DeletePostForm from "./delete-post-form";
 
 type PostDropdownProps = {
   isOwner: boolean;
@@ -32,7 +31,7 @@ export default function PostDropdown({ isOwner, postId }: PostDropdownProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full text-inactive hover:text-primary hover:bg-transparent"
+            className="!h-fit rounded-full text-inactive hover:text-primary hover:bg-transparent"
           >
             <EllipsisIcon className="w-6 h-6" />
           </Button>
@@ -55,12 +54,7 @@ export default function PostDropdown({ isOwner, postId }: PostDropdownProps) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Form method="POST" action="/?index">
-            <input type="hidden" name="postId" value={postId} />
-            <AlertDialogAction type="submit" name="_action" value="delete">
-              Continue
-            </AlertDialogAction>
-          </Form>
+          <DeletePostForm postId={postId} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
