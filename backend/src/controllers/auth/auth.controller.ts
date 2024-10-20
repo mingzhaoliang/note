@@ -10,6 +10,7 @@ import {
   findUser,
   updatePassword,
 } from "@/services/neon/auth.service.js";
+import { findProfile } from "@/services/neon/profile.service.js";
 import { Request, Response } from "express";
 import { isWithinExpirationDate } from "oslo";
 import { sha256 } from "oslo/crypto";
@@ -33,7 +34,20 @@ const validateSession = async (req: Request, res: Response) => {
     newSessionId = newSessionCookie.value;
   }
 
-  res.status(200).json({ user, newSessionId });
+  const profile = await findProfile(user.id);
+
+  if (!profile) {
+    res.status(401).end();
+    return;
+  }
+
+  const userDto = {
+    ...user,
+    name: profile.name,
+    avatar: profile.avatar,
+  };
+
+  res.status(200).json({ user: userDto, newSessionId });
 };
 
 const signup = async (req: Request, res: Response) => {
