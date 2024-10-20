@@ -7,9 +7,13 @@ const createPostSchema = z.object({
     .min(1, { message: "Enter your note." })
     .max(500, { message: "Note is too long." }),
   tags: z
-    .array(z.string().transform((str) => str.toLowerCase()))
-    .max(3, { message: "Tag limit reached." })
-    .default([]),
+    .string()
+    .transform((str) => {
+      return str ? JSON.parse(str.toLowerCase()) : [];
+    })
+    .refine((tags) => tags.length <= 3, {
+      message: "Tag limit reached.",
+    }),
 });
 
 type CreatePostSchema = z.infer<typeof createPostSchema>;
