@@ -10,7 +10,7 @@ type NavbarProps = {
 export default function Navbar({ isAuthenticated }: NavbarProps) {
   return (
     <nav className="max-md:navbar-mobile md:navbar">
-      <NavItem to="/" DefaultIcon={Home} ActiveIcon={HomeFilled} />
+      <NavItem to="/" preventScrollReset DefaultIcon={Home} ActiveIcon={HomeFilled} />
       <NavItem to="/explore" DefaultIcon={PaletteIcon} />
       <CreatePostButton isAuthenticated={isAuthenticated} />
       <NavItem to="/message" DefaultIcon={Message} ActiveIcon={MessageFilled} />

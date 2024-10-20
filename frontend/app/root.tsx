@@ -54,7 +54,9 @@ function Document({ children, theme, ssrTheme }: React.PropsWithChildren<Documen
       </head>
       <body>
         {children}
-        <ScrollRestoration />
+        <ScrollRestoration
+          getKey={(location) => (location.pathname === "/" ? location.pathname : location.key)}
+        />
         <Scripts />
       </body>
     </html>
