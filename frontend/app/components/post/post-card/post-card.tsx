@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils/cn";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Post } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
@@ -8,6 +9,7 @@ import PostImages from "./post-images";
 
 type PostCardProps = Post & {
   userId?: string | null;
+  className?: string;
 };
 
 const PostCard = ({
@@ -20,11 +22,12 @@ const PostCard = ({
   likes,
   createdAt,
   commentCount,
+  className,
 }: PostCardProps) => {
   const isOwner = userId === profile.id;
 
   return (
-    <div className="w-full flex space-x-3">
+    <div className={cn("w-full flex space-x-3", className)}>
       <div className="flex-center flex-col pb-8">
         <Avatar>
           <AvatarImage src={profile.avatar} />

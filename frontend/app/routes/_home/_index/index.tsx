@@ -1,3 +1,4 @@
+import InfiniteScrollTrigger from "@/components/common/infinite-scroll-trigger";
 import PostCard from "@/components/post/post-card/post-card";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,8 @@ export default function Index() {
   const { toast } = useToast();
   const { posts, setPosts } = useFeed();
   const { posts: loadedPosts, userId, formState } = useLoaderData<typeof loader>();
+
+  const lastPostId = posts[posts.length - 1]?.id;
 
   useEffect(() => {
     setPosts((draft) => {
@@ -73,10 +76,15 @@ export default function Index() {
   return (
     <div className="flex-1 flex flex-col items-center p-6 gap-8">
       {posts.map((post) => (
-        <div key={post.id} className="w-full flex flex-col items-center md:max-w-2xl">
-          <PostCard {...post} userId={userId} />
-        </div>
+        <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />
       ))}
+      {lastPostId && (
+        <InfiniteScrollTrigger
+          loaderRoute={`/?index&lastPostId=${lastPostId}`}
+          setPosts={setPosts}
+          className="my-4"
+        />
+      )}
     </div>
   );
 }
@@ -118,7 +126,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       // No need to fetch comment count
       break;
     default:
-      response = await fetch(`${envConfig.API_URL}/post/feed`);
+      const lastPostId = new URL(request.url).searchParams.get("lastPostId");
+
+      response = await fetch(
+        `${envConfig.API_URL}/post/feed${lastPostId ? `?lastPostId=${lastPostId}` : ""}`
+      );
   }
 
   if (response && !response.ok) {
