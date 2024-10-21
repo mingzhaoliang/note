@@ -29,6 +29,25 @@ type User = {
   avatar: string;
 };
 
+type ProfileOverview = {
+  id: string;
+  username: string;
+  name: string;
+  avatar?: string;
+  bio?: string;
+  _count: {
+    posts: number;
+    follower: number;
+    following: number;
+  };
+};
+
+type PostOverview = {
+  id: string;
+  text: string;
+  images: string[];
+};
+
 type Post = {
   id: string;
   text: string;
@@ -58,4 +77,4 @@ type PostComment = {
   };
 };
 
-export type { CloudinaryAsset, Post, User };
+export type { CloudinaryAsset, Post, PostOverview, ProfileOverview, User };
