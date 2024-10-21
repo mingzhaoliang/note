@@ -1,7 +1,6 @@
 import PostCard from "@/components/post/post-card/post-card";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
-import { cloudinary } from "@/service/.server/cloudinary.service";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
 import { useFeed } from "@/store/feed.context";

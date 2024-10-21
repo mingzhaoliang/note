@@ -1,5 +1,6 @@
 export { default as Comment } from "./comment";
 export { default as GalleryAdd } from "./gallery-add";
+export { default as Gallery } from "./gallery";
 export { default as GoogleG } from "./google-g";
 export { default as HomeFilled } from "./home-filled";
 export { default as Home } from "./home";

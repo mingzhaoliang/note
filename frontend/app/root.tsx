@@ -1,12 +1,13 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
 import clsx from "clsx";
-import { PreventFlashOnWrongTheme, Theme, ThemeProvider, useTheme } from "remix-themes";
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
+import { PublicEnv } from "./components/common/public-env";
+import { Toaster } from "./components/ui/toaster";
+import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";
 
-import { Toaster } from "./components/ui/toaster";
 import "./tailwind.css";
-import envConfig from "./config/env.config.server";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,20 +42,17 @@ export default function AppWithProviders() {
   );
 }
 
-type DocumentProps = {
-  theme?: Theme | null;
-  ssrTheme?: boolean;
-  ENV?: Record<string, unknown>;
-};
+function Document({ children }: { children: React.ReactNode }) {
+  const { theme: ssrTheme, ENV } = useLoaderData<typeof loader>();
+  const [theme] = useTheme();
 
-function Document({ children, theme, ssrTheme, ENV }: React.PropsWithChildren<DocumentProps>) {
   return (
     <html lang="en" className={clsx(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        {ssrTheme !== undefined && <PreventFlashOnWrongTheme ssrTheme={ssrTheme} />}
+        {ssrTheme !== undefined && <PreventFlashOnWrongTheme ssrTheme={Boolean(ssrTheme)} />}
         <Links />
       </head>
       <body>
@@ -62,11 +60,7 @@ function Document({ children, theme, ssrTheme, ENV }: React.PropsWithChildren<Do
         <ScrollRestoration
           getKey={(location) => (location.pathname === "/" ? location.pathname : location.key)}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(ENV)}`,
-          }}
-        />
+        <PublicEnv {...ENV} />
         <Scripts />
       </body>
     </html>
@@ -74,21 +68,10 @@ function Document({ children, theme, ssrTheme, ENV }: React.PropsWithChildren<Do
 }
 
 function App() {
-  const data = useLoaderData<typeof loader>();
-  const [theme] = useTheme();
-
   return (
-    <Document theme={theme} ssrTheme={Boolean(data.theme)} ENV={data.ENV}>
+    <Document>
       <Outlet />
       <Toaster />
     </Document>
   );
-}
-
-declare global {
-  interface Window {
-    ENV: {
-      CLOUDINARY_CLOUD_NAME: string;
-    };
-  }
 }
