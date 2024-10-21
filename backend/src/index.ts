@@ -7,6 +7,7 @@ import envConfig from "./config/env.config.js";
 import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
 import postRoute from "./routes/post/post.route.js";
+import profileRouter from "./routes/profile/profile.route.js";
 
 const { PORT } = envConfig;
 
@@ -32,6 +33,8 @@ app.use(
 );
 
 app.use("/api/auth", authRoute);
+
+app.use("/api/profile", profileRouter);
 
 app.use("/api/post", postRoute);
 
