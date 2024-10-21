@@ -6,6 +6,7 @@ import {
   createPost,
   deletePost,
   findPost,
+  findProfilePosts,
   getFeed,
   likePost,
   unLikePost,
@@ -153,11 +154,30 @@ const commentPostController = async (req: Request, res: Response) => {
   }
 };
 
+const findProfilePostsController = async (req: Request, res: Response) => {
+  try {
+    const { profileId } = req.params;
+    const { lastPostId } = req.query as { lastPostId: string | undefined };
+
+    const posts = await findProfilePosts({ profileId, lastCursor: lastPostId });
+
+    const postsDto = posts.map((post) => ({
+      ...post,
+      images: post.images.map(({ publicId }) => publicId),
+    }));
+    res.status(200).json({ posts: postsDto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal server error.");
+  }
+};
+
 export {
   commentPostController,
   createPostController,
   deletePostController,
   findPostController,
+  findProfilePostsController,
   getFeedController,
   likePostController,
 };

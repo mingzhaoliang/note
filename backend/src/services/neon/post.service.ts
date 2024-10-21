@@ -106,6 +106,39 @@ const getFeed = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
   }
 };
 
+type findProfilePostArgs = {
+  profileId: string;
+  lastCursor?: string;
+  take?: number;
+};
+
+const findProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfilePostArgs) => {
+  try {
+    const posts = await prisma.post.findMany({
+      take,
+      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
+      where: { profileId },
+      select: {
+        id: true,
+        text: true,
+        images: {
+          select: {
+            publicId: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return posts;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the posts.");
+  }
+};
+
 type PostActionArgs = {
   postId: string;
   profileId: string;
@@ -245,4 +278,13 @@ const commentPost = async ({ postId, profileId, text, parentId, createdAt }: Com
   }
 };
 
-export { commentPost, createPost, deletePost, findPost, getFeed, likePost, unLikePost };
+export {
+  commentPost,
+  createPost,
+  deletePost,
+  findPost,
+  findProfilePosts,
+  getFeed,
+  likePost,
+  unLikePost,
+};
