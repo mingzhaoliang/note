@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils/cn";
 import Image, { cloudinaryLoader, ImageProps } from "@udisc/remix-image";
 import { useEffect, useState } from "react";
 
-type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
+export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
   fill?: boolean;
 };
 

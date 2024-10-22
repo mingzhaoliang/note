@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Post } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { Avatar, AvatarFallback, CldAvatarImage } from "../../ui/avatar";
 import PostDropdown from "./post-dropdown";
 import PostFooter from "./post-footer";
 import PostImages from "./post-images";
@@ -30,7 +30,7 @@ const PostCard = ({
     <div className={cn("w-full flex space-x-3", className)}>
       <div className="flex-center flex-col pb-8">
         <Avatar>
-          <AvatarImage src={profile.avatar} />
+          <CldAvatarImage src={profile.avatar} />
           <AvatarFallback>{profile.name[0]}</AvatarFallback>
         </Avatar>
         <div className="flex-1 border-l border-muted" />
