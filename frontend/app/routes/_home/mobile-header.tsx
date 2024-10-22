@@ -1,4 +1,4 @@
-import Mark from "@/components/common/mark";
+import Mark from "@/components/shared/mark";
 import { Button } from "@/components/ui/button";
 import { Link } from "@remix-run/react";
 import { AlignRightIcon, LogInIcon } from "lucide-react";

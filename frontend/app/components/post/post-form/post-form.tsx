@@ -1,5 +1,5 @@
-import LexicalComposer from "@/components/common/lexical-composer";
 import { GalleryAdd } from "@/components/icons";
+import LexicalComposer from "@/components/shared/lexical-composer";
 import { Button } from "@/components/ui/button";
 import { MAX_NOTE_LENGTH, MAXIMUM_IMAGES, WARNING_THRESHOLD } from "@/config/post.config";
 import { useToast } from "@/hooks/use-toast";

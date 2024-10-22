@@ -1,5 +1,5 @@
-import LexicalComposer from "@/components/common/lexical-composer";
 import { Comment } from "@/components/icons";
+import LexicalComposer from "@/components/shared/lexical-composer";
 import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";

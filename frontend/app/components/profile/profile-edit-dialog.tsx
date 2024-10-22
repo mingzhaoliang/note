@@ -4,6 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ACCEPTED_IMAGE_TYPES } from "@/config/shared.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { profileEditSchema, ProfileEditSchema } from "@/schemas/profile/profile-edit.schema";
@@ -14,13 +15,12 @@ import { useFetcher } from "@remix-run/react";
 import { EditIcon, ImagePlusIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
-import CldImage from "../common/cld-image";
+import CldImage from "../shared/cld-image";
 import { Button } from "../ui/button";
 import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { ResponsiveDialog } from "../ui/responsive-dialog";
 import { Textarea } from "../ui/textarea";
-import { ACCEPTED_IMAGE_TYPES } from "@/config/shared.config";
 
 export default function ProfileEditDialog({ id, username, name, bio, avatar }: ProfileOverview) {
   const [open, setOpen] = useState(false);

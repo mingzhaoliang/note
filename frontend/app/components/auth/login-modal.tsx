@@ -6,8 +6,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import LoginForm from "@/routes/_auth/login";
-import Mark from "../common/mark";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import Mark from "../shared/mark";
 
 export default function LoginModal({ children }: { children: React.ReactNode }) {
   return (

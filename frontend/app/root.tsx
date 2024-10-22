@@ -2,7 +2,7 @@ import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
 import clsx from "clsx";
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
-import { PublicEnv } from "./components/common/public-env";
+import { PublicEnv } from "./components/shared/public-env";
 import { Toaster } from "./components/ui/toaster";
 import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";

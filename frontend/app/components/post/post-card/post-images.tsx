@@ -1,4 +1,4 @@
-import CldImage from "@/components/common/cld-image";
+import CldImage from "@/components/shared/cld-image";
 import {
   Carousel,
   CarouselContent,

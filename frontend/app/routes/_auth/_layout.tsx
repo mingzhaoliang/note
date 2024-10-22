@@ -1,4 +1,4 @@
-import Mark from "@/components/common/mark";
+import Mark from "@/components/shared/mark";
 import { Link, Outlet } from "@remix-run/react";
 
 export default function AuthLayout() {

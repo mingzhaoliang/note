@@ -1,6 +1,6 @@
-import CldImage from "@/components/common/cld-image";
-import InfiniteScrollTrigger from "@/components/common/infinite-scroll-trigger";
 import { Gallery } from "@/components/icons";
+import CldImage from "@/components/shared/cld-image";
+import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";

@@ -1,5 +1,5 @@
-import InfiniteScrollTrigger from "@/components/common/infinite-scroll-trigger";
 import PostCard from "@/components/post/post-card/post-card";
+import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
