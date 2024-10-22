@@ -14,12 +14,12 @@ export default function CreatePostDialog({ trigger }: CreatePostDialogProps) {
       {({ Header, Title, Content, Description, Trigger }) => (
         <>
           <Trigger>{trigger}</Trigger>
-          <Content className="max-md:h-[calc(100vh-4rem)] md:!rounded-3xl md:max-w-screen-sm bg-primary-foreground no-highlight">
+          <Content className="responsive-dialog-content">
             <Header className="max-md:text-left">
               <Title>Create Note</Title>
               <Description>Share your thoughts with the world.</Description>
             </Header>
-            <PostForm className="max-md:flex-1 max-md:px-4 w-[590px]" setOpen={setOpen} />
+            <PostForm className="max-md:flex-1 max-md:px-4" setOpen={setOpen} />
           </Content>
         </>
       )}
