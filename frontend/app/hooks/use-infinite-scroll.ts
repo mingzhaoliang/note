@@ -26,7 +26,7 @@ const useInfiniteScroll = <T extends PostOverview>({
     onLoad(fetcher.data.posts);
     const hasMorePosts = fetcher.data.posts?.length > 0;
     setHasMore(hasMorePosts);
-  }, [fetcher.data, onLoad]);
+  }, [JSON.stringify(fetcher.data), onLoad]);
 
   return { hasMore };
 };

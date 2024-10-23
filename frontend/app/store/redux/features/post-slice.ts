@@ -59,9 +59,10 @@ const postSlice = createSlice({
       state.feedPosts.push(...action.payload);
     },
     initialiseFeed: (state, action: PayloadAction<Post[]>) => {
-      if (state.feedInitialised) return;
-      state.feedPosts.push(...action.payload);
-      state.feedInitialised = true;
+      if (!state.feedInitialised) {
+        state.feedInitialised = true;
+        state.feedPosts.push(...action.payload);
+      }
     },
   },
 });
