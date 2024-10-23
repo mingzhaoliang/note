@@ -1,3 +1,4 @@
+import { createPostDto } from "@/lib/utils/createDto.js";
 import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
@@ -57,17 +58,7 @@ const getFeedController = async (req: Request, res: Response) => {
     const { lastPostId } = req.query as { lastPostId: string | undefined };
     const posts = await getFeed({ lastCursor: lastPostId });
 
-    const postsDto = posts.map((post) => ({
-      ...post,
-      profile: {
-        ...post.profile,
-        avatar: post.profile.avatar ? post.profile.avatar : null,
-      },
-      tags: post.tags.map(({ tag: { name } }) => name),
-      images: post.images.map(({ publicId }) => publicId),
-      likes: post.likes.map(({ profileId }) => profileId),
-      commentCount: post._count.comments,
-    }));
+    const postsDto = posts.map((post) => createPostDto(post));
 
     res.status(200).json({ posts: postsDto });
   } catch (error) {
@@ -111,23 +102,12 @@ const findPostController = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params as { postId: string };
     const post = await findPost(postId);
+    const postDto = createPostDto(post);
 
-    if (!post) {
+    if (!postDto) {
       res.status(404).json("Post not found.");
       return;
     }
-
-    const postDto = {
-      ...post,
-      profile: {
-        ...post.profile,
-        avatar: post.profile.avatar ? post.profile.avatar : null,
-      },
-      tags: post.tags.map(({ tag: { name } }) => name),
-      images: post.images.map(({ publicId }) => publicId),
-      likes: post.likes.map(({ profileId }: any) => profileId),
-      commentCount: post._count.comments,
-    };
 
     res.status(200).json({ post: postDto });
   } catch (error) {

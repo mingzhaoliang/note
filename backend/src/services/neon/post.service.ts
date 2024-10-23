@@ -2,15 +2,25 @@ import { prisma } from "@/lib/db/prisma.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { Prisma } from "@prisma/client";
 
+const basicPostSelect = {
+  id: true,
+  text: true,
+  createdAt: true,
+  profile: true,
+  images: { select: { publicId: true } },
+  tags: { select: { tag: { select: { name: true } } } },
+  likes: { select: { profileId: true } },
+  _count: { select: { comments: true } },
+};
+
 type CreatePostArgs = {
   profileId: string;
   text: string;
   images: ImageSchema[] | undefined;
   tags: string[] | undefined;
-  createdAt: Date;
 };
 
-const createPost = async ({ profileId, text, images, tags, createdAt }: CreatePostArgs) => {
+const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => {
   try {
     const post = await prisma.post.create({
       data: {
@@ -36,8 +46,8 @@ const createPost = async ({ profileId, text, images, tags, createdAt }: CreatePo
               },
             })) ?? Prisma.skip,
         },
-        createdAt,
       },
+      select: basicPostSelect,
     });
 
     return post;
@@ -57,43 +67,7 @@ const getFeed = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
     const posts = await prisma.post.findMany({
       take,
       ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
-      select: {
-        id: true,
-        text: true,
-        createdAt: true,
-        profile: {
-          select: {
-            id: true,
-            username: true,
-            name: true,
-            avatar: true,
-          },
-        },
-        images: {
-          select: {
-            publicId: true,
-          },
-        },
-        tags: {
-          select: {
-            tag: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        likes: {
-          select: {
-            profileId: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-          },
-        },
-      },
+      select: basicPostSelect,
       orderBy: {
         createdAt: "desc",
       },
@@ -174,13 +148,13 @@ const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
     return postLike;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to cancel like the post.");
+    throw new Error("Failed to unlike the post.");
   }
 };
 
-const deletePost = async ({ postId, profileId }: PostActionArgs) => {
+const deletePost = async ({ postId }: { postId: string }) => {
   try {
-    const deletedPost = await prisma.post.delete({ where: { id: postId, profileId } });
+    const deletedPost = await prisma.post.delete({ where: { id: postId } });
 
     return deletedPost;
   } catch (error) {
@@ -193,44 +167,7 @@ const findPost = async (postId: string) => {
   try {
     const post = await prisma.post.findUnique({
       where: { id: postId },
-      select: {
-        id: true,
-        text: true,
-        updatedAt: true,
-        createdAt: true,
-        profile: {
-          select: {
-            id: true,
-            username: true,
-            name: true,
-            avatar: true,
-          },
-        },
-        images: {
-          select: {
-            publicId: true,
-          },
-        },
-        tags: {
-          select: {
-            tag: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        likes: {
-          select: {
-            profileId: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-          },
-        },
-      },
+      select: basicPostSelect,
     });
 
     return post;
@@ -245,10 +182,9 @@ type CommentPostArgs = {
   profileId: string;
   text: string;
   parentId: string | undefined;
-  createdAt: Date;
 };
 
-const commentPost = async ({ postId, profileId, text, parentId, createdAt }: CommentPostArgs) => {
+const commentPost = async ({ postId, profileId, text, parentId }: CommentPostArgs) => {
   try {
     const postComment = await prisma.postComment.create({
       data: {
@@ -256,7 +192,6 @@ const commentPost = async ({ postId, profileId, text, parentId, createdAt }: Com
         postId,
         parentId: parentId ?? Prisma.skip,
         text,
-        createdAt,
       },
     });
 
