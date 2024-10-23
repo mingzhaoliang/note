@@ -71,9 +71,9 @@ const getFeedController = async (req: Request, res: Response) => {
 
 const deletePostController = async (req: Request, res: Response) => {
   try {
-    const { postId, profileId } = req.body;
-    const { id } = await deletePost({ postId, profileId });
-    res.status(200).json({ postId: id });
+    const { postId } = req.params as { postId: string };
+    await deletePost({ postId });
+    res.status(200).end();
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

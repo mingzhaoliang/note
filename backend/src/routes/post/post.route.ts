@@ -3,9 +3,9 @@ import {
   createPostController,
   deletePostController,
   findPostController,
+  findProfilePostsController,
   getFeedController,
   likePostController,
-  findProfilePostsController,
 } from "@/controllers/post/post.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { createPostSchema } from "@/schemas/post/create-post.schema.js";
@@ -19,9 +19,9 @@ router.post("/create", validateData(createPostSchema), createPostController);
 
 router.get("/feed", getFeedController);
 
-router.post("/like", validateData(postActionSchema), likePostController);
+router.put("/like", validateData(postActionSchema), likePostController);
 
-router.post("/delete", validateData(postActionSchema), deletePostController);
+router.delete("/delete/:postId", deletePostController);
 
 router.post("/comment", validateData(postCommentSchema), commentPostController);
 
