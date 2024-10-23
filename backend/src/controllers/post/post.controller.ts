@@ -51,7 +51,7 @@ const createPostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -76,7 +76,7 @@ const deletePostController = async (req: Request, res: Response) => {
     res.status(200).json({ postId: id });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -99,7 +99,7 @@ const likePostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(400).json({ error: "Oops! Something went wrong." });
   }
 };
 
@@ -117,7 +117,7 @@ const findPostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(400).json({ error: "Oops! Something went wrong." });
   }
 };
 
