@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { loader } from "@/routes/_home/_index";
-import { useFeed } from "@/store/feed.context";
+import { incrementCommentCount } from "@/store/redux/features/post-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { useFetcher, useRouteLoaderData } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
 import { useState } from "react";
 
@@ -27,9 +27,8 @@ type PostCommentProps = {
 
 const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
   const fetcher = useFetcher();
-  const loaderData = useRouteLoaderData<typeof loader>("/?index");
 
-  const { setPosts } = useFeed();
+  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -56,11 +55,7 @@ const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
 
     // Optimistic update
     const createdAt = new Date().toISOString();
-    setPosts((draft) => {
-      const targetPost = draft.find((post) => post.id === postId);
-      if (!targetPost) throw new Error("Post not found");
-      targetPost.commentCount += 1;
-    });
+    dispatch(incrementCommentCount({ postId }));
 
     // Submit the comment to the server
     fetcher.submit(

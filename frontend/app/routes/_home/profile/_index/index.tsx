@@ -9,7 +9,7 @@ import { PostOverview } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { LetterTextIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useImmer } from "use-immer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -47,6 +47,12 @@ export default function Profile() {
   const { posts, formState } = useLoaderData<typeof loader>();
   const [profilePosts, setProfilePosts] = useImmer(posts);
   const lastPostId = profilePosts[profilePosts.length - 1]?.id;
+
+  const handleNewProfilePosts = useCallback((newPosts: PostOverview[]) => {
+    setProfilePosts((draft) => {
+      draft.push(...newPosts);
+    });
+  }, []);
 
   useEffect(() => {
     if (!formState) return;
@@ -91,7 +97,7 @@ export default function Profile() {
       {lastPostId && (
         <InfiniteScrollTrigger
           loaderRoute={`/profile/?index&lastPostId=${lastPostId}`}
-          setPosts={setProfilePosts}
+          onLoad={handleNewProfilePosts}
           className="!mt-12"
         />
       )}

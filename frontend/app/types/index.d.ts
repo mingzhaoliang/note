@@ -48,9 +48,7 @@ type PostOverview = {
   images: string[];
 };
 
-type Post = {
-  id: string;
-  text: string;
+type Post = PostOverview & {
   createdAt: string;
   profile: {
     id: string;
@@ -58,7 +56,6 @@ type Post = {
     name: string;
     avatar: string;
   };
-  images: string[];
   tags: string[];
   likes: string[];
   commentCount: number;

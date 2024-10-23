@@ -1,5 +1,6 @@
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
-import { useFeed } from "@/store/feed.context";
+import { deletePost } from "@/store/redux/features/post-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { useFetcher } from "@remix-run/react";
 
 type DeletePostFormProps = {
@@ -8,13 +9,10 @@ type DeletePostFormProps = {
 
 export default function DeletePostForm({ postId }: DeletePostFormProps) {
   const fetcher = useFetcher();
-  const { setPosts } = useFeed();
+  const dispatch = useAppDispatch();
 
   const onSubmit = () => {
-    setPosts((draft) => {
-      const targetPostIndex = draft.findIndex((post) => post.id === postId);
-      draft.splice(targetPostIndex, 1);
-    });
+    dispatch(deletePost({ postId }));
   };
 
   return (

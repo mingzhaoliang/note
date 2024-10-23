@@ -1,8 +1,9 @@
 import LoginModal from "@/components/auth/login-modal";
 import { Comment, Like, LikeFilled } from "@/components/icons";
-import { useFeed } from "@/store/feed.context";
+import { likeUnlikePost } from "@/store/redux/features/post-slice";
 import { Slot } from "@radix-ui/react-slot";
 import { useFetcher } from "@remix-run/react";
+import { useDispatch } from "react-redux";
 import PostComment from "./post-comment";
 
 type PostFooterProps = {
@@ -61,19 +62,12 @@ type PostLikeProps = {
 
 const PostLike = ({ userId, postId, hasLiked, count }: PostLikeProps) => {
   const fetcher = useFetcher();
-  const { setPosts } = useFeed();
+  const dispatch = useDispatch();
 
   const Icon = hasLiked ? LikeFilled : Like;
 
   const onSubmit = () => {
-    setPosts((draft) => {
-      const targetPost = draft.find((post) => post.id === postId);
-      if (targetPost) {
-        hasLiked
-          ? targetPost.likes.splice(targetPost.likes.indexOf(userId), 1)
-          : targetPost.likes.push(userId);
-      }
-    });
+    dispatch(likeUnlikePost({ postId, userId }));
   };
 
   return (

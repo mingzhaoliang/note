@@ -1,17 +1,17 @@
+import { PostOverview } from "@/types";
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { Updater } from "use-immer";
 
-type UseInfiniteScrollProps<T extends { id: string }> = {
+type UseInfiniteScrollProps<T extends PostOverview> = {
   loaderRoute: string;
   inView: boolean;
-  setPosts: Updater<T[]>;
+  onLoad: (posts: T[]) => void;
 };
 
-const useInfiniteScroll = <T extends { id: string }>({
+const useInfiniteScroll = <T extends PostOverview>({
   loaderRoute,
   inView,
-  setPosts,
+  onLoad,
 }: UseInfiniteScrollProps<T>) => {
   const fetcher = useFetcher<{ posts: any }>();
   const [hasMore, setHasMore] = useState(true);
@@ -23,19 +23,10 @@ const useInfiniteScroll = <T extends { id: string }>({
 
   useEffect(() => {
     if (!fetcher.data) return;
-
-    setPosts((draft) => {
-      if (!fetcher.data) return;
-      fetcher.data.posts?.forEach((post: any) => {
-        if (draft.findIndex((p) => p.id === post.id) === -1) {
-          draft.push(post);
-        }
-      });
-    });
-
+    onLoad(fetcher.data.posts);
     const hasMorePosts = fetcher.data.posts?.length > 0;
     setHasMore(hasMorePosts);
-  }, [fetcher.data]);
+  }, [fetcher.data, onLoad]);
 
   return { hasMore };
 };

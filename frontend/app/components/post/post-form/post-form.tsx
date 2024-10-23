@@ -5,7 +5,8 @@ import { MAX_NOTE_LENGTH, MAXIMUM_IMAGES, WARNING_THRESHOLD } from "@/config/pos
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
-import { useFeed } from "@/store/feed.context";
+import { createPost } from "@/store/redux/features/post-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { useSession } from "@/store/session.context";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -32,9 +33,9 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
-  const { setPosts } = useFeed();
   const { user } = useSession();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const form = useForm<PostFormSchema>({
     resolver: zodResolver(postFormSchema),
@@ -77,8 +78,8 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
     formData.append("createdAt", createdAt);
     formData.append("_action", "create");
 
-    setPosts((draft) => {
-      draft.unshift({
+    dispatch(
+      createPost({
         ...data,
         id: "tmp-" + Math.random().toString(36).substring(2, 9),
         createdAt,
@@ -91,8 +92,8 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
         commentCount: 0,
         likes: [],
         images: data.images.map((image) => URL.createObjectURL(image)),
-      });
-    });
+      })
+    );
 
     fetcher.submit(formData, {
       method: "POST",

@@ -4,90 +4,18 @@ import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
-import { useFeed } from "@/store/feed.context";
+import {
+  addFeedPosts,
+  createPostRevalidate,
+  incrementCommentRevalidate,
+  initialiseFeed,
+  likeUnlikePostRevalidate,
+} from "@/store/redux/features/post-slice";
+import { useAppDispatch, useAppSelector } from "@/store/redux/hooks";
 import { Post } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useEffect } from "react";
-
-export default function Index() {
-  const { toast } = useToast();
-  const { posts, setPosts } = useFeed();
-  const { posts: loadedPosts, userId, formState } = useLoaderData<typeof loader>();
-
-  const lastPostId = posts[posts.length - 1]?.id;
-
-  useEffect(() => {
-    setPosts((draft) => {
-      if (draft.length === 0) {
-        draft.push(...loadedPosts);
-        return;
-      }
-
-      switch (formState?._action) {
-        case "create":
-          const tmpPostIndex = draft.findIndex(
-            (post) => post.id.startsWith("tmp-") && post.createdAt === formState.createdAt
-          );
-          if (tmpPostIndex === -1) break;
-          // Fail to create post - delete temp post
-          if (loadedPosts.length === 0) {
-            draft.splice(tmpPostIndex, 1);
-            break;
-          }
-          // Success to create post - update temp post
-          const createdPost = loadedPosts[0];
-          draft[tmpPostIndex] = createdPost;
-          break;
-        case "like":
-          // No need to update if mutation succeeded
-          if (!formState.message) break;
-
-          // Restore like stats if mutation failed
-          const postIndex = draft.findIndex((post) => post.id === formState.postId);
-          if (postIndex === -1) break;
-          draft[postIndex].likes = loadedPosts[0].likes;
-          break;
-        case "comment":
-          // No need to update if mutation succeeded
-          if (!formState.message) break;
-
-          // Restore comment count if mutation failed
-          const targetPost = draft.findIndex((post) => post.id === formState.postId);
-          if (targetPost === -1) break;
-          draft[targetPost].commentCount -= 1;
-          break;
-        case "delete":
-          // Do nothing - undeleted posts will be loaded again upon refresh
-          break;
-      }
-    });
-  }, [loadedPosts, formState]);
-
-  useEffect(() => {
-    if (formState?.message) {
-      toast({
-        variant: "primary",
-        title: formState.message,
-      });
-    }
-  }, [formState]);
-
-  return (
-    <div className="flex-1 flex flex-col items-center p-6 gap-8">
-      {posts.map((post) => (
-        <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />
-      ))}
-      {lastPostId && (
-        <InfiniteScrollTrigger
-          loaderRoute={`/?index&lastPostId=${lastPostId}`}
-          setPosts={setPosts}
-          className="my-4"
-        />
-      )}
-    </div>
-  );
-}
+import { useCallback, useEffect } from "react";
 
 type FormState =
   | {
@@ -123,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       }
       break;
     case "comment":
-      // No need to fetch comment count
+      response = await fetch(`${envConfig.API_URL}/post/${formState.postId}`);
       break;
     default:
       const lastPostId = new URL(request.url).searchParams.get("lastPostId");
@@ -153,6 +81,77 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json(
     { posts: postsDto, userId: user?.id, formState },
     { headers: { "Set-Cookie": await commitBaseSession(baseSession) } }
+  );
+}
+
+export default function Index() {
+  const { toast } = useToast();
+  const feedPosts = useAppSelector((state) => state.post.feedPosts);
+  const dispatch = useAppDispatch();
+  const { posts: loadedPosts, userId, formState } = useLoaderData<typeof loader>();
+
+  const lastPostId = feedPosts[feedPosts.length - 1]?.id;
+
+  const handleNewFeedPosts = useCallback((newPosts: Post[]) => {
+    dispatch(addFeedPosts(newPosts));
+  }, []);
+
+  useEffect(() => {
+    dispatch(initialiseFeed(loadedPosts));
+  }, [JSON.stringify(loadedPosts), dispatch]);
+
+  useEffect(() => {
+    if (formState?.message) {
+      toast({
+        variant: "primary",
+        title: formState.message,
+      });
+    }
+
+    switch (formState?._action) {
+      case "create":
+        dispatch(
+          createPostRevalidate({ createdPost: loadedPosts[0], createdAt: formState.createdAt })
+        );
+        break;
+      case "like":
+        // No need to update if mutation succeeded
+        if (!formState.message) break;
+        // Restore like stats if mutation failed
+        dispatch(
+          likeUnlikePostRevalidate({ postId: formState.postId, likes: loadedPosts[0].likes })
+        );
+        break;
+      case "comment":
+        // No need to update if mutation succeeded
+        if (!formState.message) break;
+        // Restore comment count if mutation failed
+        dispatch(
+          incrementCommentRevalidate({
+            postId: formState.postId,
+            commentCount: loadedPosts[0].commentCount,
+          })
+        );
+        break;
+      case "delete":
+        // Do nothing - undeleted posts will be loaded again upon refresh
+        break;
+    }
+  }, [loadedPosts, formState, dispatch]);
+
+  return (
+    <div className="flex-1 flex flex-col items-center p-6 gap-8">
+      {feedPosts.map((post) => (
+        <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />
+      ))}
+      {lastPostId && (
+        <InfiniteScrollTrigger
+          loaderRoute={`/?index&lastPostId=${lastPostId}`}
+          onLoad={handleNewFeedPosts}
+          className="my-4"
+        />
+      )}
+    </div>
   );
 }
 

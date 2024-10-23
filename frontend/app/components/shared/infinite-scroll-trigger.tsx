@@ -1,23 +1,23 @@
 import { useInView } from "@/hooks/use-in-view";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { cn } from "@/lib/utils/cn";
+import { Post, PostOverview } from "@/types";
 import { Loader2Icon } from "lucide-react";
-import { Updater } from "use-immer";
 
-type InfiniteScrollTriggerProps = {
+type InfiniteScrollTriggerProps<T extends PostOverview> = {
   loaderRoute: string;
-  setPosts: Updater<any[]>;
+  onLoad: (posts: T[]) => void;
   className?: string;
 };
 
-export default function InfiniteScrollTrigger({
+export default function InfiniteScrollTrigger<T extends PostOverview>({
   loaderRoute,
-  setPosts,
+  onLoad,
   className,
-}: InfiniteScrollTriggerProps) {
+}: InfiniteScrollTriggerProps<T>) {
   const [targetRef, inView] = useInView();
 
-  const { hasMore } = useInfiniteScroll({ loaderRoute, inView, setPosts });
+  const { hasMore } = useInfiniteScroll({ loaderRoute, inView, onLoad });
 
   return (
     <div ref={targetRef} className={cn("w-full flex-center", className)}>

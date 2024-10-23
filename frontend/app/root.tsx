@@ -6,6 +6,8 @@ import { PublicEnv } from "./components/shared/public-env";
 import { Toaster } from "./components/ui/toaster";
 import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "./store/redux/store";
 
 import "./tailwind.css";
 
@@ -70,8 +72,10 @@ function Document({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Document>
-      <Outlet />
-      <Toaster />
+      <ReduxProvider store={store}>
+        <Outlet />
+        <Toaster />
+      </ReduxProvider>
     </Document>
   );
 }
