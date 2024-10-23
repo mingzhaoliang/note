@@ -2,9 +2,10 @@ import { Comment } from "@/components/icons";
 import LexicalComposer from "@/components/shared/lexical-composer";
 import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { incrementCommentCount } from "@/store/redux/features/post-slice";
+import { RevalidatePostStats } from "@/store/redux/features/post-slice";
 import { useAppDispatch } from "@/store/redux/hooks";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -14,7 +15,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const MAX_COMMENT_LENGTH = 500;
 const WARNING_THRESHOLD = 20;
@@ -27,6 +28,8 @@ type PostCommentProps = {
 
 const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
   const fetcher = useFetcher();
+  const isSubmitting = fetcher.formData?.get("postId") === postId;
+  const optimisticCount = isSubmitting ? count + 1 : count;
 
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -35,6 +38,14 @@ const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
   const isValid = commentText.length > 0 && commentText.length <= MAX_COMMENT_LENGTH;
   const remaining = MAX_COMMENT_LENGTH - commentText.length;
   const shouldShowWarning = remaining <= WARNING_THRESHOLD;
+
+  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
+    if (!updatedPost) return;
+
+    dispatch(RevalidatePostStats({ updatedPost, postId: actionState.postId }));
+  }, []);
+
+  useRevalidatePost(fetcher, handleRevalidate);
 
   const handleEditorChange = (editorState: EditorState, editor: LexicalEditor) => {
     const textContent = editor.getRootElement()?.textContent;
@@ -53,10 +64,6 @@ const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
       return;
     }
 
-    // Optimistic update
-    const createdAt = new Date().toISOString();
-    dispatch(incrementCommentCount({ postId }));
-
     // Submit the comment to the server
     fetcher.submit(
       {
@@ -64,9 +71,8 @@ const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
         postId,
         ...(parentId && { parentId }),
         text: commentText,
-        createdAt,
       },
-      { method: "POST", action: "/?index" }
+      { method: "POST", action: "/post/comment" }
     );
 
     setCommentText("");
@@ -82,7 +88,7 @@ const PostComment = ({ postId, parentId, count }: PostCommentProps) => {
               <Comment className="text-inactive w-5 h-5" />
             </Trigger>
             <div className="min-w-3">
-              {count > 0 && <p className="text-inactive text-sm">{count}</p>}
+              {optimisticCount > 0 && <p className="text-inactive text-sm">{optimisticCount}</p>}
             </div>
           </div>
           <Content>

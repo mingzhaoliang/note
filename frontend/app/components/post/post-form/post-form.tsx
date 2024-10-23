@@ -15,7 +15,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { useFetcher, useNavigate } from "@remix-run/react";
+import { useActionData, useFetcher, useNavigate } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
 import { HashIcon, MapPinIcon } from "lucide-react";
 import { useRef } from "react";
@@ -29,7 +29,7 @@ type PostFormProps = {
 };
 
 export default function PostForm({ className, setOpen }: PostFormProps) {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher({ key: "post" });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
@@ -73,16 +73,16 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
 
     const formData = new FormData(event?.target);
 
-    const createdAt = new Date().toISOString();
+    const tempPostId = "tmp-" + Math.random().toString(36).slice(2);
     formData.set("text", data.text);
-    formData.append("createdAt", createdAt);
-    formData.append("_action", "create");
+    formData.set("_action", "create");
+    formData.set("postId", tempPostId);
 
     dispatch(
       createPost({
         ...data,
-        id: "tmp-" + Math.random().toString(36).substring(2, 9),
-        createdAt,
+        id: tempPostId,
+        createdAt: new Date().toISOString(),
         profile: {
           id: user.id,
           username: user.username,
@@ -97,7 +97,7 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
 
     fetcher.submit(formData, {
       method: "POST",
-      action: "/?index",
+      action: "/post/create",
       encType: "multipart/form-data",
     });
 

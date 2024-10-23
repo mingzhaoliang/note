@@ -1,6 +1,4 @@
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
-import { deletePost } from "@/store/redux/features/post-slice";
-import { useAppDispatch } from "@/store/redux/hooks";
 import { useFetcher } from "@remix-run/react";
 
 type DeletePostFormProps = {
@@ -8,15 +6,10 @@ type DeletePostFormProps = {
 };
 
 export default function DeletePostForm({ postId }: DeletePostFormProps) {
-  const fetcher = useFetcher();
-  const dispatch = useAppDispatch();
-
-  const onSubmit = () => {
-    dispatch(deletePost({ postId }));
-  };
+  const fetcher = useFetcher({ key: "post" });
 
   return (
-    <fetcher.Form method="POST" action="/?index" onSubmit={onSubmit}>
+    <fetcher.Form method="DELETE" action="/post/delete">
       <input type="hidden" name="postId" value={postId} />
       <AlertDialogAction type="submit" name="_action" value="delete">
         Continue

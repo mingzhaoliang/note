@@ -18,43 +18,11 @@ const postSlice = createSlice({
     createPost: (state, action: PayloadAction<Post>) => {
       state.feedPosts.unshift(action.payload);
     },
-    createPostRevalidate: (
-      state,
-      action: PayloadAction<{ createdPost: Post | undefined; createdAt: string | undefined }>
-    ) => {
-      const { createdPost, createdAt } = action.payload;
-      const tempPostIndex = state.feedPosts.findIndex(
-        (post) => post.id.startsWith("tmp-") && post.createdAt === createdAt
-      );
-      if (tempPostIndex !== -1) {
-        if (createdPost) {
-          state.feedPosts.splice(tempPostIndex, 1, createdPost);
-        } else {
-          state.feedPosts.splice(tempPostIndex, 1);
-        }
-      }
-    },
     deletePost: (state, action: PayloadAction<{ postId: string }>) => {
       const targetPostIndex = state.feedPosts.findIndex(
         (post) => post.id === action.payload.postId
       );
       state.feedPosts.splice(targetPostIndex, 1);
-    },
-    incrementCommentCount: (state, action: PayloadAction<{ postId: string }>) => {
-      const targetPost = state.feedPosts.find((post) => post.id === action.payload.postId);
-      if (targetPost) {
-        targetPost.commentCount += 1;
-      }
-    },
-    incrementCommentRevalidate: (
-      state,
-      action: PayloadAction<{ postId: string; commentCount: number }>
-    ) => {
-      const { postId, commentCount } = action.payload;
-      const targetPost = state.feedPosts.find((post) => post.id === postId);
-      if (targetPost) {
-        targetPost.commentCount = commentCount;
-      }
     },
     likeUnlikePost: (state, action: PayloadAction<{ postId: string; userId: string }>) => {
       const { postId, userId } = action.payload;
@@ -65,14 +33,26 @@ const postSlice = createSlice({
           : targetPost.likes.push(userId);
       }
     },
-    likeUnlikePostRevalidate: (
+    RevalidatePost: (
       state,
-      action: PayloadAction<{ postId: string; likes: string[] }>
+      action: PayloadAction<{ updatedPost: Post | undefined; postId: string; _action: string }>
     ) => {
-      const { postId, likes } = action.payload;
+      const { updatedPost, postId, _action } = action.payload;
+      const postIndex = state.feedPosts.findIndex((post) => post.id === postId);
+      if (postIndex !== -1) {
+        if (updatedPost && _action === "create") {
+          state.feedPosts.splice(postIndex, 1, updatedPost);
+        } else {
+          state.feedPosts.splice(postIndex, 1);
+        }
+      }
+    },
+    RevalidatePostStats: (state, action: PayloadAction<{ updatedPost: Post; postId: string }>) => {
+      const { updatedPost, postId } = action.payload;
       const targetPost = state.feedPosts.find((post) => post.id === postId);
       if (targetPost) {
-        targetPost.likes = likes;
+        targetPost.likes = updatedPost.likes;
+        targetPost.commentCount = updatedPost.commentCount;
       }
     },
     addFeedPosts: (state, action: PayloadAction<Post[]>) => {
@@ -88,12 +68,10 @@ const postSlice = createSlice({
 
 export const {
   createPost,
-  createPostRevalidate,
+  RevalidatePost,
   deletePost,
-  incrementCommentCount,
-  incrementCommentRevalidate,
   likeUnlikePost,
-  likeUnlikePostRevalidate,
+  RevalidatePostStats,
   addFeedPosts,
   initialiseFeed,
 } = postSlice.actions;

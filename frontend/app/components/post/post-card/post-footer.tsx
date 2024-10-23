@@ -1,10 +1,8 @@
 import LoginModal from "@/components/auth/login-modal";
-import { Comment, Like, LikeFilled } from "@/components/icons";
-import { likeUnlikePost } from "@/store/redux/features/post-slice";
+import { Comment, Like } from "@/components/icons";
 import { Slot } from "@radix-ui/react-slot";
-import { useFetcher } from "@remix-run/react";
-import { useDispatch } from "react-redux";
 import PostComment from "./post-comment";
+import PostLikes from "./post-likes";
 
 type PostFooterProps = {
   postId: string;
@@ -20,7 +18,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
     <div className="mt-6 flex items-center gap-x-2">
       {userId && (
         <>
-          <PostLike userId={userId} postId={postId} hasLiked={hasLiked} count={likes.length} />
+          <PostLikes postId={postId} hasLiked={hasLiked} count={likes.length} />
           <PostComment postId={postId} count={commentCount} />
         </>
       )}
@@ -48,36 +46,6 @@ const PostStats = ({ children, count }: React.PropsWithChildren<PostStatsProps>)
       <LoginModal>
         <Slot className="text-inactive w-5 h-5">{children}</Slot>
       </LoginModal>
-      <div className="min-w-3">{count > 0 && <p className="text-inactive text-sm">{count}</p>}</div>
-    </div>
-  );
-};
-
-type PostLikeProps = {
-  userId: string;
-  postId: string;
-  hasLiked: boolean;
-  count: number;
-};
-
-const PostLike = ({ userId, postId, hasLiked, count }: PostLikeProps) => {
-  const fetcher = useFetcher();
-  const dispatch = useDispatch();
-
-  const Icon = hasLiked ? LikeFilled : Like;
-
-  const onSubmit = () => {
-    dispatch(likeUnlikePost({ postId, userId }));
-  };
-
-  return (
-    <div className="flex items-center space-x-2">
-      <fetcher.Form method="POST" action="/?index" className="flex-center" onSubmit={onSubmit}>
-        <input type="hidden" name="postId" value={postId} />
-        <button type="submit" name="_action" value="like">
-          <Icon className="text-inactive w-5 h-5" />
-        </button>
-      </fetcher.Form>
       <div className="min-w-3">{count > 0 && <p className="text-inactive text-sm">{count}</p>}</div>
     </div>
   );
