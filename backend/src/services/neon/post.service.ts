@@ -225,20 +225,9 @@ const findPost = async (postId: string) => {
             profileId: true,
           },
         },
-        comments: {
+        _count: {
           select: {
-            id: true,
-            text: true,
-            createdAt: true,
-            profile: {
-              select: {
-                id: true,
-                username: true,
-                name: true,
-                avatar: true,
-              },
-            },
-            parentId: true,
+            comments: true,
           },
         },
       },

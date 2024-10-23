@@ -66,20 +66,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  let postsDto: Post[] = [];
+  let posts: Post[] = [];
 
   if (response) {
     const data = await response.json();
-    const posts = data.posts ?? [data.post];
-
-    postsDto = posts.map((post: any) => ({
-      ...post,
-      commentCount: post.commentCount ?? post.comments?.length ?? 0,
-    }));
+    posts = data.posts ?? [data.post];
   }
 
   return json(
-    { posts: postsDto, userId: user?.id, formState },
+    { posts, userId: user?.id, formState },
     { headers: { "Set-Cookie": await commitBaseSession(baseSession) } }
   );
 }

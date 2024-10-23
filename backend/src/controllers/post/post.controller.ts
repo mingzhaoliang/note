@@ -126,13 +126,7 @@ const findPostController = async (req: Request, res: Response) => {
       tags: post.tags.map(({ tag: { name } }) => name),
       images: post.images.map(({ publicId }) => publicId),
       likes: post.likes.map(({ profileId }: any) => profileId),
-      comments: post.comments.map((comment) => ({
-        ...comment,
-        profile: {
-          ...comment.profile,
-          avatar: comment.profile.avatar ? comment.profile.avatar : null,
-        },
-      })),
+      commentCount: post._count.comments,
     };
 
     res.status(200).json({ post: postDto });
