@@ -14,7 +14,6 @@ const createPostSchema = z.object({
     .refine((tags) => tags.length <= 3, {
       message: "Tag limit reached.",
     }),
-  createdAt: z.coerce.date(),
 });
 
 type CreatePostSchema = z.infer<typeof createPostSchema>;

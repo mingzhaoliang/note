@@ -8,7 +8,6 @@ const postCommentSchema = z.object({
     .string({ required_error: "Enter your comment." })
     .min(1, { message: "Enter your comment." })
     .max(500, { message: "Comment is too long." }),
-  createdAt: z.coerce.date(),
 });
 
 export { postCommentSchema };

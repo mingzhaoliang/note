@@ -19,7 +19,7 @@ import fs from "fs";
 
 const createPostController = async (req: Request, res: Response) => {
   try {
-    const { profileId, text, tags, createdAt } = req.body as CreatePostSchema;
+    const { profileId, text, tags } = req.body as CreatePostSchema;
 
     const imagePaths = Object.values((req.files ?? {}) as any).map((file: any) => {
       if (!["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.mimetype)) {
@@ -44,9 +44,11 @@ const createPostController = async (req: Request, res: Response) => {
       fs.unlinkSync(imagePath);
     }
 
-    const { id } = await createPost({ profileId, text, images, tags, createdAt });
+    const post = await createPost({ profileId, text, images, tags });
 
-    res.status(200).json({ postId: id });
+    const postDto = createPostDto(post);
+
+    res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -91,7 +93,10 @@ const likePostController = async (req: Request, res: Response) => {
       postLike = await likePost({ postId, profileId });
     }
 
-    res.status(200).json({ postId: postLike.postId });
+    const post = (await findPost(postLike.postId))!;
+    const postDto = createPostDto(post);
+
+    res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -118,10 +123,14 @@ const findPostController = async (req: Request, res: Response) => {
 
 const commentPostController = async (req: Request, res: Response) => {
   try {
-    const { profileId, postId, parentId, text, createdAt } = req.body;
+    const { profileId, postId, parentId, text } = req.body;
 
-    const postComment = await commentPost({ postId, parentId, profileId, text, createdAt });
-    res.status(200).json({ postId: postComment.postId });
+    const postComment = await commentPost({ postId, parentId, profileId, text });
+
+    const post = (await findPost(postComment.postId))!;
+    const postDto = createPostDto(post);
+
+    res.status(200).json({ post: postDto, postComment });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });
