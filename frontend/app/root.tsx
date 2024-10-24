@@ -1,12 +1,12 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
 import clsx from "clsx";
+import { Provider as ReduxProvider } from "react-redux";
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
-import { PublicEnv } from "./components/shared/public-env";
 import { Toaster } from "./components/ui/toaster";
 import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";
-import { Provider as ReduxProvider } from "react-redux";
+import { RootProvider } from "./store/context/root.context";
 import { store } from "./store/redux/store";
 
 import "./tailwind.css";
@@ -45,7 +45,7 @@ export default function AppWithProviders() {
 }
 
 function Document({ children }: { children: React.ReactNode }) {
-  const { theme: ssrTheme, ENV } = useLoaderData<typeof loader>();
+  const { theme: ssrTheme } = useLoaderData<typeof loader>();
   const [theme] = useTheme();
 
   return (
@@ -62,7 +62,6 @@ function Document({ children }: { children: React.ReactNode }) {
         <ScrollRestoration
           getKey={(location) => (location.pathname === "/" ? location.pathname : location.key)}
         />
-        <PublicEnv {...ENV} />
         <Scripts />
       </body>
     </html>
@@ -70,10 +69,14 @@ function Document({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
     <Document>
       <ReduxProvider store={store}>
-        <Outlet />
+        <RootProvider {...ENV}>
+          <Outlet />
+        </RootProvider>
         <Toaster />
       </ReduxProvider>
     </Document>

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils/cn";
+import { useRootContext } from "@/store/context/root.context";
 import { cloudinaryLoader, Image, ImageProps } from "@udisc/remix-image";
 
 export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
@@ -6,10 +7,12 @@ export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimiz
 };
 
 export default function CldImage({ src, className, options, shimmer, ...props }: CldImageProps) {
+  const { CLOUDINARY_CLOUD_NAME } = useRootContext();
+
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
       <Image
-        loaderUrl={`http://res.cloudinary.com/${window.ENV.CLOUDINARY_CLOUD_NAME}/`}
+        loaderUrl={`http://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/`}
         loader={cloudinaryLoader}
         src={src}
         options={{ background: undefined, ...options }}
