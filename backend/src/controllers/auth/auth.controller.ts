@@ -34,7 +34,7 @@ const validateSession = async (req: Request, res: Response) => {
     newSessionId = newSessionCookie.value;
   }
 
-  const profile = await findProfile(user.id);
+  const profile = await findProfile({ id: user.id });
 
   if (!profile) {
     res.status(401).end();

@@ -12,7 +12,7 @@ import {
   likePost,
   unLikePost,
 } from "@/services/neon/post.service.js";
-import { getLikedPost } from "@/services/neon/profile.service.js";
+import { findProfile, getLikedPost } from "@/services/neon/profile.service.js";
 import { CloudinaryAsset } from "@/types/index.js";
 import { Request, Response } from "express";
 import fs from "fs";
@@ -139,10 +139,15 @@ const commentPostController = async (req: Request, res: Response) => {
 
 const findProfilePostsController = async (req: Request, res: Response) => {
   try {
-    const { profileId } = req.params;
+    const { username } = req.params;
     const { lastPostId } = req.query as { lastPostId: string | undefined };
 
-    const posts = await findProfilePosts({ profileId, lastCursor: lastPostId });
+    const profile = await findProfile({ username });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+    const posts = await findProfilePosts({ profileId: profile.id, lastCursor: lastPostId });
 
     const postsDto = posts.map((post) => ({
       ...post,
@@ -151,7 +156,7 @@ const findProfilePostsController = async (req: Request, res: Response) => {
     res.status(200).json({ posts: postsDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 

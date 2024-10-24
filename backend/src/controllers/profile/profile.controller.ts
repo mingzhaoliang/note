@@ -11,8 +11,8 @@ import fs from "fs";
 
 const findProfileOverviewController = async (req: Request, res: Response) => {
   try {
-    const { profileId } = req.params;
-    const profile = await findProfileOverview(profileId);
+    const { username } = req.params;
+    const profile = await findProfileOverview({ username });
 
     if (!profile) {
       res.status(404).json("Profile not found.");
@@ -36,7 +36,7 @@ const editProfileController = async (req: Request, res: Response) => {
     if (req.files) {
       const avatarImage = req.files.avatar as any;
 
-      let profile = await findProfile(profileId);
+      let profile = await findProfile({ id: profileId });
       if (!profile) throw new Error("Profile not found.");
 
       let currentAvatar = profile.avatar;
@@ -85,7 +85,7 @@ const editProfileController = async (req: Request, res: Response) => {
 const deleteAvatarController = async (req: Request, res: Response) => {
   try {
     const { profileId } = req.params;
-    const profile = await findProfile(profileId);
+    const profile = await findProfile({ id: profileId });
     if (!profile) throw new Error("Profile not found.");
 
     const { avatar } = profile;

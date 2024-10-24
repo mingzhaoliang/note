@@ -2,9 +2,20 @@ import { prisma } from "@/lib/db/prisma.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { Prisma } from "@prisma/client";
 
-const findProfile = async (id: string) => {
+type FindProfileArgs = {
+  id?: string;
+  username?: string;
+};
+
+const findProfile = async ({ id, username }: FindProfileArgs) => {
   try {
-    const profile = await prisma.profile.findUnique({ where: { id } });
+    if (!id && !username) {
+      throw new Error("Either 'id' or 'username' must be provided.");
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: { id: id ?? Prisma.skip, username: username ?? Prisma.skip },
+    });
 
     return profile;
   } catch (error) {
@@ -13,10 +24,14 @@ const findProfile = async (id: string) => {
   }
 };
 
-const findProfileOverview = async (id: string) => {
+const findProfileOverview = async ({ id, username }: FindProfileArgs) => {
   try {
+    if (!id && !username) {
+      throw new Error("Either 'id' or 'username' must be provided.");
+    }
+
     const profile = await prisma.profile.findUnique({
-      where: { id },
+      where: { username },
       select: {
         id: true,
         username: true,

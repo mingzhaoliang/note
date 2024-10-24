@@ -25,7 +25,7 @@ router.delete("/delete/:postId", deletePostController);
 
 router.post("/comment", validateData(postCommentSchema), commentPostController);
 
-router.get("/profile/:profileId", findProfilePostsController);
+router.get("/profile/:username", findProfilePostsController);
 
 router.get("/:postId", findPostController);
 

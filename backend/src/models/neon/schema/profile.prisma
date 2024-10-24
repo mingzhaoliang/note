@@ -1,6 +1,6 @@
 model Profile {
   id        String        @id
-  username  String
+  username  String        @unique
   user      User          @relation(references: [id, username], fields: [id, username], onDelete: Cascade)
   name      String
   avatar    String?
@@ -14,7 +14,6 @@ model Profile {
   createdAt DateTime      @default(now())
 
   @@unique([id, username])
-  @@index([username])
 }
 
 model Follows {
