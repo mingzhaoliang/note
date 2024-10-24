@@ -13,9 +13,10 @@ import { useCallback, useEffect, useState } from "react";
 
 type PostImagesProps = {
   images: Post["images"];
+  isLocal?: boolean;
 };
 
-export default function PostImages({ images }: PostImagesProps) {
+export default function PostImages({ images, isLocal }: PostImagesProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [currentSnap, setCurrentSnap] = useState(1);
 
@@ -40,17 +41,20 @@ export default function PostImages({ images }: PostImagesProps) {
         {images.map((url) => (
           <CarouselItem key={url}>
             <div className="w-full h-full max-h-96 rounded-2xl overflow-hidden">
-              <CldImage
-                src={url}
-                alt=""
-                responsive={[
-                  { size: { width: 310, height: 190 }, maxWidth: 768 },
-                  { size: { width: 620, height: 380 } },
-                ]}
-                dprVariants={[1, 3, 5]}
-                placeholder="blur"
-                fill
-              />
+              {isLocal && <img src={url} alt="" className="w-full h-full object-cover" />}
+              {!isLocal && (
+                <CldImage
+                  src={url}
+                  alt=""
+                  responsive={[
+                    { size: { width: 310, height: 190 }, maxWidth: 768 },
+                    { size: { width: 620, height: 380 } },
+                  ]}
+                  dprVariants={[1, 3, 5]}
+                  placeholder="blur"
+                  fill
+                />
+              )}
             </div>
           </CarouselItem>
         ))}

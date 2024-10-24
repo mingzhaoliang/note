@@ -56,7 +56,7 @@ const PostCard = ({
             <PostDropdown isOwner={isOwner} postId={postId} />
           )}
         </div>
-        {images.length > 0 && <PostImages images={images} />}
+        {images.length > 0 && <PostImages images={images} isLocal={isCreating} />}
         <div className="flex items-center flex-wrap gap-2">
           <p className="text-foreground">{text}</p>
           {tags.map((tag, index) => (
