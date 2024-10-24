@@ -55,15 +55,27 @@ model PostLike {
 }
 
 model PostComment {
-  id        String        @id @default(cuid())
+  id        String            @id @default(cuid())
   postId    String
-  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post              @relation(fields: [postId], references: [id], onDelete: Cascade)
   text      String
   profileId String
-  profile   Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile           @relation(fields: [profileId], references: [id], onDelete: Cascade)
   parentId  String?
-  parent    PostComment?  @relation("nestedComments", fields: [parentId], references: [id])
-  children  PostComment[] @relation("nestedComments")
-  updatedAt DateTime      @updatedAt
-  createdAt DateTime      @default(now())
+  parent    PostComment?      @relation("nestedComments", fields: [parentId], references: [id])
+  children  PostComment[]     @relation("nestedComments")
+  likes     PostCommentLike[]
+  updatedAt DateTime          @updatedAt
+  createdAt DateTime          @default(now())
+}
+
+model PostCommentLike {
+  profileId String
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  updatedAt DateTime    @updatedAt
+  createdAt DateTime    @default(now())
+
+  @@id([profileId, commentId])
 }

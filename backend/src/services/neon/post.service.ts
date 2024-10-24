@@ -100,6 +100,7 @@ const findProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfil
             publicId: true,
           },
         },
+        profile: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -202,11 +203,62 @@ const commentPost = async ({ postId, profileId, text, parentId }: CommentPostArg
   }
 };
 
+const findPostComments = async ({
+  postId,
+  lastCursor,
+  parentId,
+  take = 10,
+}: {
+  postId: string;
+  lastCursor?: string;
+  parentId?: string;
+  take?: number;
+}) => {
+  try {
+    const comments = await prisma.postComment.findMany({
+      take,
+      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
+      where: { postId, parentId: parentId ?? null },
+      select: {
+        id: true,
+        postId: true,
+        text: true,
+        likes: { select: { profileId: true } },
+        createdAt: true,
+        profile: true,
+        parentId: true,
+        children: {
+          select: {
+            id: true,
+            postId: true,
+            text: true,
+            likes: { select: { profileId: true } },
+            createdAt: true,
+            profile: true,
+            parentId: true,
+            _count: { select: { children: true } },
+          },
+        },
+        _count: { select: { children: true } },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return comments;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the comments.");
+  }
+};
+
 export {
   commentPost,
   createPost,
   deletePost,
   findPost,
+  findPostComments,
   findProfilePosts,
   getFeed,
   likePost,

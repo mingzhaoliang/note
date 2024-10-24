@@ -2,6 +2,7 @@ import {
   commentPostController,
   createPostController,
   deletePostController,
+  findPostCommentsController,
   findPostController,
   findProfilePostsController,
   getFeedController,
@@ -28,5 +29,7 @@ router.post("/comment", validateData(postCommentSchema), commentPostController);
 router.get("/profile/:username", findProfilePostsController);
 
 router.get("/:postId", findPostController);
+
+router.get("/comment/:postId", findPostCommentsController);
 
 export default router;
