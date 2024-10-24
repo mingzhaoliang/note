@@ -78,7 +78,6 @@ export default function Profile() {
                   ]}
                   dprVariants={[1, 3, 5]}
                   placeholder="blur"
-                  fill
                 />
                 {post.images.length > 1 && (
                   <Gallery className="absolute top-4 right-4 text-primary-foreground/80" />

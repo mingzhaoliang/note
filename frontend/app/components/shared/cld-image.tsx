@@ -1,30 +1,21 @@
 import { cn } from "@/lib/utils/cn";
-import Image, { cloudinaryLoader, ImageProps } from "@udisc/remix-image";
-import { useEffect, useState } from "react";
+import { cloudinaryLoader, Image, ImageProps } from "@udisc/remix-image";
 
 export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
-  fill?: boolean;
+  shimmer?: [number, number];
 };
 
-export default function CldImage({ fill, src, className, options, ...props }: CldImageProps) {
-  const [client, setClient] = useState(false);
-
-  useEffect(() => {
-    setClient(true);
-  }, []);
-
-  if (!client) {
-    return null;
-  }
-
+export default function CldImage({ src, className, options, shimmer, ...props }: CldImageProps) {
   return (
-    <Image
-      loaderUrl={`http://res.cloudinary.com/${window.ENV.CLOUDINARY_CLOUD_NAME}/`}
-      loader={cloudinaryLoader}
-      src={src}
-      options={{ background: undefined, ...options }}
-      className={cn("object-cover", fill && "!min-w-full !min-h-full w-full h-full", className)}
-      {...props}
-    />
+    <div className={cn("relative w-full h-full overflow-hidden", className)}>
+      <Image
+        loaderUrl={`http://res.cloudinary.com/${window.ENV.CLOUDINARY_CLOUD_NAME}/`}
+        loader={cloudinaryLoader}
+        src={src}
+        options={{ background: undefined, ...options }}
+        className="object-cover !min-w-full !min-h-full w-full h-full"
+        {...props}
+      />
+    </div>
   );
 }

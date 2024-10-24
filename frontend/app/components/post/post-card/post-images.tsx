@@ -40,19 +40,18 @@ export default function PostImages({ images, isLocal }: PostImagesProps) {
       <CarouselContent>
         {images.map((url) => (
           <CarouselItem key={url}>
-            <div className="w-full h-full max-h-96 rounded-2xl overflow-hidden">
+            <div className="w-full h-full aspect-[3/2] rounded-2xl overflow-hidden">
               {isLocal && <img src={url} alt="" className="w-full h-full object-cover" />}
               {!isLocal && (
                 <CldImage
                   src={url}
                   alt=""
                   responsive={[
-                    { size: { width: 310, height: 190 }, maxWidth: 768 },
-                    { size: { width: 620, height: 380 } },
+                    { size: { width: 300, height: 200 }, maxWidth: 768 },
+                    { size: { width: 600, height: 400 } },
                   ]}
                   dprVariants={[1, 3, 5]}
                   placeholder="blur"
-                  fill
                 />
               )}
             </div>

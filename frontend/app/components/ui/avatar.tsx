@@ -38,7 +38,6 @@ const CldAvatarImage = ({ src, alt, responsive, dprVariants, ...props }: CldImag
       responsive={responsive ?? [{ size: { width: 16, height: 16 } }]}
       dprVariants={dprVariants ?? [1, 3, 5]}
       placeholder="blur"
-      fill
       {...props}
     />
   );

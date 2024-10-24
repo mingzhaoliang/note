@@ -159,7 +159,6 @@ export default function ProfileEditDialog({ id, username, name, bio, avatar }: P
                         responsive={[{ size: { width: 96, height: 96 } }]}
                         dprVariants={[1, 3, 5]}
                         placeholder="blur"
-                        fill
                       />
                     ) : (
                       <ImagePlusIcon className="text-inactive" />
