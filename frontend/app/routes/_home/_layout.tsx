@@ -12,13 +12,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function HomeLayout() {
   const { user } = useLoaderData<typeof loader>();
-  const isAuthenticated = user !== null;
 
   return (
     <SessionProvider user={user}>
       <div className="h-full min-h-screen md:pl-20 md:flex">
-        <Sidebar isAuthenticated={isAuthenticated} />
-        <MobileHeader isAuthenticated={isAuthenticated} />
+        <Sidebar />
+        <MobileHeader />
         <Outlet />
       </div>
     </SessionProvider>

@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@remix-run/react";
 import { AlignRightIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
+import { useSession } from "@/store/session.context";
 
-type MobileHeaderProps = {
-  isAuthenticated: boolean;
-};
+export default function MobileHeader() {
+  const { user } = useSession();
 
-export default function MobileHeader({ isAuthenticated }: MobileHeaderProps) {
   return (
     <section className="blur-background header-mobile">
       <div className="flex-between px-5 py-4">
@@ -16,9 +15,9 @@ export default function MobileHeader({ isAuthenticated }: MobileHeaderProps) {
           <Mark />
         </Link>
 
-        {isAuthenticated && <NavDropdown triggerIcon={<AlignRightIcon />} />}
+        {user && <NavDropdown triggerIcon={<AlignRightIcon />} />}
 
-        {!isAuthenticated && (
+        {!user && (
           <Button variant="ghost" size="icon" className="rounded-full" asChild>
             <Link to="/login">
               <LogInIcon className="w-5 h-5" />

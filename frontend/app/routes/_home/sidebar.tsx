@@ -4,18 +4,17 @@ import { Link } from "@remix-run/react";
 import { AlignLeftIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
 import Navbar from "./navbar";
+import { useSession } from "@/store/session.context";
 
-type SidebarProps = {
-  isAuthenticated: boolean;
-};
+export default function Sidebar() {
+  const { user } = useSession();
 
-export default function Sidebar({ isAuthenticated }: SidebarProps) {
   return (
     <div className="blur-background sidebar-mobile md:sidebar">
       <Logo className="hidden md:block shrink-0 w-8 h-8 hover:scale-105 transition-transform" />
-      <Navbar isAuthenticated={isAuthenticated} />
+      <Navbar />
       <div className="hidden md:block">
-        {isAuthenticated ? (
+        {user ? (
           <NavDropdown triggerIcon={<AlignLeftIcon />} />
         ) : (
           <Button variant="ghost" size="icon" className="rounded-full" asChild>

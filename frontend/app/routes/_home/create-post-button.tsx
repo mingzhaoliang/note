@@ -2,12 +2,11 @@ import LoginModal from "@/components/auth/login-modal";
 import CreatePostDialog from "@/components/post/create-post-dialog";
 import { PlusIcon } from "lucide-react";
 import NavIcon from "./nav-icon";
+import { useSession } from "@/store/session.context";
 
-type CreatePostButtonProps = {
-  isAuthenticated: boolean;
-};
+export default function CreatePostButton() {
+  const { user } = useSession();
 
-export default function CreatePostButton({ isAuthenticated }: CreatePostButtonProps) {
   const postButton = (
     <NavIcon
       Icon={PlusIcon}
@@ -18,8 +17,8 @@ export default function CreatePostButton({ isAuthenticated }: CreatePostButtonPr
 
   return (
     <>
-      {isAuthenticated && <CreatePostDialog trigger={postButton} />}
-      {!isAuthenticated && <LoginModal>{postButton}</LoginModal>}
+      {user && <CreatePostDialog trigger={postButton} />}
+      {!user && <LoginModal>{postButton}</LoginModal>}
     </>
   );
 }
