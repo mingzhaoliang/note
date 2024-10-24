@@ -21,13 +21,14 @@ import DeletePostForm from "./delete-post-form";
 type PostDropdownProps = {
   isOwner: boolean;
   postId: string;
+  onDelete?: () => void;
 };
 
-export default function PostDropdown({ isOwner, postId }: PostDropdownProps) {
+export default function PostDropdown({ isOwner, postId, onDelete }: PostDropdownProps) {
   return (
     <AlertDialog>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
           <Button
             variant="ghost"
             size="icon"
@@ -37,24 +38,35 @@ export default function PostDropdown({ isOwner, postId }: PostDropdownProps) {
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="w-60 p-2 font-medium bg-primary-foreground">
+        <DropdownMenuContent
+          onClick={(e) => e.stopPropagation()}
+          align="end"
+          className="w-60 p-2 font-medium bg-primary-foreground"
+        >
           {isOwner && (
             <DropdownMenuItem className="p-3" asChild>
-              <AlertDialogTrigger className="cursor-pointer" asChild>
+              <AlertDialogTrigger
+                onClick={(e) => e.stopPropagation()}
+                className="cursor-pointer"
+                asChild
+              >
                 <button className="w-full h-full flex-start">Delete</button>
               </AlertDialogTrigger>
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialogContent>
+      <AlertDialogContent
+        overlayConfig={{ onClick: (e) => e.stopPropagation() }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure to delete this post?</AlertDialogTitle>
           <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <DeletePostForm postId={postId} />
+          <DeletePostForm postId={postId} onDelete={onDelete} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

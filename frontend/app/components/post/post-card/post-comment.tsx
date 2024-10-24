@@ -2,6 +2,7 @@ import { Comment } from "@/components/icons";
 import LexicalComposer from "@/components/shared/lexical-composer";
 import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { MAX_COMMENT_LENGTH, WARNING_THRESHOLD } from "@/config/post.config";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
@@ -16,9 +17,6 @@ import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
 import { useCallback, useState } from "react";
-
-const MAX_COMMENT_LENGTH = 500;
-const WARNING_THRESHOLD = 20;
 
 type PostCommentProps = {
   postId: string;

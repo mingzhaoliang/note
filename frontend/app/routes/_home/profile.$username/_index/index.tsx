@@ -7,7 +7,7 @@ import { commitBaseSession, getBaseSession } from "@/session/base-session.server
 import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { PostOverview } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { LetterTextIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { useImmer } from "use-immer";
@@ -61,9 +61,11 @@ export default function Profile() {
     <>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
         {profilePosts.map((post) => (
-          <div
+          <Link
             key={post.id}
+            to={`/profile/${post.profile.username}/post/${post.id}`}
             className="relative w-full h-fit aspect-[4/3] md:aspect-square bg-primary-foreground shadow-sm rounded-3xl flex-center"
+            state={{ referrer: `/profile/${post.profile.username}` }}
           >
             {post.images.length > 0 && (
               <div className="relative w-full h-full rounded-2xl overflow-hidden">
@@ -89,7 +91,7 @@ export default function Profile() {
                 <LetterTextIcon className="absolute top-4 right-4" />
               </>
             )}
-          </div>
+          </Link>
         ))}
       </div>
       {lastPostId && (

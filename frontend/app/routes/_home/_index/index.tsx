@@ -7,7 +7,7 @@ import { addFeedPosts, initialiseFeed, RevalidatePost } from "@/store/redux/feat
 import { useAppDispatch, useAppSelector } from "@/store/redux/hooks";
 import { Post } from "@/types";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -61,9 +61,22 @@ export default function Index() {
 
   return (
     <div className="flex-1 flex flex-col items-center p-6 gap-8">
-      {feedPosts.map((post) => (
-        <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />
-      ))}
+      {feedPosts.map((post) => {
+        if (post.id.startsWith("tmp-")) {
+          <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />;
+        }
+
+        return (
+          <Link
+            key={post.id}
+            to={`/profile/${post.profile.username}/post/${post.id}`}
+            className="w-full md:max-w-2xl flex justify-center"
+            state={{ referrer: "/?index" }}
+          >
+            <PostCard key={post.id} {...post} userId={userId} />
+          </Link>
+        );
+      })}
       {lastPostId && (
         <InfiniteScrollTrigger
           loaderRoute={`/?index&lastPostId=${lastPostId}`}

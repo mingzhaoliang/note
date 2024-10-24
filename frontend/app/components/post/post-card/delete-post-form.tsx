@@ -3,15 +3,25 @@ import { useFetcher } from "@remix-run/react";
 
 type DeletePostFormProps = {
   postId: string;
+  onDelete?: () => void;
 };
 
-export default function DeletePostForm({ postId }: DeletePostFormProps) {
+export default function DeletePostForm({ postId, onDelete }: DeletePostFormProps) {
   const fetcher = useFetcher({ key: "post" });
 
+  const onSubmit = () => {
+    if (onDelete) onDelete();
+  };
+
   return (
-    <fetcher.Form method="DELETE" action="/post/delete">
+    <fetcher.Form method="DELETE" action="/post/delete" onSubmit={onSubmit}>
       <input type="hidden" name="postId" value={postId} />
-      <AlertDialogAction type="submit" name="_action" value="delete">
+      <AlertDialogAction
+        type="submit"
+        name="_action"
+        value="delete"
+        onClick={(e) => e.stopPropagation()}
+      >
         Continue
       </AlertDialogAction>
     </fetcher.Form>
