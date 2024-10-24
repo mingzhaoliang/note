@@ -1,5 +1,6 @@
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import { Avatar, AvatarFallback, CldAvatarImage } from "@/components/ui/avatar";
+import { useSession } from "@/store/session.context";
 import { ProfileOverview } from "@/types";
 
 type ProfileInfoProps = {
@@ -7,13 +8,14 @@ type ProfileInfoProps = {
 };
 
 export default function ProfileInfo({ profile }: ProfileInfoProps) {
+  const { user } = useSession();
   return (
     <div className="flex justify-between gap-6 pb-8">
       <div className="flex justify-center flex-col gap-4">
         <div className="flex flex-col space-y-1">
           <div className="flex items-center gap-3">
             <p className="text-2xl md:text-3xl font-semibold">{profile.name}</p>
-            <ProfileEditDialog {...profile} />
+            {user?.id === profile.id && <ProfileEditDialog {...profile} />}
           </div>
           <p className="text-muted-foreground">{"@" + profile.username}</p>
         </div>

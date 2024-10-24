@@ -1,14 +1,13 @@
 import envConfig from "@/config/env.config.server";
-import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { ProfileOverview } from "@/types";
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import ProfileInfo from "./profile-info";
 import ProfileNavbar from "./profile-navbar";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const response = await fetch(`${envConfig.API_URL}/profile/overview/${user.id}`);
+export async function loader({ params }: LoaderFunctionArgs) {
+  const { username } = params;
+  const response = await fetch(`${envConfig.API_URL}/profile/overview/${username}`);
 
   if (!response.ok) {
     return redirect("/");
@@ -16,7 +15,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { profile } = (await response.json()) as { profile: ProfileOverview };
 
-  return json({ profile }, { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
+  return json({ profile });
 }
 
 export default function ProfileLayout() {

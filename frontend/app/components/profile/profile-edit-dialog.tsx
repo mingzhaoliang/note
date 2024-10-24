@@ -58,7 +58,7 @@ export default function ProfileEditDialog({ id, username, name, bio, avatar }: P
   const onSubmit: SubmitHandler<ProfileEditSchema> = (data, event) => {
     fetcher.submit(event?.target, {
       method: "PUT",
-      action: `/profile?index`,
+      action: `/profile/${username}?index`,
       encType: data.avatar ? "multipart/form-data" : undefined,
     });
 

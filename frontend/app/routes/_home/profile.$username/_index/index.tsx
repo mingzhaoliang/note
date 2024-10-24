@@ -12,8 +12,8 @@ import { LetterTextIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { useImmer } from "use-immer";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
+export async function loader({ params, request }: LoaderFunctionArgs) {
+  const { username } = params;
   const baseSession = await getBaseSession(request.headers.get("Cookie"));
   const formState_ = baseSession.get("formState");
   let formState = formState_ ? JSON.parse(formState_) : undefined;
@@ -24,7 +24,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!formState) {
     const response = await fetch(
-      `${envConfig.API_URL}/post/profile/${user.id}${lastPostId ? `?lastPostId=${lastPostId}` : ""}`
+      `${envConfig.API_URL}/post/profile/${username}${
+        lastPostId ? `?lastPostId=${lastPostId}` : ""
+      }`
     );
 
     if (!response.ok) {
@@ -35,11 +37,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     posts = (await response.json()).posts;
   }
 
-  const headers = new Headers();
-  headers.append("Set-Cookie", await commitBaseSession(baseSession));
-  if (authHeader) headers.append("Set-Cookie", authHeader);
-
-  return json({ posts, formState }, { headers });
+  return json({ posts, formState });
 }
 
 export default function Profile() {
@@ -105,9 +103,14 @@ export default function Profile() {
   );
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ params, request }: ActionFunctionArgs) {
   const { authHeader, user } = await redirectIfUnauthenticated(request);
   const baseSession = await getBaseSession(request.headers.get("Cookie"));
+
+  const { username } = params;
+  if (username !== user.username) {
+    return json({}, { status: 400 });
+  }
 
   const formData = await request.formData();
 
