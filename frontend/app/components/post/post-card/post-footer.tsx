@@ -1,8 +1,8 @@
 import LoginModal from "@/components/auth/login-modal";
 import { Comment, Like } from "@/components/icons";
 import { Slot } from "@radix-ui/react-slot";
-import PostComment from "./post-comment";
-import PostLikes from "./post-likes";
+import PostCommentButton from "./post-comment-button";
+import PostLikeButton from "./post-like-button";
 
 type PostFooterProps = {
   postId: string;
@@ -18,8 +18,8 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
     <div className="mt-6 flex items-center gap-x-2">
       {userId && (
         <>
-          <PostLikes postId={postId} hasLiked={hasLiked} count={likes.length} />
-          <PostComment postId={postId} count={commentCount} />
+          <PostLikeButton postId={postId} hasLiked={hasLiked} count={likes.length} />
+          <PostCommentButton postId={postId} count={commentCount} />
         </>
       )}
       {!userId && (

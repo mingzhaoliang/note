@@ -11,7 +11,7 @@ type PostLikesProps = {
   count: number;
 };
 
-const PostLikes = ({ postId, hasLiked, count }: PostLikesProps) => {
+const PostLikeButton = ({ postId, hasLiked, count }: PostLikesProps) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.formData?.get("postId") === postId;
   const Icon = (isSubmitting ? !hasLiked : hasLiked) ? LikeFilled : Like;
@@ -40,4 +40,4 @@ const PostLikes = ({ postId, hasLiked, count }: PostLikesProps) => {
   );
 };
 
-export default PostLikes;
+export default PostLikeButton;
