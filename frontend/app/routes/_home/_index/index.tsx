@@ -60,7 +60,7 @@ export default function Index() {
   }, [JSON.stringify(loadedPosts), dispatch]);
 
   return (
-    <div className="flex-1 flex flex-col items-center p-6 gap-8">
+    <div className="flex-1 flex flex-col items-center p-6">
       {feedPosts.map((post) => {
         if (post.id.startsWith("tmp-")) {
           <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />;

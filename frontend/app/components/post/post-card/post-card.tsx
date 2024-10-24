@@ -36,7 +36,7 @@ const PostCard = ({
     fetcherFormData?.get("_action") === "delete" && fetcherFormData?.get("postId") === postId;
 
   return (
-    <div className={cn("w-full flex space-x-3", isDeleting && "hidden", className)}>
+    <div className={cn("w-full flex space-x-3 py-4", isDeleting && "hidden", className)}>
       <div className="flex-center flex-col pb-8">
         <Avatar>
           <CldAvatarImage src={profile.avatar} />
