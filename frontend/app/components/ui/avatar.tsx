@@ -2,7 +2,6 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
 
 import { cn } from "@/lib/utils/cn";
-import CldImage, { CldImageProps } from "../shared/cld-image";
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -28,16 +27,17 @@ const AvatarImage = React.forwardRef<
 ));
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
-const CldAvatarImage = ({ src, alt, responsive, dprVariants, ...props }: CldImageProps) => {
+const CldAvatarImage = ({
+  src,
+  alt,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof AvatarImage>) => {
   if (!src) return null;
 
   return (
-    <CldImage
-      src={src}
+    <AvatarImage
+      src={`http://res.cloudinary.com/${window.ENV.CLOUDINARY_CLOUD_NAME}/${src}`}
       alt={alt ?? "avatar"}
-      responsive={responsive ?? [{ size: { width: 16, height: 16 } }]}
-      dprVariants={dprVariants ?? [1, 3, 5]}
-      placeholder="blur"
       {...props}
     />
   );
