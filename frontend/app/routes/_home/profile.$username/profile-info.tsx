@@ -1,3 +1,4 @@
+import FollowButton from "@/components/profile/follow-button";
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/session.context";
@@ -9,13 +10,17 @@ type ProfileInfoProps = {
 
 export default function ProfileInfo({ profile }: ProfileInfoProps) {
   const { user } = useSession();
+  const isOwner = user?.id === profile.id;
+  const isFollowing = profile.follower.some((followerId) => followerId === user?.id);
+
   return (
     <div className="flex justify-between gap-6 pb-8">
       <div className="flex justify-center flex-col gap-4">
         <div className="flex flex-col space-y-1">
           <div className="flex items-center gap-3">
             <p className="text-2xl md:text-3xl font-semibold">{profile.name}</p>
-            {user?.id === profile.id && <ProfileEditDialog {...profile} />}
+            {isOwner && <ProfileEditDialog {...profile} />}
+            {!isOwner && <FollowButton isFollowing={isFollowing} username={profile.username} />}
           </div>
           <p className="text-muted-foreground">{"@" + profile.username}</p>
         </div>
