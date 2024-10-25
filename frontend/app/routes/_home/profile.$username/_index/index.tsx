@@ -47,7 +47,8 @@ export default function ProfilePosts() {
   const lastPostId = profilePosts[profilePosts.length - 1]?.id;
   const { username } = useParams();
 
-  const handleNewProfilePosts = useCallback((newPosts: PostOverview[]) => {
+  const handleNewProfilePosts = useCallback((newPosts: PostOverview[] | null) => {
+    if (!newPosts) return;
     setProfilePosts((draft) => {
       draft.push(...newPosts);
     });
