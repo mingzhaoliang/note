@@ -2,7 +2,7 @@ import { findProfilePostsController } from "@/controllers/post/post.controller.j
 import {
   deleteAvatarController,
   editProfileController,
-  findProfileOverviewController,
+  getProfileController,
 } from "@/controllers/profile/profile.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { profileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
@@ -10,7 +10,7 @@ import { Router } from "express";
 
 const router = Router();
 
-router.get("/:username/overview", findProfileOverviewController);
+router.get("/:username/overview", getProfileController);
 
 router.get("/:username/posts", findProfilePostsController);
 

@@ -1,25 +1,24 @@
+import { createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
-import {
-  findProfile,
-  findProfileOverview,
-  updateProfile,
-} from "@/services/neon/profile.service.js";
+import { findProfile, getProfile, updateProfile } from "@/services/neon/profile.service.js";
 import { CloudinaryAsset } from "@/types/index.js";
 import { Request, Response } from "express";
 import fs from "fs";
 
-const findProfileOverviewController = async (req: Request, res: Response) => {
+const getProfileController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const profile = await findProfileOverview({ username });
+    const profile = await getProfile({ username });
 
     if (!profile) {
       res.status(404).json("Profile not found.");
       return;
     }
 
-    res.status(200).json({ profile });
+    const profileDto = createProfileDto(profile);
+
+    res.status(200).json({ profile: profileDto });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -99,4 +98,4 @@ const deleteAvatarController = async (req: Request, res: Response) => {
   }
 };
 
-export { deleteAvatarController, editProfileController, findProfileOverviewController };
+export { deleteAvatarController, editProfileController, getProfileController };

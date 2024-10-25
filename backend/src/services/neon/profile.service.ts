@@ -24,7 +24,7 @@ const findProfile = async ({ id, username }: FindProfileArgs) => {
   }
 };
 
-const findProfileOverview = async ({ id, username }: FindProfileArgs) => {
+const getProfile = async ({ id, username }: FindProfileArgs) => {
   try {
     if (!id && !username) {
       throw new Error("Either 'id' or 'username' must be provided.");
@@ -38,11 +38,11 @@ const findProfileOverview = async ({ id, username }: FindProfileArgs) => {
         name: true,
         avatar: true,
         bio: true,
+        follower: { select: { followerId: true } },
+        following: { select: { followingId: true } },
         _count: {
           select: {
             posts: true,
-            follower: true,
-            following: true,
           },
         },
       },
@@ -99,4 +99,4 @@ const updateProfile = async ({
   }
 };
 
-export { findProfile, findProfileOverview, getLikedPost, updateProfile };
+export { findProfile, getProfile, getLikedPost, updateProfile };

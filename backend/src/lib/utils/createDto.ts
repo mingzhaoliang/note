@@ -1,4 +1,5 @@
 import { findPost, getComment } from "@/services/neon/post.service.js";
+import { getProfile } from "@/services/neon/profile.service.js";
 
 const createPostDto = (post: Awaited<ReturnType<typeof findPost>>) => {
   if (!post) {
@@ -45,4 +46,21 @@ const createCommentDto = (comment: Comment): CommentDto => {
   };
 };
 
-export { createCommentDto, createPostDto };
+const createProfileDto = (profile: Awaited<ReturnType<typeof getProfile>>) => {
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    id: profile.id,
+    username: profile.username,
+    name: profile.name,
+    avatar: profile.avatar,
+    bio: profile.bio,
+    follower: profile.follower.map(({ followerId }) => followerId),
+    following: profile.following.map(({ followingId }) => followingId),
+    postCount: profile._count.posts,
+  };
+};
+
+export { createCommentDto, createPostDto, createProfileDto };
