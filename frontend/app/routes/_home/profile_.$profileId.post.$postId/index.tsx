@@ -23,7 +23,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     throw new Error("Oops! This post seems to be missing.");
   }
 
-  const comments: Promise<Comment[]> = fetch(`${envConfig.API_URL}/post/comment/${postId}`)
+  const comments: Promise<Comment[]> = fetch(`${envConfig.API_URL}/post/${postId}/comments`)
     .then((response) => response.json())
     .then((data) => data.comments);
 

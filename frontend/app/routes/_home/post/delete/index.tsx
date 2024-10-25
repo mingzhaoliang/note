@@ -11,7 +11,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const _action = formData.get("_action");
   const postId = formData.get("postId");
 
-  const response = await fetch(`${envConfig.API_URL}/post/delete/${postId}`, { method: "DELETE" });
+  const response = await fetch(`${envConfig.API_URL}/post/${postId}`, { method: "DELETE" });
 
   let message;
   if (!response.ok) {
