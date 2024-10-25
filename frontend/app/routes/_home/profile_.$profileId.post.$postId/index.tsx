@@ -78,7 +78,7 @@ export default function PostDetail() {
         <Await resolve={comments}>
           {(comments) => {
             return (
-              <div className="flex flex-col gap-y-8">
+              <div className="flex flex-col gap-y-3">
                 <CommentGroups comments={comments} user={user} />
               </div>
             );

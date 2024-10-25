@@ -23,13 +23,13 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
           <AvatarFallback>{profile.name[0]}</AvatarFallback>
         </Avatar>
       </div>
-      <div className="flex flex-col gap-y-2">
-        <p className="text-sm flex items-center gap-3">
+      <div className="flex flex-col">
+        <p className="mb-2 text-sm flex items-center gap-3">
           <span className="font-semibold">{profile.username}</span>
           <span className="text-muted-foreground">{postDateFormat(comment.createdAt)}</span>
         </p>
         <p className="text-sm">{comment.text}</p>
-        <div className="mt-2 -ml-3 flex items-center gap-x-2">
+        <div className="-ml-3 flex items-center gap-x-2">
           {user && (
             <>
               <LikeButton

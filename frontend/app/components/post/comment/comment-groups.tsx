@@ -29,10 +29,10 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
           return null;
         }
         return (
-          <div key={comment.id} className="flex flex-col gap-y-6">
+          <div key={comment.id} className="flex flex-col gap-y-3">
             <PostComment profile={comment.profile} comment={comment} user={user} />
             {comment.commentCount > 0 && comment.comments && (
-              <div className="ml-11 flex flex-col gap-y-6">
+              <div className="ml-10 flex flex-col gap-y-3">
                 <CommentGroups comments={comment.comments} user={user} />
               </div>
             )}
