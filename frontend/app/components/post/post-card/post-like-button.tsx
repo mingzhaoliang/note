@@ -30,6 +30,7 @@ const PostLikeButton = ({ postId, hasLiked, count }: PostLikesProps) => {
       <fetcher.Form method="PUT" action="/post/like" className="flex-center">
         <input type="hidden" name="postId" value={postId} />
         <button type="submit" name="_action" value="like">
+        <button type="submit" name="_action" value="like" onClick={(e) => e.stopPropagation()}>
           <Icon className="text-inactive w-5 h-5" />
         </button>
       </fetcher.Form>
