@@ -16,9 +16,9 @@ export default function HomeLayout() {
   return (
     <SessionProvider user={user}>
       <div className="h-full min-h-screen md:pl-20 md:flex">
-        <Sidebar />
         <MobileHeader />
         <Outlet />
+        <Sidebar />
       </div>
     </SessionProvider>
   );
