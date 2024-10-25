@@ -17,7 +17,7 @@ export async function action({ request }: ActionFunctionArgs) {
     .map(([, value]) => value as string);
   formData.set("tags", JSON.stringify(tags));
 
-  const response = await fetch(`${envConfig.API_URL}/post/create`, {
+  const response = await fetch(`${envConfig.API_URL}/post`, {
     method: "POST",
     body: formData,
   });

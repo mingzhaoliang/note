@@ -15,7 +15,7 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post("/create", validateData(createPostSchema), createPostController);
+router.post("/", validateData(createPostSchema), createPostController);
 
 router.get("/feed", getFeedController);
 

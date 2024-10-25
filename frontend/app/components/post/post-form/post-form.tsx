@@ -97,7 +97,7 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
 
     fetcher.submit(formData, {
       method: "POST",
-      action: "/post/create",
+      action: "/api/post?index",
       encType: "multipart/form-data",
     });
 
