@@ -12,7 +12,7 @@ type CommentSectionProps = {
 const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   const [showMore, setShowMore] = useState(false);
   // Only grandchildren comments will be collapsed
-  const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].parentId;
+  const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].commentOnId;
 
   const handleShowMore = useCallback(() => {
     setShowMore(true);
@@ -25,15 +25,15 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   return (
     <>
       {comments.map((comment, index) => {
-        if (index + 1 > INITIAL_DISPLAY_COMMENTS && !showMore && comment.parentId) {
+        if (index + 1 > INITIAL_DISPLAY_COMMENTS && !showMore && comment.commentOnId) {
           return null;
         }
         return (
           <div key={comment.id} className="flex flex-col gap-y-6">
             <PostComment profile={comment.profile} comment={comment} user={user} />
-            {comment.childrenCount > 0 && comment.children && (
+            {comment.commentCount > 0 && comment.comments && (
               <div className="ml-11 flex flex-col gap-y-6">
-                <CommentGroups comments={comment.children} user={user} />
+                <CommentGroups comments={comment.comments} user={user} />
               </div>
             )}
           </div>

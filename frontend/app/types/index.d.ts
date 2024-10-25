@@ -61,14 +61,13 @@ type Post = PostOverview & {
 
 type Comment = {
   id: string;
-  postId: string;
+  profile: Profile;
   text: string;
   likes: string[];
+  commentOnId: string | null;
+  commentCount: number;
+  comments?: Comment[];
   createdAt: string;
-  profile: Profile;
-  parentId: string | null;
-  children?: PostComment[];
-  childrenCount: number;
 };
 
-export type { CloudinaryAsset, Post, Comment, PostOverview, Profile, ProfileOverview, User };
+export type { CloudinaryAsset, Comment, Post, PostOverview, Profile, ProfileOverview, User };

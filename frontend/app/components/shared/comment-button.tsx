@@ -19,14 +19,13 @@ import { EditorState, LexicalEditor } from "lexical";
 import { useCallback, useState } from "react";
 
 type PostCommentProps = {
-  postId: string;
-  parentId?: string;
+  commentOnId: string;
   count: number;
 };
 
-const CommentButton = ({ postId, parentId, count }: PostCommentProps) => {
+const CommentButton = ({ commentOnId, count }: PostCommentProps) => {
   const fetcher = useFetcher();
-  const isSubmitting = fetcher.formData?.get("postId") === postId;
+  const isSubmitting = fetcher.state !== "idle";
   const optimisticCount = isSubmitting ? count + 1 : count;
 
   const dispatch = useAppDispatch();
@@ -64,13 +63,8 @@ const CommentButton = ({ postId, parentId, count }: PostCommentProps) => {
 
     // Submit the comment to the server
     fetcher.submit(
-      {
-        _action: "comment",
-        postId,
-        ...(parentId && { parentId }),
-        text: commentText,
-      },
-      { method: "POST", action: "/post/comment" }
+      { commentOnId, text: commentText },
+      { method: "POST", action: `/api/post/${commentOnId}/comment` }
     );
 
     setCommentText("");

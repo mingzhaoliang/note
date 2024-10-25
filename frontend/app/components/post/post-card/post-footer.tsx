@@ -18,7 +18,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
       {userId && (
         <>
           <LikeButton id={postId} type="post" hasLiked={hasLiked} count={likes.length} />
-          <CommentButton postId={postId} count={commentCount} />
+          <CommentButton commentOnId={postId} count={commentCount} />
         </>
       )}
       {!userId && (

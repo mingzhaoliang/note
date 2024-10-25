@@ -9,8 +9,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
   formData.append("profileId", user.id);
-  const _action = formData.get("_action");
-  const postId = formData.get("postId");
+  const commentOnId = formData.get("commentOnId");
 
   const response = await fetch(`${envConfig.API_URL}/post/comment`, {
     method: "POST",
@@ -25,7 +24,7 @@ export async function action({ request }: ActionFunctionArgs) {
     post = (await response.json()).post;
   }
 
-  const actionState = { message, _action, postId };
+  const actionState = { message, postId: commentOnId };
 
   return json({ post, actionState }, { headers });
 }

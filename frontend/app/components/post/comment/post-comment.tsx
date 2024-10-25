@@ -38,11 +38,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
                 hasLiked={hasLiked}
                 count={comment.likes.length}
               />
-              <CommentButton
-                postId={comment.postId}
-                parentId={comment.id}
-                count={comment.childrenCount}
-              />
+              <CommentButton commentOnId={comment.id} count={comment.commentCount} />
             </>
           )}
           {!user && (
@@ -50,7 +46,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
               <PostStats count={0}>
                 <Like />
               </PostStats>
-              <PostStats count={comment.childrenCount}>
+              <PostStats count={comment.commentCount}>
                 <CommentIcon />
               </PostStats>
             </>
