@@ -14,7 +14,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { useFetcher } from "@remix-run/react";
+import { Form, useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
 import { useCallback, useState } from "react";
 
@@ -81,15 +81,25 @@ const PostCommentButton = ({ postId, parentId, count }: PostCommentProps) => {
     <ResponsiveDialog query="(min-width: 768px)" modal open={open} onOpenChange={setOpen}>
       {({ Trigger, Content, Header, Title, Description }) => (
         <>
-          <div className="flex items-center space-x-2">
-            <Trigger>
+          <Trigger asChild>
+            <Button
+              variant="ghost"
+              className="rounded-full space-x-2 px-3"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(true);
+              }}
+            >
               <Comment className="text-inactive w-5 h-5" />
-            </Trigger>
-            <div className="min-w-3">
               {optimisticCount > 0 && <p className="text-inactive text-sm">{optimisticCount}</p>}
-            </div>
-          </div>
-          <Content className="responsive-dialog-content pb-6">
+            </Button>
+          </Trigger>
+          <Content
+            className="responsive-dialog-content pb-6"
+            overlayConfig={{ onClick: (e) => e.stopPropagation() }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Header className="max-md:text-left">
               <Title>Comment</Title>
               <Description>Leave a comment below</Description>

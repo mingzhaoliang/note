@@ -63,8 +63,20 @@ export default function PostImages({ images, isLocal }: PostImagesProps) {
           <div className="absolute top-2 right-2 rounded-full bg-secondary/60 px-2 py-1 text-xs">
             {currentSnap} / {images.length}
           </div>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
+          <CarouselPrevious
+            className="left-2"
+            onClick={(e) => {
+              e.preventDefault();
+              api?.scrollPrev();
+            }}
+          />
+          <CarouselNext
+            className="right-2"
+            onClick={(e) => {
+              e.preventDefault();
+              api?.scrollNext();
+            }}
+          />
         </>
       )}
     </Carousel>
