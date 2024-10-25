@@ -3,12 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Post } from "@/types";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 import { Loader2Icon } from "lucide-react";
 import { memo } from "react";
 import PostDropdown from "./post-dropdown";
 import PostFooter from "./post-footer";
 import PostImages from "./post-images";
+import UsernameButton from "@/components/shared/username-button";
 
 type PostCardProps = Post & {
   userId?: string | null;
@@ -43,10 +44,10 @@ const PostCard = ({
       </div>
       <div className="w-full flex flex-col space-y-4">
         <div className="py-1 flex-between gap-3">
-          <p className="text-sm flex-center gap-3">
-            <span className="font-semibold">{profile.username}</span>
-            <span className="text-muted-foreground">{postDateFormat(createdAt)}</span>
-          </p>
+          <div className="text-sm flex-center gap-3">
+            <UsernameButton username={profile.username} />
+            <p className="text-muted-foreground">{postDateFormat(createdAt)}</p>
+          </div>
           {isCreating ? (
             <Loader2Icon className="animate-spin text-inactive" />
           ) : (

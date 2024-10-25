@@ -3,6 +3,7 @@ import PostDropdown from "@/components/post/post-card/post-dropdown";
 import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
 import CldAvatar from "@/components/shared/cld-avatar";
+import UsernameButton from "@/components/shared/username-button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
@@ -53,10 +54,10 @@ export default function PostDetail() {
     <div className="mx-auto w-full max-w-2xl flex-col space-y-3 p-6">
       <div className="flex-between gap-3">
         <CldAvatar profile={profile} />
-        <p className="flex-1 text-sm flex items-center gap-3">
-          <span className="font-semibold">{profile.username}</span>
-          <span className="text-muted-foreground">{postDateFormat(createdAt)}</span>
-        </p>
+        <div className="flex-1 text-sm flex items-center gap-3">
+          <UsernameButton username={profile.username} />
+          <p className="text-muted-foreground">{postDateFormat(createdAt)}</p>
+        </div>
         <PostDropdown isOwner={isOwner} postId={postId} onDelete={handleDelete} />
       </div>
       {images.length > 0 && <PostImages images={images} />}

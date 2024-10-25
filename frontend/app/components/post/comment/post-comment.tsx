@@ -1,9 +1,10 @@
+import { Comment as CommentIcon, Like } from "@/components/icons";
 import CldAvatar from "@/components/shared/cld-avatar";
+import CommentButton from "@/components/shared/comment-button";
+import LikeButton from "@/components/shared/like-button";
+import UsernameButton from "@/components/shared/username-button";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Comment, Profile, User } from "@/types";
-import { Comment as CommentIcon, Like } from "../../icons";
-import CommentButton from "../../shared/comment-button";
-import LikeButton from "../../shared/like-button";
 import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
@@ -21,10 +22,10 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
         <CldAvatar className="w-8 h-8" profile={profile} />
       </div>
       <div className="flex flex-col">
-        <p className="mb-2 text-sm flex items-center gap-3">
-          <span className="font-semibold">{profile.username}</span>
-          <span className="text-muted-foreground">{postDateFormat(comment.createdAt)}</span>
-        </p>
+        <div className="mb-2 text-sm flex items-center gap-3">
+          <UsernameButton username={profile.username} />
+          <p className="text-muted-foreground">{postDateFormat(comment.createdAt)}</p>
+        </div>
         <p className="text-sm">{comment.text}</p>
         <div className="-ml-3 flex items-center gap-x-2">
           {user && (
