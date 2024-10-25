@@ -29,11 +29,14 @@ type User = {
   avatar: string;
 };
 
-type ProfileOverview = {
+type Profile = {
   id: string;
   username: string;
   name: string;
-  avatar?: string;
+  avatar: string | null;
+};
+
+type ProfileOverview = Profile & {
   bio?: string;
   _count: {
     posts: number;
@@ -46,12 +49,7 @@ type PostOverview = {
   id: string;
   text: string;
   images: string[];
-  profile: {
-    id: string;
-    username: string;
-    name: string;
-    avatar: string;
-  };
+  profile: Profile;
 };
 
 type Post = PostOverview & {
@@ -61,17 +59,15 @@ type Post = PostOverview & {
   commentCount: number;
 };
 
-type PostComment = {
+type Comment = {
   id: string;
+  postId: string;
   text: string;
-  createdAt: Date;
+  createdAt: string;
+  profile: Profile;
   parentId: string | null;
-  profile: {
-    avatar: string | null;
-    id: string;
-    username: string;
-    name: string;
-  };
+  children?: PostComment[];
+  _count: { children: number };
 };
 
-export type { CloudinaryAsset, Post, PostOverview, ProfileOverview, User };
+export type { CloudinaryAsset, Post, Comment, PostOverview, Profile, ProfileOverview, User };

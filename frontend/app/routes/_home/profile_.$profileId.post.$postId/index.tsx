@@ -1,14 +1,17 @@
+import CommentSection from "@/components/post/comment-section";
 import PostDropdown from "@/components/post/post-card/post-dropdown";
 import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
 import { Avatar, AvatarFallback, CldAvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { requireUser } from "@/session/guard.server";
-import { Post } from "@/types";
+import { Comment, Post } from "@/types";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { defer, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { Await, defer, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { Suspense } from "react";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { authHeader, user } = await requireUser(request);
@@ -20,7 +23,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     throw new Error("Oops! This post seems to be missing.");
   }
 
-  const comments = fetch(`${envConfig.API_URL}/post/comment/${postId}`)
+  const comments: Promise<Comment[]> = fetch(`${envConfig.API_URL}/post/comment/${postId}`)
     .then((response) => response.json())
     .then((data) => data.comments);
 
@@ -50,7 +53,7 @@ export default function PostDetail() {
     <div className="mx-auto w-full max-w-2xl flex-col space-y-3 p-6">
       <div className="flex-between gap-3">
         <Avatar>
-          <CldAvatarImage src={profile.avatar} />
+          <CldAvatarImage src={profile.avatar || undefined} />
           <AvatarFallback>{profile.name[0]}</AvatarFallback>
         </Avatar>
         <p className="flex-1 text-sm flex items-center gap-3">
@@ -69,6 +72,19 @@ export default function PostDetail() {
         ))}
       </div>
       <PostFooter postId={postId} userId={user?.id} likes={likes} commentCount={commentCount} />
+      <Separator className="!my-8" />
+
+      <Suspense fallback={<p>Loading comments...</p>}>
+        <Await resolve={comments}>
+          {(comments) => {
+            return (
+              <div className="flex flex-col gap-y-8">
+                <CommentSection comments={comments} user={user} />
+              </div>
+            );
+          }}
+        </Await>
+      </Suspense>
     </div>
   );
 }

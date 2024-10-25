@@ -39,7 +39,7 @@ const PostCard = ({
     <div className={cn("w-full flex space-x-3 py-4", isDeleting && "hidden", className)}>
       <div className="flex-center flex-col pb-8">
         <Avatar>
-          <CldAvatarImage src={profile.avatar} />
+          <CldAvatarImage src={profile.avatar || undefined} />
           <AvatarFallback>{profile.name[0]}</AvatarFallback>
         </Avatar>
         <div className="flex-1 border-l border-muted" />
