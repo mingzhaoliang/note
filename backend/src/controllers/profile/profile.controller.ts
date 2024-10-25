@@ -1,7 +1,13 @@
 import { createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
-import { findProfile, getProfile, updateProfile } from "@/services/neon/profile.service.js";
+import {
+  findProfile,
+  followProfile,
+  getProfile,
+  unfollowProfile,
+  updateProfile,
+} from "@/services/neon/profile.service.js";
 import { CloudinaryAsset } from "@/types/index.js";
 import { Request, Response } from "express";
 import fs from "fs";
@@ -98,4 +104,34 @@ const deleteAvatarController = async (req: Request, res: Response) => {
   }
 };
 
-export { deleteAvatarController, editProfileController, getProfileController };
+const followProfileController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { profileId } = req.body;
+
+    const profileToFollow = await getProfile({ username });
+    if (!profileToFollow) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+
+    const isFollowing = profileToFollow.follower.some(({ followerId }) => followerId === profileId);
+    if (isFollowing) {
+      await unfollowProfile({ followingId: profileToFollow.id, followerId: profileId });
+    } else {
+      await followProfile({ followingId: profileToFollow.id, followerId: profileId });
+    }
+
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export {
+  deleteAvatarController,
+  editProfileController,
+  followProfileController,
+  getProfileController,
+};

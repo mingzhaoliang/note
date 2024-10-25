@@ -99,4 +99,41 @@ const updateProfile = async ({
   }
 };
 
-export { findProfile, getProfile, getLikedPost, updateProfile };
+const followProfile = async ({
+  followingId,
+  followerId,
+}: {
+  followingId: string;
+  followerId: string;
+}) => {
+  try {
+    await prisma.follows.create({
+      data: {
+        followingId,
+        followerId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to follow profile.");
+  }
+};
+
+const unfollowProfile = async ({
+  followingId,
+  followerId,
+}: {
+  followingId: string;
+  followerId: string;
+}) => {
+  try {
+    await prisma.follows.delete({
+      where: { followerId_followingId: { followingId, followerId } },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to unfollow profile.");
+  }
+};
+
+export { findProfile, followProfile, getLikedPost, getProfile, unfollowProfile, updateProfile };
