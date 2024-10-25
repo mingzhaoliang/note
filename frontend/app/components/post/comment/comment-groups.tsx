@@ -3,6 +3,7 @@ import { Comment, User } from "@/types";
 import { useCallback, useState } from "react";
 import { Button } from "../../ui/button";
 import PostComment from "./post-comment";
+import { Link, useLocation } from "@remix-run/react";
 
 type CommentSectionProps = {
   comments: Comment[];
@@ -13,6 +14,7 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   const [showMore, setShowMore] = useState(false);
   // Only grandchildren comments will be collapsed
   const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].commentOnId;
+  const location = useLocation();
 
   const handleShowMore = useCallback(() => {
     setShowMore(true);
@@ -30,7 +32,12 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
         }
         return (
           <div key={comment.id} className="flex flex-col gap-y-3">
-            <PostComment profile={comment.profile} comment={comment} user={user} />
+            <Link
+              to={`/profile/${comment.profile.username}/post/${comment.id}`}
+              state={{ referrer: location.pathname }}
+            >
+              <PostComment profile={comment.profile} comment={comment} user={user} />
+            </Link>
             {comment.commentCount > 0 && comment.comments && (
               <div className="ml-10 flex flex-col gap-y-3">
                 <CommentGroups comments={comment.comments} user={user} />
