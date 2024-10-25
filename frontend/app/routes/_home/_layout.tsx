@@ -15,9 +15,11 @@ export default function HomeLayout() {
 
   return (
     <SessionProvider user={user}>
-      <div className="h-full min-h-screen md:pl-20 md:flex">
+      <div className="h-full min-h-screen md:pl-20 flex flex-col md:flex-row">
         <MobileHeader />
-        <Outlet />
+        <div className="flex-1">
+          <Outlet />
+        </div>
         <Sidebar />
       </div>
     </SessionProvider>
