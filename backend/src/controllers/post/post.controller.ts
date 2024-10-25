@@ -1,15 +1,16 @@
-import { createPostDto } from "@/lib/utils/createDto.js";
+import { createCommentDto, createPostDto } from "@/lib/utils/createDto.js";
 import { ActionSchema } from "@/schemas/post/action.schema.js";
+import { CreateCommentSchema } from "@/schemas/post/create-comment.schema.js";
 import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
 import {
-  commentPost,
+  createComment,
   createPost,
   deletePost,
   findPost,
-  findPostComments,
   findProfilePosts,
+  getComments,
   getFeedPosts,
   likePost,
   unLikePost,
@@ -82,9 +83,9 @@ const deletePostController = async (req: Request, res: Response) => {
   }
 };
 
-const likePostController = async (req: Request, res: Response) => {
+const likeUnlikePostController = async (req: Request, res: Response) => {
   try {
-    const { postId } = req.params;
+    const { id: postId } = req.params;
     const { profileId } = req.body as ActionSchema;
     const isLiked = (await getLikedPost(profileId, postId)) !== null;
 
@@ -124,22 +125,6 @@ const findPostController = async (req: Request, res: Response) => {
   }
 };
 
-const commentPostController = async (req: Request, res: Response) => {
-  try {
-    const { profileId, postId, parentId, text } = req.body;
-
-    const postComment = await commentPost({ postId, parentId, profileId, text });
-
-    const post = (await findPost(postComment.postId))!;
-    const postDto = createPostDto(post);
-
-    res.status(200).json({ post: postDto, postComment });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error." });
-  }
-};
-
 const findProfilePostsController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
@@ -163,15 +148,31 @@ const findProfilePostsController = async (req: Request, res: Response) => {
   }
 };
 
-const findPostCommentsController = async (req: Request, res: Response) => {
+const getCommentsController = async (req: Request, res: Response) => {
   try {
-    const { postId } = req.params;
-    const { lastCommentId, parentId } = req.query as {
-      lastCommentId: string | undefined;
-      parentId: string | undefined;
-    };
-    const comments = await findPostComments({ postId, lastCursor: lastCommentId, parentId });
-    res.status(200).json({ comments });
+    const { id: commentOnId } = req.params;
+    const { lastCommentId } = req.query as { lastCommentId: string | undefined };
+    const comments = await getComments({ commentOnId, lastCursor: lastCommentId });
+
+    const commentsDto = comments.map((comment) => createCommentDto(comment));
+
+    res.status(200).json({ comments: commentsDto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const createCommentController = async (req: Request, res: Response) => {
+  try {
+    const data = req.body as CreateCommentSchema;
+
+    const comment = await createComment(data);
+
+    const post = await findPost(comment.commentOnId!);
+    const postDto = createPostDto(post);
+
+    res.status(200).json({ post: postDto, comment });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });
@@ -179,12 +180,12 @@ const findPostCommentsController = async (req: Request, res: Response) => {
 };
 
 export {
-  commentPostController,
+  createCommentController,
   createPostController,
   deletePostController,
-  findPostCommentsController,
   findPostController,
   findProfilePostsController,
-  likePostController,
+  getCommentsController,
   getFeedPostsController,
+  likeUnlikePostController,
 };

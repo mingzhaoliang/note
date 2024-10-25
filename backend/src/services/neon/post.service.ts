@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/db/prisma.js";
+import { CreateCommentSchema } from "@/schemas/post/create-comment.schema.js";
+import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { Prisma } from "@prisma/client";
 
@@ -13,14 +15,12 @@ const basicPostSelect = {
   _count: { select: { comments: true } },
 };
 
-type CreatePostArgs = {
-  profileId: string;
-  text: string;
-  images: ImageSchema[] | undefined;
-  tags: string[] | undefined;
-};
-
-const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => {
+const createPost = async ({
+  profileId,
+  text,
+  images,
+  tags,
+}: CreatePostSchema & { images: ImageSchema[] | undefined }) => {
   try {
     const post = await prisma.post.create({
       data: {
@@ -54,6 +54,30 @@ const createPost = async ({ profileId, text, images, tags }: CreatePostArgs) => 
   } catch (error) {
     console.error(error);
     throw new Error("Failed to create the post.");
+  }
+};
+
+const createComment = async ({ profileId, text, commentOnId }: CreateCommentSchema) => {
+  try {
+    const postComment = await prisma.post.create({
+      data: {
+        profileId,
+        commentOnId: commentOnId ?? Prisma.skip,
+        text,
+      },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        profile: true,
+        commentOnId: true,
+      },
+    });
+
+    return postComment;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to comment the post.");
   }
 };
 
@@ -179,68 +203,61 @@ const findPost = async (postId: string) => {
   }
 };
 
-type CommentPostArgs = {
-  postId: string;
-  profileId: string;
-  text: string;
-  parentId: string | undefined;
-};
-
-const commentPost = async ({ postId, profileId, text, parentId }: CommentPostArgs) => {
+const getComment = async (commentId: string) => {
   try {
-    const postComment = await prisma.postComment.create({
-      data: {
-        profileId,
-        postId,
-        parentId: parentId ?? Prisma.skip,
-        text,
+    const comment = await prisma.post.findUnique({
+      where: { id: commentId },
+      select: {
+        id: true,
+        profile: true,
+        text: true,
+        likes: { select: { profileId: true } },
+        commentOnId: true,
+        createdAt: true,
+        _count: { select: { comments: true } },
       },
     });
 
-    return postComment;
+    return comment;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to comment the post.");
+    throw new Error("Failed to get the comment.");
   }
 };
 
-const findPostComments = async ({
-  postId,
+const getComments = async ({
+  commentOnId,
   lastCursor,
-  parentId,
   take = 10,
 }: {
-  postId: string;
+  commentOnId: string;
   lastCursor?: string;
-  parentId?: string;
   take?: number;
 }) => {
   try {
-    const comments = await prisma.postComment.findMany({
+    const comments = await prisma.post.findMany({
       take,
       ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
-      where: { postId, parentId: parentId ?? null },
+      where: { commentOnId },
       select: {
         id: true,
-        postId: true,
+        profile: true,
         text: true,
         likes: { select: { profileId: true } },
-        createdAt: true,
-        profile: true,
-        parentId: true,
-        children: {
+        commentOnId: true,
+        comments: {
           select: {
             id: true,
-            postId: true,
+            profile: true,
             text: true,
             likes: { select: { profileId: true } },
+            commentOnId: true,
             createdAt: true,
-            profile: true,
-            parentId: true,
-            _count: { select: { children: true } },
+            _count: { select: { comments: true } },
           },
         },
-        _count: { select: { children: true } },
+        createdAt: true,
+        _count: { select: { comments: true } },
       },
       orderBy: {
         createdAt: "desc",
@@ -255,12 +272,13 @@ const findPostComments = async ({
 };
 
 export {
-  commentPost,
+  createComment,
   createPost,
   deletePost,
   findPost,
-  findPostComments,
   findProfilePosts,
+  getComment,
+  getComments,
   getFeedPosts,
   likePost,
   unLikePost,

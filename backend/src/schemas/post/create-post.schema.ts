@@ -9,7 +9,7 @@ const createPostSchema = z.object({
   tags: z
     .string()
     .transform((str) => {
-      return str ? JSON.parse(str.toLowerCase()) : [];
+      return str ? (JSON.parse(str.toLowerCase()) as string[]) : [];
     })
     .refine((tags) => tags.length <= 3, {
       message: "Tag limit reached.",
