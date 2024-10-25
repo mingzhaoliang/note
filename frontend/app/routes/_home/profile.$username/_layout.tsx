@@ -1,5 +1,5 @@
 import envConfig from "@/config/env.config.server";
-import { ProfileOverview } from "@/types";
+import { Profile } from "@/types";
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import ProfileInfo from "./profile-info";
@@ -13,7 +13,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     return redirect("/");
   }
 
-  const { profile } = (await response.json()) as { profile: ProfileOverview };
+  const { profile } = (await response.json()) as { profile: Profile };
 
   return json({ profile });
 }

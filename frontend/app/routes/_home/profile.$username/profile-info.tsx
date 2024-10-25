@@ -1,10 +1,10 @@
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/session.context";
-import { ProfileOverview } from "@/types";
+import { Profile } from "@/types";
 
 type ProfileInfoProps = {
-  profile: ProfileOverview;
+  profile: Profile;
 };
 
 export default function ProfileInfo({ profile }: ProfileInfoProps) {
@@ -21,15 +21,15 @@ export default function ProfileInfo({ profile }: ProfileInfoProps) {
         </div>
         <div className="md:text-lg flex gap-3 md:gap-6 font-medium">
           <div className="flex flex-wrap gap-1.5">
-            <p>{profile._count.posts}</p>
+            <p>{profile.postCount}</p>
             <p>Posts</p>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <p>{profile._count.follower}</p>
+            <p>{profile.follower.length}</p>
             <p>Followers</p>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <p>{profile._count.following}</p>
+            <p>{profile.following.length}</p>
             <p>Following</p>
           </div>
         </div>

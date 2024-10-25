@@ -5,7 +5,7 @@ import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { PostOverview, Profile } from "@/types";
+import { PostOverview, BaseProfile } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, replace, useLoaderData, useParams } from "@remix-run/react";
 import { LetterTextIcon } from "lucide-react";
@@ -141,7 +141,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   headers.append("Set-Cookie", await commitBaseSession(baseSession));
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
-  const updatedProfile: Profile = (await updateResponse.json()).profile;
+  const updatedProfile: BaseProfile = (await updateResponse.json()).profile;
 
   return replace(`/profile/${updatedProfile.username}`, { headers });
 }

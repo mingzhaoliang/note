@@ -29,7 +29,7 @@ type User = {
   avatar: string;
 };
 
-type Profile = {
+type BaseProfile = {
   id: string;
   username: string;
   name: string;
@@ -37,13 +37,10 @@ type Profile = {
   bio: string | null;
 };
 
-type ProfileOverview = Profile & {
-  bio?: string;
-  _count: {
-    posts: number;
-    follower: number;
-    following: number;
-  };
+type Profile = BaseProfile & {
+  follower: string[];
+  following: string[];
+  postCount: number;
 };
 
 type PostOverview = {
@@ -71,4 +68,4 @@ type Comment = {
   createdAt: string;
 };
 
-export type { CloudinaryAsset, Comment, Post, PostOverview, Profile, ProfileOverview, User };
+export type { CloudinaryAsset, Comment, Post, PostOverview, BaseProfile, Profile, User };

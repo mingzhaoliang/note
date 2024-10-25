@@ -1,8 +1,8 @@
-import { Profile } from "@/types";
+import { BaseProfile } from "@/types";
 import { Avatar, AvatarFallback, CldAvatarImage } from "../ui/avatar";
 
 type CldAvatarProps = {
-  profile: Profile;
+  profile: BaseProfile;
   className?: string;
 };
 

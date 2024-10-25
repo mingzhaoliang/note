@@ -4,11 +4,11 @@ import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
 import UsernameButton from "@/components/shared/username-button";
 import { postDateFormat } from "@/lib/utils/formatter";
-import { Comment, Profile, User } from "@/types";
+import { Comment, BaseProfile, User } from "@/types";
 import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
-  profile: Profile;
+  profile: BaseProfile;
   comment: Comment;
   user: User | null;
 };
