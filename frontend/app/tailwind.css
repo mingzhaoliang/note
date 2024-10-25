@@ -145,6 +145,6 @@ body {
   }
 
   .responsive-dialog-content {
-    @apply max-md:h-[calc(100vh-4rem)] md:!rounded-3xl md:max-w-screen-sm bg-primary-foreground no-highlight;
+    @apply md:!rounded-3xl md:max-w-screen-sm bg-primary-foreground no-highlight;
   }
 }

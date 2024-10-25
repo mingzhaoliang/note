@@ -89,13 +89,16 @@ const PostCommentButton = ({ postId, parentId, count }: PostCommentProps) => {
               {optimisticCount > 0 && <p className="text-inactive text-sm">{optimisticCount}</p>}
             </div>
           </div>
-          <Content>
-            <Header>
+          <Content className="responsive-dialog-content pb-6">
+            <Header className="max-md:text-left">
               <Title>Comment</Title>
               <Description>Leave a comment below</Description>
             </Header>
-            <fetcher.Form onSubmit={handleSubmit}>
-              <div className="relative">
+            <fetcher.Form
+              onSubmit={handleSubmit}
+              className="max-md:flex-1 flex flex-col max-md:px-4"
+            >
+              <div className="relative flex-1">
                 <LexicalComposer>
                   <PlainTextPlugin
                     contentEditable={
