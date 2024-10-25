@@ -1,7 +1,7 @@
 import { createCommentDto, createPostDto } from "@/lib/utils/createDto.js";
-import { ActionSchema } from "@/schemas/post/action.schema.js";
 import { CreateCommentSchema } from "@/schemas/post/create-comment.schema.js";
 import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
+import { ActionSchema } from "@/schemas/shared/action.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
 import {

@@ -8,9 +8,9 @@ import {
   likeUnlikePostController,
 } from "@/controllers/post/post.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
-import { actionSchema } from "@/schemas/post/action.schema.js";
 import { createCommentSchema } from "@/schemas/post/create-comment.schema.js";
 import { createPostSchema } from "@/schemas/post/create-post.schema.js";
+import { actionSchema } from "@/schemas/shared/action.schema.js";
 import { Router } from "express";
 
 const router = Router();
