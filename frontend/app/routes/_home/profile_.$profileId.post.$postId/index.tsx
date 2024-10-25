@@ -1,4 +1,4 @@
-import CommentSection from "@/components/post/comment-section";
+import CommentGroups from "@/components/post/comment/comment-groups";
 import PostDropdown from "@/components/post/post-card/post-dropdown";
 import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
@@ -79,7 +79,7 @@ export default function PostDetail() {
           {(comments) => {
             return (
               <div className="flex flex-col gap-y-8">
-                <CommentSection comments={comments} user={user} />
+                <CommentGroups comments={comments} user={user} />
               </div>
             );
           }}

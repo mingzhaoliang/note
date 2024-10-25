@@ -1,7 +1,7 @@
 import { INITIAL_DISPLAY_COMMENTS } from "@/config/post.config";
 import { Comment, User } from "@/types";
 import { useCallback, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import PostComment from "./post-comment";
 
 type CommentSectionProps = {
@@ -9,7 +9,7 @@ type CommentSectionProps = {
   user: User | null;
 };
 
-const CommentSection = ({ comments, user }: CommentSectionProps) => {
+const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   const [showMore, setShowMore] = useState(false);
   // Only grandchildren comments will be collapsed
   const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].parentId;
@@ -31,9 +31,9 @@ const CommentSection = ({ comments, user }: CommentSectionProps) => {
         return (
           <div key={comment.id} className="flex flex-col gap-y-6">
             <PostComment profile={comment.profile} comment={comment} user={user} />
-            {comment._count.children > 0 && comment.children && (
+            {comment.childrenCount > 0 && comment.children && (
               <div className="ml-11 flex flex-col gap-y-6">
-                <CommentSection comments={comment.children} user={user} />
+                <CommentGroups comments={comment.children} user={user} />
               </div>
             )}
           </div>
@@ -52,4 +52,4 @@ const CommentSection = ({ comments, user }: CommentSectionProps) => {
   );
 };
 
-export default CommentSection;
+export default CommentGroups;

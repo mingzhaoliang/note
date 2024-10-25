@@ -1,6 +1,6 @@
 import { Comment, Like } from "@/components/icons";
-import LikeButton from "../like-button";
-import PostCommentButton from "./post-comment-button";
+import CommentButton from "@/components/shared/comment-button";
+import LikeButton from "@/components/shared/like-button";
 import PostStats from "./post-stats";
 
 type PostFooterProps = {
@@ -18,7 +18,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
       {userId && (
         <>
           <LikeButton id={postId} type="post" hasLiked={hasLiked} count={likes.length} />
-          <PostCommentButton postId={postId} count={commentCount} />
+          <CommentButton postId={postId} count={commentCount} />
         </>
       )}
       {!userId && (

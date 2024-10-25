@@ -24,7 +24,7 @@ type PostCommentProps = {
   count: number;
 };
 
-const PostCommentButton = ({ postId, parentId, count }: PostCommentProps) => {
+const CommentButton = ({ postId, parentId, count }: PostCommentProps) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.formData?.get("postId") === postId;
   const optimisticCount = isSubmitting ? count + 1 : count;
@@ -142,4 +142,4 @@ const PostCommentButton = ({ postId, parentId, count }: PostCommentProps) => {
   );
 };
 
-export default PostCommentButton;
+export default CommentButton;

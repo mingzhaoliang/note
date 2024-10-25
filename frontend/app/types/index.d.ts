@@ -63,11 +63,12 @@ type Comment = {
   id: string;
   postId: string;
   text: string;
+  likes: string[];
   createdAt: string;
   profile: Profile;
   parentId: string | null;
   children?: PostComment[];
-  _count: { children: number };
+  childrenCount: number;
 };
 
 export type { CloudinaryAsset, Post, Comment, PostOverview, Profile, ProfileOverview, User };

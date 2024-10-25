@@ -1,10 +1,10 @@
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Comment, Profile, User } from "@/types";
-import { Comment as CommentIcon, Like } from "../icons";
-import { Avatar, AvatarFallback, CldAvatarImage } from "../ui/avatar";
-import LikeButton from "./like-button";
-import PostCommentButton from "./post-card/post-comment-button";
-import PostStats from "./post-card/post-stats";
+import { Comment as CommentIcon, Like } from "../../icons";
+import CommentButton from "../../shared/comment-button";
+import LikeButton from "../../shared/like-button";
+import { Avatar, AvatarFallback, CldAvatarImage } from "../../ui/avatar";
+import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
   profile: Profile;
@@ -13,6 +13,8 @@ type CommentDetailsProps = {
 };
 
 const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
+  const hasLiked = user ? comment.likes.includes(user.id) : false;
+
   return (
     <div className="flex gap-x-3">
       <div className="flex items-center flex-col pb-1">
@@ -30,11 +32,16 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
         <div className="mt-2 -ml-3 flex items-center gap-x-2">
           {user && (
             <>
-              <LikeButton id={comment.id} type="comment" hasLiked={false} count={0} />
-              <PostCommentButton
+              <LikeButton
+                id={comment.id}
+                type="comment"
+                hasLiked={hasLiked}
+                count={comment.likes.length}
+              />
+              <CommentButton
                 postId={comment.postId}
                 parentId={comment.id}
-                count={comment._count.children}
+                count={comment.childrenCount}
               />
             </>
           )}
@@ -43,7 +50,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
               <PostStats count={0}>
                 <Like />
               </PostStats>
-              <PostStats count={comment._count.children}>
+              <PostStats count={comment.childrenCount}>
                 <CommentIcon />
               </PostStats>
             </>
