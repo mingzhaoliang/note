@@ -93,8 +93,6 @@ export default function ProfileEditDialog({ id, username, name, bio, avatar }: P
             </Header>
             <FormProvider {...form}>
               <fetcher.Form
-                method="PUT"
-                action="/profile?index"
                 className="max-md:pb-4 flex flex-col gap-4 max-md:flex-1 max-md:px-4"
                 onSubmit={form.handleSubmit(onSubmit, onError)}
               >

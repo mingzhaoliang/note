@@ -5,9 +5,9 @@ import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { PostOverview } from "@/types";
+import { PostOverview, Profile } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { Link, replace, useLoaderData, useParams } from "@remix-run/react";
 import { LetterTextIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { useImmer } from "use-immer";
@@ -40,7 +40,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   return json({ posts, formState });
 }
 
-export default function Profile() {
+export default function ProfilePosts() {
   const { toast } = useToast();
   const { posts, formState } = useLoaderData<typeof loader>();
   const [profilePosts, setProfilePosts] = useImmer(posts);
@@ -141,5 +141,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   headers.append("Set-Cookie", await commitBaseSession(baseSession));
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
-  return json({}, { headers });
+  const updatedProfile: Profile = (await updateResponse.json()).profile;
+
+  return replace(`/profile/${updatedProfile.username}`, { headers });
 }

@@ -34,6 +34,7 @@ type Profile = {
   username: string;
   name: string;
   avatar: string | null;
+  bio: string | null;
 };
 
 type ProfileOverview = Profile & {
