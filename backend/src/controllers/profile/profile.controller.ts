@@ -18,7 +18,7 @@ const getProfileController = async (req: Request, res: Response) => {
     const profile = await getProfile({ username });
 
     if (!profile) {
-      res.status(404).json("Profile not found.");
+      res.status(404).json({ error: "Profile not found." });
       return;
     }
 
@@ -27,7 +27,7 @@ const getProfileController = async (req: Request, res: Response) => {
     res.status(200).json({ profile: profileDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -42,7 +42,10 @@ const editProfileController = async (req: Request, res: Response) => {
       const avatarImage = req.files.avatar as any;
 
       let profile = await findProfile({ id: profileId });
-      if (!profile) throw new Error("Profile not found.");
+      if (!profile) {
+        res.status(404).json({ error: "Profile not found." });
+        return;
+      }
 
       let currentAvatar = profile.avatar;
       try {
@@ -51,7 +54,8 @@ const editProfileController = async (req: Request, res: Response) => {
         if (
           !["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(avatarImage.mimetype)
         ) {
-          throw new Error("Invalid file type.");
+          res.status(400).json({ error: "Invalid file type." });
+          return;
         }
 
         const { public_id } = (await uploadImage(avatarImage.tempFilePath, {
@@ -83,7 +87,7 @@ const editProfileController = async (req: Request, res: Response) => {
     res.status(200).json({ profile });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -91,7 +95,10 @@ const deleteAvatarController = async (req: Request, res: Response) => {
   try {
     const { profileId } = req.params;
     const profile = await findProfile({ id: profileId });
-    if (!profile) throw new Error("Profile not found.");
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
 
     const { avatar } = profile;
     if (avatar) await deleteImage(avatar);
@@ -100,7 +107,7 @@ const deleteAvatarController = async (req: Request, res: Response) => {
     res.status(200).json({ profile: updatedProfile });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
