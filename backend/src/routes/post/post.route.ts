@@ -4,8 +4,8 @@ import {
   deletePostController,
   findPostCommentsController,
   findPostController,
-  getFeedController,
   likePostController,
+  getFeedPostsController,
 } from "@/controllers/post/post.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { actionSchema } from "@/schemas/post/action.schema.js";
@@ -17,9 +17,9 @@ const router = Router();
 
 router.post("/", validateData(createPostSchema), createPostController);
 
-router.get("/feed", getFeedController);
 
 router.put("/:postId/like", validateData(actionSchema), likePostController);
+router.get("/feed", getFeedPostsController);
 
 router.delete("/delete/:postId", deletePostController);
 

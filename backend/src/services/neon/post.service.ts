@@ -62,10 +62,11 @@ type getInfinitePostsArgs = {
   take?: number;
 };
 
-const getFeed = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
+const getFeedPosts = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
   try {
     const posts = await prisma.post.findMany({
       take,
+      where: { commentOnId: null },
       ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
       select: basicPostSelect,
       orderBy: {
@@ -260,7 +261,7 @@ export {
   findPost,
   findPostComments,
   findProfilePosts,
-  getFeed,
+  getFeedPosts,
   likePost,
   unLikePost,
 };

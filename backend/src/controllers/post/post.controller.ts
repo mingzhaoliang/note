@@ -10,7 +10,7 @@ import {
   findPost,
   findPostComments,
   findProfilePosts,
-  getFeed,
+  getFeedPosts,
   likePost,
   unLikePost,
 } from "@/services/neon/post.service.js";
@@ -57,10 +57,10 @@ const createPostController = async (req: Request, res: Response) => {
   }
 };
 
-const getFeedController = async (req: Request, res: Response) => {
+const getFeedPostsController = async (req: Request, res: Response) => {
   try {
     const { lastPostId } = req.query as { lastPostId: string | undefined };
-    const posts = await getFeed({ lastCursor: lastPostId });
+    const posts = await getFeedPosts({ lastCursor: lastPostId });
 
     const postsDto = posts.map((post) => createPostDto(post));
 
@@ -185,6 +185,6 @@ export {
   findPostCommentsController,
   findPostController,
   findProfilePostsController,
-  getFeedController,
   likePostController,
+  getFeedPostsController,
 };
