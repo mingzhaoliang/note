@@ -2,8 +2,8 @@ import { postDateFormat } from "@/lib/utils/formatter";
 import { Comment, Profile, User } from "@/types";
 import { Comment as CommentIcon, Like } from "../icons";
 import { Avatar, AvatarFallback, CldAvatarImage } from "../ui/avatar";
+import LikeButton from "./like-button";
 import PostCommentButton from "./post-card/post-comment-button";
-import PostLikeButton from "./post-card/post-like-button";
 import PostStats from "./post-card/post-stats";
 
 type CommentDetailsProps = {
@@ -30,7 +30,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
         <div className="mt-2 flex items-center gap-x-2">
           {user && (
             <>
-              <PostLikeButton postId={comment.id} hasLiked={false} count={0} />
+              <LikeButton id={comment.id} type="comment" hasLiked={false} count={0} />
               <PostCommentButton
                 postId={comment.postId}
                 parentId={comment.id}

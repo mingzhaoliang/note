@@ -1,6 +1,6 @@
 import { Comment, Like } from "@/components/icons";
+import LikeButton from "../like-button";
 import PostCommentButton from "./post-comment-button";
-import PostLikeButton from "./post-like-button";
 import PostStats from "./post-stats";
 
 type PostFooterProps = {
@@ -17,7 +17,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
     <div className="mt-2 flex items-center gap-x-2">
       {userId && (
         <>
-          <PostLikeButton postId={postId} hasLiked={hasLiked} count={likes.length} />
+          <LikeButton id={postId} type="post" hasLiked={hasLiked} count={likes.length} />
           <PostCommentButton postId={postId} count={commentCount} />
         </>
       )}

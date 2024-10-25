@@ -2,19 +2,17 @@ import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
   const { authHeader, user } = await redirectIfUnauthenticated(request);
   const headers = new Headers();
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
-  const formData = await request.formData();
-  formData.append("profileId", user.id);
-  const _action = formData.get("_action");
-  const postId = formData.get("postId");
+  const { postId } = params;
 
-  const response = await fetch(`${envConfig.API_URL}/post/like`, {
+  const response = await fetch(`${envConfig.API_URL}/post/${postId}/like`, {
     method: "PUT",
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ profileId: user.id }),
   });
 
   let message, post;
@@ -25,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     post = (await response.json()).post;
   }
 
-  const actionState = { message, _action, postId };
+  const actionState = { message, postId };
 
   return json({ post, actionState }, { headers });
 }
