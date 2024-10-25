@@ -4,7 +4,6 @@ import {
   deletePostController,
   findPostCommentsController,
   findPostController,
-  findProfilePostsController,
   getFeedController,
   likePostController,
 } from "@/controllers/post/post.controller.js";
@@ -25,8 +24,6 @@ router.put("/like", validateData(postActionSchema), likePostController);
 router.delete("/delete/:postId", deletePostController);
 
 router.post("/comment", validateData(postCommentSchema), commentPostController);
-
-router.get("/profile/:username", findProfilePostsController);
 
 router.get("/:postId", findPostController);
 

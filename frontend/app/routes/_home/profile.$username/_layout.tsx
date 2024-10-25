@@ -7,7 +7,7 @@ import ProfileNavbar from "./profile-navbar";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { username } = params;
-  const response = await fetch(`${envConfig.API_URL}/profile/overview/${username}`);
+  const response = await fetch(`${envConfig.API_URL}/profile/${username}/overview`);
 
   if (!response.ok) {
     return redirect("/");

@@ -1,3 +1,4 @@
+import { findProfilePostsController } from "@/controllers/post/post.controller.js";
 import {
   deleteAvatarController,
   editProfileController,
@@ -9,7 +10,9 @@ import { Router } from "express";
 
 const router = Router();
 
-router.get("/overview/:username", findProfileOverviewController);
+router.get("/:username/overview", findProfileOverviewController);
+
+router.get("/:username/posts", findProfilePostsController);
 
 router.put("/:profileId", validateData(profileEditSchema), editProfileController);
 

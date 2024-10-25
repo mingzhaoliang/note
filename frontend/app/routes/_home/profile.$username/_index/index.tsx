@@ -24,7 +24,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!formState) {
     const response = await fetch(
-      `${envConfig.API_URL}/post/profile/${username}${
+      `${envConfig.API_URL}/profile/${username}/posts${
         lastPostId ? `?lastPostId=${lastPostId}` : ""
       }`
     );
