@@ -25,7 +25,7 @@ import { Textarea } from "../ui/textarea";
 export default function ProfileEditDialog({ id, username, name, bio, avatar }: Profile) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const fetcher = useFetcher();
+  const fetcher = useFetcher({ key: "edit-profile" });
   const form = useForm<ProfileEditSchema>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
