@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useFetcher } from "@remix-run/react";
 import { EditIcon, ImagePlusIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import CldImage from "../shared/cld-image";
 import { Button } from "../ui/button";
@@ -66,10 +66,6 @@ export default function ProfileEditDialog({ id, username, name, bio, avatar }: P
   };
   const onError: SubmitErrorHandler<ProfileEditSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
-
-  useEffect(() => {
-    form.reset();
-  }, [form.reset, open]);
 
   return (
     <ResponsiveDialog query="(min-width: 768px)" modal open={open} onOpenChange={setOpen}>
