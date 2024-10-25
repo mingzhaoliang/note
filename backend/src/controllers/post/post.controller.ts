@@ -1,4 +1,5 @@
 import { createPostDto } from "@/lib/utils/createDto.js";
+import { ActionSchema } from "@/schemas/post/action.schema.js";
 import { CreatePostSchema } from "@/schemas/post/create-post.schema.js";
 import { ImageSchema } from "@/schemas/shared/image.schema.js";
 import { uploadImage } from "@/services/apis/cloudinary.service.js";
@@ -83,7 +84,8 @@ const deletePostController = async (req: Request, res: Response) => {
 
 const likePostController = async (req: Request, res: Response) => {
   try {
-    const { postId, profileId } = req.body;
+    const { postId } = req.params;
+    const { profileId } = req.body as ActionSchema;
     const isLiked = (await getLikedPost(profileId, postId)) !== null;
 
     let postLike;

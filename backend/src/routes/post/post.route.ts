@@ -8,8 +8,8 @@ import {
   likePostController,
 } from "@/controllers/post/post.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
+import { actionSchema } from "@/schemas/post/action.schema.js";
 import { createPostSchema } from "@/schemas/post/create-post.schema.js";
-import { postActionSchema } from "@/schemas/post/post-action.schema.js";
 import { postCommentSchema } from "@/schemas/post/post-comment.schema.js";
 import { Router } from "express";
 
@@ -19,7 +19,7 @@ router.post("/create", validateData(createPostSchema), createPostController);
 
 router.get("/feed", getFeedController);
 
-router.put("/like", validateData(postActionSchema), likePostController);
+router.put("/:postId/like", validateData(actionSchema), likePostController);
 
 router.delete("/delete/:postId", deletePostController);
 
