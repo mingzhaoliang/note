@@ -60,7 +60,7 @@ export default function ProfilePosts() {
 
   return (
     <>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,290px))] lg:grid-cols-[repeat(auto-fit,minmax(260px,290px))] gap-6">
         {profilePosts.map((post) => (
           <Link
             key={post.id}

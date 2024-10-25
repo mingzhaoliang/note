@@ -4,7 +4,7 @@ import { NavLink } from "@remix-run/react";
 const navLinks = [
   {
     to: "/profile",
-    label: "posts",
+    label: "Posts",
   },
   {
     to: "/profile/comments",
