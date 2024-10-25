@@ -4,6 +4,7 @@ import { RevalidatePostStats } from "@/store/redux/features/post-slice";
 import { useAppDispatch } from "@/store/redux/hooks";
 import { useFetcher } from "@remix-run/react";
 import { useCallback } from "react";
+import { Button } from "../ui/button";
 
 type PostLikesProps = {
   id: string;
@@ -27,16 +28,17 @@ const LikeButton = ({ id, hasLiked, count, type }: PostLikesProps) => {
   useRevalidatePost(fetcher, handleRevalidate);
 
   return (
-    <div className="flex items-center space-x-2">
-      <fetcher.Form method="PUT" action={`/api/${type}/${id}/like`} className="flex-center">
-        <button type="submit" onClick={(e) => e.stopPropagation()}>
-          <Icon className="text-inactive w-5 h-5" />
-        </button>
-      </fetcher.Form>
-      <div className="min-w-3">
+    <fetcher.Form method="PUT" action={`/api/post/${id}/like`} className="flex-center">
+      <Button
+        variant="ghost"
+        type="submit"
+        className="rounded-full space-x-2 px-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Icon className="text-inactive w-5 h-5" />
         {optimisticCount > 0 && <p className="text-inactive text-sm">{optimisticCount}</p>}
-      </div>
-    </div>
+      </Button>
+    </fetcher.Form>
   );
 };
 

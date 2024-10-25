@@ -14,7 +14,7 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
   const hasLiked = userId ? likes.includes(userId) : false;
 
   return (
-    <div className="mt-2 flex items-center gap-x-2">
+    <div className="mt-2 -ml-3 flex items-center">
       {userId && (
         <>
           <LikeButton id={postId} type="post" hasLiked={hasLiked} count={likes.length} />

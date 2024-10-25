@@ -27,7 +27,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
           <span className="text-muted-foreground">{postDateFormat(comment.createdAt)}</span>
         </p>
         <p className="text-sm">{comment.text}</p>
-        <div className="mt-2 flex items-center gap-x-2">
+        <div className="mt-2 -ml-3 flex items-center gap-x-2">
           {user && (
             <>
               <LikeButton id={comment.id} type="comment" hasLiked={false} count={0} />
