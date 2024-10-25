@@ -1,3 +1,4 @@
+import CldAvatar from "@/components/shared/cld-avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { postDateFormat } from "@/lib/utils/formatter";
@@ -5,7 +6,6 @@ import { Post } from "@/types";
 import { useFetcher } from "@remix-run/react";
 import { Loader2Icon } from "lucide-react";
 import { memo } from "react";
-import { Avatar, AvatarFallback, CldAvatarImage } from "../../ui/avatar";
 import PostDropdown from "./post-dropdown";
 import PostFooter from "./post-footer";
 import PostImages from "./post-images";
@@ -38,10 +38,7 @@ const PostCard = ({
   return (
     <div className={cn("w-full flex space-x-3 py-4", isDeleting && "hidden", className)}>
       <div className="flex-center flex-col pb-8">
-        <Avatar>
-          <CldAvatarImage src={profile.avatar || undefined} />
-          <AvatarFallback>{profile.name[0]}</AvatarFallback>
-        </Avatar>
+        <CldAvatar profile={profile} />
         <div className="flex-1 border-l border-muted" />
       </div>
       <div className="w-full flex flex-col space-y-4">

@@ -1,5 +1,5 @@
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
-import { Avatar, AvatarFallback, CldAvatarImage } from "@/components/ui/avatar";
+import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/session.context";
 import { ProfileOverview } from "@/types";
 
@@ -35,10 +35,7 @@ export default function ProfileInfo({ profile }: ProfileInfoProps) {
         </div>
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
       </div>
-      <Avatar className="w-20 h-20 md:w-24 md:h-24">
-        <CldAvatarImage src={profile.avatar} responsive={[{ size: { width: 96, height: 96 } }]} />
-        <AvatarFallback>{profile.name[0]}</AvatarFallback>
-      </Avatar>
+      <CldAvatar className="w-20 h-20 md:w-24 md:h-24" profile={profile} />
     </div>
   );
 }

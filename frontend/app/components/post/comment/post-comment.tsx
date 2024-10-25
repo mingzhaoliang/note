@@ -1,9 +1,9 @@
+import CldAvatar from "@/components/shared/cld-avatar";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Comment, Profile, User } from "@/types";
 import { Comment as CommentIcon, Like } from "../../icons";
 import CommentButton from "../../shared/comment-button";
 import LikeButton from "../../shared/like-button";
-import { Avatar, AvatarFallback, CldAvatarImage } from "../../ui/avatar";
 import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
@@ -18,10 +18,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
   return (
     <div className="flex gap-x-3">
       <div className="flex items-center flex-col pb-1">
-        <Avatar className="w-8 h-8">
-          <CldAvatarImage src={profile.avatar || undefined} />
-          <AvatarFallback>{profile.name[0]}</AvatarFallback>
-        </Avatar>
+        <CldAvatar className="w-8 h-8" profile={profile} />
       </div>
       <div className="flex flex-col">
         <p className="mb-2 text-sm flex items-center gap-3">

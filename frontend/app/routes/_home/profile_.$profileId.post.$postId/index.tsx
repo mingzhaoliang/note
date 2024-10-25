@@ -2,7 +2,7 @@ import CommentGroups from "@/components/post/comment/comment-groups";
 import PostDropdown from "@/components/post/post-card/post-dropdown";
 import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
-import { Avatar, AvatarFallback, CldAvatarImage } from "@/components/ui/avatar";
+import CldAvatar from "@/components/shared/cld-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
@@ -52,10 +52,7 @@ export default function PostDetail() {
   return (
     <div className="mx-auto w-full max-w-2xl flex-col space-y-3 p-6">
       <div className="flex-between gap-3">
-        <Avatar>
-          <CldAvatarImage src={profile.avatar || undefined} />
-          <AvatarFallback>{profile.name[0]}</AvatarFallback>
-        </Avatar>
+        <CldAvatar profile={profile} />
         <p className="flex-1 text-sm flex items-center gap-3">
           <span className="font-semibold">{profile.username}</span>
           <span className="text-muted-foreground">{postDateFormat(createdAt)}</span>
