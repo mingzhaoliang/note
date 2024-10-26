@@ -1,15 +1,15 @@
 import CldAvatar from "@/components/shared/cld-avatar";
-import { Badge } from "@/components/ui/badge";
+import TagButton from "@/components/shared/tag-button";
+import UsernameButton from "@/components/shared/username-button";
 import { cn } from "@/lib/utils/cn";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { Post } from "@/types";
-import { useFetcher, useNavigate } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Loader2Icon } from "lucide-react";
 import { memo } from "react";
 import PostDropdown from "./post-dropdown";
 import PostFooter from "./post-footer";
 import PostImages from "./post-images";
-import UsernameButton from "@/components/shared/username-button";
 
 type PostCardProps = Post & {
   userId?: string | null;
@@ -58,9 +58,7 @@ const PostCard = ({
         <div className="flex items-center flex-wrap gap-2">
           <p className="text-foreground">{text}</p>
           {tags.map((tag, index) => (
-            <Badge key={tag + index} variant="secondary" className="rounded-full">
-              {tag}
-            </Badge>
+            <TagButton key={tag + index} tag={tag} />
           ))}
         </div>
         <PostFooter postId={postId} userId={userId} likes={likes} commentCount={commentCount} />

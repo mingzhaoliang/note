@@ -4,6 +4,7 @@ import PostStats from "@/components/post/post-card/post-stats";
 import CldAvatar from "@/components/shared/cld-avatar";
 import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
+import TagButton from "@/components/shared/tag-button";
 import UsernameButton from "@/components/shared/username-button";
 import { Badge } from "@/components/ui/badge";
 import { OnRevalidate } from "@/hooks/use-revalidate-post";
@@ -67,9 +68,7 @@ const CommentOnItem = ({
           <div className="flex items-center flex-wrap gap-2">
             <p className="text-foreground">{text}</p>
             {tags.map((tag, index) => (
-              <Badge key={tag + index} variant="secondary" className="rounded-full">
-                {tag}
-              </Badge>
+              <TagButton key={tag + index} tag={tag} />
             ))}
           </div>
           <div className="mt-2 -ml-3 flex items-center">

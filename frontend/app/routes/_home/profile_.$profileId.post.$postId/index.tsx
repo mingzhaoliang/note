@@ -3,6 +3,7 @@ import PostDropdown from "@/components/post/post-card/post-dropdown";
 import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
 import CldAvatar from "@/components/shared/cld-avatar";
+import TagButton from "@/components/shared/tag-button";
 import UsernameButton from "@/components/shared/username-button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -64,9 +65,7 @@ export default function PostDetail() {
       <div className="flex items-center flex-wrap gap-2">
         <p className="text-foreground">{text}</p>
         {tags.map((tag, index) => (
-          <Badge key={tag + index} variant="secondary" className="rounded-full">
-            {tag}
-          </Badge>
+          <TagButton key={tag + index} tag={tag} />
         ))}
       </div>
       <PostFooter postId={postId} userId={user?.id} likes={likes} commentCount={commentCount} />
