@@ -11,6 +11,7 @@ import {
   findPost,
   getComments,
   getFeedPosts,
+  getPostsByTag,
   likePost,
   unLikePost,
 } from "@/services/neon/post.service.js";
@@ -156,6 +157,20 @@ const createCommentController = async (req: Request, res: Response) => {
   }
 };
 
+const searchPostsController = async (req: Request, res: Response) => {
+  try {
+    const { q, lastPostId } = req.query as { q: string; lastPostId: string | undefined };
+
+    const posts = await getPostsByTag({ q, lastPostId });
+    const postsDto = posts.map((post) => createPostDto(post));
+
+    res.status(200).json({ posts: postsDto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 export {
   createCommentController,
   createPostController,
@@ -164,4 +179,5 @@ export {
   getCommentsController,
   getFeedPostsController,
   likeUnlikePostController,
+  searchPostsController,
 };

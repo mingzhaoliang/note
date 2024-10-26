@@ -320,6 +320,32 @@ const getComments = async ({
   }
 };
 
+const getPostsByTag = async ({
+  q,
+  lastPostId,
+  take = 10,
+}: {
+  q: string;
+  lastPostId?: string;
+  take?: number;
+}) => {
+  try {
+    const posts = await prisma.post.findMany({
+      take,
+      ...(lastPostId && { skip: 1, cursor: { id: lastPostId } }),
+      where: {
+        OR: [{ text: { contains: q } }, { tags: { some: { tag: { name: { contains: q } } } } }],
+      },
+      select: basicPostSelect,
+    });
+
+    return posts;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get posts by tag.");
+  }
+};
+
 export {
   createComment,
   createPost,
@@ -328,6 +354,7 @@ export {
   getComment,
   getComments,
   getFeedPosts,
+  getPostsByTag,
   getProfileComments,
   getProfilePosts,
   likePost,

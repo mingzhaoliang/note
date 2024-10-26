@@ -6,6 +6,7 @@ import {
   getCommentsController,
   getFeedPostsController,
   likeUnlikePostController,
+  searchPostsController,
 } from "@/controllers/post/post.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { createCommentSchema } from "@/schemas/post/create-comment.schema.js";
@@ -20,6 +21,8 @@ router.post("/", validateData(createPostSchema), createPostController);
 router.post("/comment", validateData(createCommentSchema), createCommentController);
 
 router.get("/feed", getFeedPostsController);
+
+router.get("/explore", searchPostsController);
 
 router.put("/:id/like", validateData(actionSchema), likeUnlikePostController);
 
