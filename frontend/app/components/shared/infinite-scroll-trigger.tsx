@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils/cn";
 import { Post, PostOverview } from "@/types";
 import { Loader2Icon } from "lucide-react";
 
-type InfiniteScrollTriggerProps<T extends PostOverview> = {
+type InfiniteScrollTriggerProps<T> = {
   loaderRoute: string;
   onLoad: (posts: T[]) => void;
   className?: string;
 };
 
-export default function InfiniteScrollTrigger<T extends PostOverview>({
+export default function InfiniteScrollTrigger<T>({
   loaderRoute,
   onLoad,
   className,

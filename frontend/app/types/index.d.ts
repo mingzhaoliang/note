@@ -68,4 +68,35 @@ type Comment = {
   createdAt: string;
 };
 
-export type { CloudinaryAsset, Comment, Post, PostOverview, BaseProfile, Profile, User };
+type ProfileComment = {
+  id: string;
+  text: string;
+  profile: Profile;
+  likes: string[];
+  commentOnId: string | null;
+  createdAt: string;
+  commentCount: number;
+  commentOn: {
+    id: string;
+    text: string;
+    profile: Profile;
+    commentOnId: string | null;
+    createdAt: string;
+    commentCount: number;
+    commentOnUsername: string | null;
+    images: string[];
+    tags: string[];
+    likes: string[];
+  };
+};
+
+export type {
+  BaseProfile,
+  CloudinaryAsset,
+  Comment,
+  Post,
+  PostOverview,
+  Profile,
+  ProfileComment,
+  User,
+};

@@ -6,29 +6,27 @@ import { MAX_COMMENT_LENGTH, WARNING_THRESHOLD } from "@/config/post.config";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { RevalidatePostStats } from "@/store/redux/features/post-slice";
-import { useAppDispatch } from "@/store/redux/hooks";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { Form, useFetcher } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 type PostCommentProps = {
   commentOnId: string;
   count: number;
+  onRevalidate: OnRevalidate;
 };
 
-const CommentButton = ({ commentOnId, count }: PostCommentProps) => {
+const CommentButton = ({ commentOnId, count, onRevalidate }: PostCommentProps) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state !== "idle";
   const optimisticCount = isSubmitting ? count + 1 : count;
 
-  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -36,13 +34,7 @@ const CommentButton = ({ commentOnId, count }: PostCommentProps) => {
   const remaining = MAX_COMMENT_LENGTH - commentText.length;
   const shouldShowWarning = remaining <= WARNING_THRESHOLD;
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
-    if (!updatedPost) return;
-
-    dispatch(RevalidatePostStats({ updatedPost, postId: actionState.postId }));
-  }, []);
-
-  useRevalidatePost(fetcher, handleRevalidate);
+  useRevalidatePost(fetcher, onRevalidate);
 
   const handleEditorChange = (editorState: EditorState, editor: LexicalEditor) => {
     const textContent = editor.getRootElement()?.textContent;

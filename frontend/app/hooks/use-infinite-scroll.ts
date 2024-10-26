@@ -1,18 +1,13 @@
-import { PostOverview } from "@/types";
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-type UseInfiniteScrollProps<T extends PostOverview> = {
+type UseInfiniteScrollProps<T> = {
   loaderRoute: string;
   inView: boolean;
   onLoad: (posts: T[]) => void;
 };
 
-const useInfiniteScroll = <T extends PostOverview>({
-  loaderRoute,
-  inView,
-  onLoad,
-}: UseInfiniteScrollProps<T>) => {
+const useInfiniteScroll = <T>({ loaderRoute, inView, onLoad }: UseInfiniteScrollProps<T>) => {
   const fetcher = useFetcher<{ posts: any }>();
   const [hasMore, setHasMore] = useState(true);
 
