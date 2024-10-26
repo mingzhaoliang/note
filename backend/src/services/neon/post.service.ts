@@ -227,9 +227,9 @@ const unLikePost = async ({ postId, profileId }: PostActionArgs) => {
   }
 };
 
-const deletePost = async ({ postId }: { postId: string }) => {
+const deletePost = async ({ postId, profileId }: { postId: string; profileId: string }) => {
   try {
-    const deletedPost = await prisma.post.delete({ where: { id: postId } });
+    const deletedPost = await prisma.post.delete({ where: { id: postId, profileId } });
 
     return deletedPost;
   } catch (error) {

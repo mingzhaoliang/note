@@ -74,7 +74,8 @@ const getFeedPostsController = async (req: Request, res: Response) => {
 const deletePostController = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params as { postId: string };
-    await deletePost({ postId });
+    const { profileId } = req.body as ActionSchema;
+    await deletePost({ postId, profileId });
     res.status(200).end();
   } catch (error) {
     console.error(error);

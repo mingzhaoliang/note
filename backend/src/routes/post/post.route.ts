@@ -27,6 +27,6 @@ router.get("/:postId", findPostController);
 
 router.get("/:id/comments", getCommentsController);
 
-router.delete("/:postId", deletePostController);
+router.post("/:postId/delete", deletePostController);
 
 export default router;

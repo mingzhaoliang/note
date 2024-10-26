@@ -14,14 +14,9 @@ export default function DeletePostForm({ postId, onDelete }: DeletePostFormProps
   };
 
   return (
-    <fetcher.Form method="DELETE" action="/post/delete" onSubmit={onSubmit}>
+    <fetcher.Form method="DELETE" action={`/api/post/${postId}/delete`} onSubmit={onSubmit}>
       <input type="hidden" name="postId" value={postId} />
-      <AlertDialogAction
-        type="submit"
-        name="_action"
-        value="delete"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <AlertDialogAction type="submit" onClick={(e) => e.stopPropagation()}>
         Continue
       </AlertDialogAction>
     </fetcher.Form>
