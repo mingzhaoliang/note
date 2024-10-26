@@ -1,4 +1,5 @@
 import PostCard from "@/components/post/post-card/post-card";
+import InfinitePosts from "@/components/shared/infinite-posts";
 import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import envConfig from "@/config/env.config.server";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
@@ -28,13 +29,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const posts: Post[] = (await response.json()).posts;
 
-  return json({ posts, userId: user?.id }, { headers });
+  return json({ posts, user }, { headers });
 }
 
 export default function Index() {
   const feedPosts = useAppSelector((state) => state.post.feedPosts);
   const dispatch = useAppDispatch();
-  const { posts: loadedPosts, userId } = useLoaderData<typeof loader>();
+  const { posts: loadedPosts, user } = useLoaderData<typeof loader>();
   const fetcher = useFetcher({ key: "post" });
 
   const lastPostId = feedPosts[feedPosts.length - 1]?.id;
@@ -60,30 +61,13 @@ export default function Index() {
   }, [JSON.stringify(loadedPosts), dispatch]);
 
   return (
-    <div className="flex-1 flex flex-col items-center p-6">
-      {feedPosts.map((post) => {
-        if (post.id.startsWith("tmp-")) {
-          <PostCard key={post.id} {...post} userId={userId} className="md:max-w-2xl" />;
-        }
-
-        return (
-          <Link
-            key={post.id}
-            to={`/profile/${post.profile.username}/post/${post.id}`}
-            className="w-full md:max-w-2xl flex justify-center"
-            state={{ referrer: "/?index" }}
-          >
-            <PostCard key={post.id} {...post} userId={userId} />
-          </Link>
-        );
-      })}
-      {lastPostId && (
-        <InfiniteScrollTrigger
-          loaderRoute={`/?index&lastPostId=${lastPostId}`}
-          onLoad={handleNewFeedPosts}
-          className="my-4"
-        />
-      )}
+    <div className="flex-1 flex flex-col items-center p-6 w-full md:max-w-2xl mx-auto">
+      <InfinitePosts
+        posts={feedPosts}
+        user={user}
+        loaderRoute={`/?index&lastPostId=${lastPostId}`}
+        onLoad={handleNewFeedPosts}
+      />
     </div>
   );
 }

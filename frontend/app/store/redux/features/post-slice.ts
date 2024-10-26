@@ -4,11 +4,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 type PostSliceState = {
   feedPosts: Post[];
   feedInitialised: boolean;
+  searchedPosts: Post[];
+  searchedInitialised: boolean;
 };
 
 const initialState: PostSliceState = {
   feedPosts: [],
   feedInitialised: false,
+  searchedPosts: [],
+  searchedInitialised: false,
 };
 
 const postSlice = createSlice({
@@ -46,13 +50,26 @@ const postSlice = createSlice({
           state.feedPosts.splice(postIndex, 1);
         }
       }
+
+      const searchedPostIndex = state.searchedPosts.findIndex((post) => post.id === postId);
+      if (searchedPostIndex !== -1) {
+        if (!(updatedPost && _action === "create")) {
+          state.searchedPosts.splice(searchedPostIndex, 1);
+        }
+      }
     },
     RevalidatePostStats: (state, action: PayloadAction<{ updatedPost: Post; postId: string }>) => {
       const { updatedPost, postId } = action.payload;
-      const targetPost = state.feedPosts.find((post) => post.id === postId);
-      if (targetPost) {
-        targetPost.likes = updatedPost.likes;
-        targetPost.commentCount = updatedPost.commentCount;
+      const feedPost = state.feedPosts.find((post) => post.id === postId);
+      if (feedPost) {
+        feedPost.likes = updatedPost.likes;
+        feedPost.commentCount = updatedPost.commentCount;
+      }
+
+      const searchedPost = state.searchedPosts.find((post) => post.id === postId);
+      if (searchedPost) {
+        searchedPost.likes = updatedPost.likes;
+        searchedPost.commentCount = updatedPost.commentCount;
       }
     },
     addFeedPosts: (state, action: PayloadAction<Post[]>) => {
@@ -63,6 +80,12 @@ const postSlice = createSlice({
         state.feedInitialised = true;
         state.feedPosts.push(...action.payload);
       }
+    },
+    addSearchedPosts: (state, action: PayloadAction<Post[]>) => {
+      state.searchedPosts.push(...action.payload);
+    },
+    initialiseSearchedPosts: (state, action: PayloadAction<Post[]>) => {
+      state.searchedPosts = action.payload;
     },
   },
 });
@@ -75,6 +98,8 @@ export const {
   RevalidatePostStats,
   addFeedPosts,
   initialiseFeed,
+  initialiseSearchedPosts,
+  addSearchedPosts,
 } = postSlice.actions;
 
 export { postSlice, type PostSliceState };
