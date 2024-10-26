@@ -1,4 +1,4 @@
-import { findPost, getComment } from "@/services/neon/post.service.js";
+import { findPost, getComment, getProfileComments } from "@/services/neon/post.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
 
 const createPostDto = (post: Awaited<ReturnType<typeof findPost>>) => {
@@ -63,4 +63,33 @@ const createProfileDto = (profile: Awaited<ReturnType<typeof getProfile>>) => {
   };
 };
 
-export { createCommentDto, createPostDto, createProfileDto };
+const createProfileCommentDto = (
+  comment: Awaited<ReturnType<typeof getProfileComments>>[number]
+) => {
+  if (!comment) {
+    return null;
+  }
+  return {
+    id: comment.id,
+    text: comment.text,
+    profile: comment.profile,
+    likes: comment.likes.map(({ profileId }) => profileId),
+    commentOnId: comment.commentOnId,
+    commentOn: {
+      id: comment.commentOn!.id,
+      text: comment.commentOn!.text,
+      profile: comment.commentOn!.profile,
+      commentOnId: comment.commentOn!.commentOnId,
+      commentOnUsername: comment.commentOn!.commentOn?.profile.username,
+      images: comment.commentOn!.images.map(({ publicId }) => publicId),
+      tags: comment.commentOn!.tags.map(({ tag: { name } }) => name),
+      likes: comment.commentOn!.likes.map(({ profileId }) => profileId),
+      createdAt: comment.commentOn!.createdAt,
+      commentCount: comment.commentOn!._count.comments,
+    },
+    createdAt: comment.createdAt,
+    commentCount: comment._count.comments,
+  };
+};
+
+export { createCommentDto, createPostDto, createProfileDto, createProfileCommentDto };

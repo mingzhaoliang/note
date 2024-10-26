@@ -111,7 +111,7 @@ type findProfilePostArgs = {
   take?: number;
 };
 
-const findProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfilePostArgs) => {
+const getProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfilePostArgs) => {
   try {
     const posts = await prisma.post.findMany({
       take,
@@ -136,6 +136,55 @@ const findProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfil
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get the posts.");
+  }
+};
+
+const getProfileComments = async ({
+  profileId,
+  lastCursor,
+  take = 10,
+}: {
+  profileId: string;
+  lastCursor?: string;
+  take?: number;
+}) => {
+  try {
+    const comments = await prisma.post.findMany({
+      where: { profileId, commentOnId: { not: null } },
+      take,
+      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
+      select: {
+        id: true,
+        text: true,
+        profile: true,
+        likes: { select: { profileId: true } },
+        commentOnId: true,
+        commentOn: {
+          select: {
+            id: true,
+            text: true,
+            profile: true,
+            commentOnId: true,
+            commentOn: { select: { profile: { select: { username: true } } } },
+            images: { select: { publicId: true } },
+            tags: { select: { tag: { select: { name: true } } } },
+            likes: { select: { profileId: true } },
+            createdAt: true,
+            _count: { select: { comments: true } },
+          },
+        },
+        createdAt: true,
+        _count: { select: { comments: true } },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return comments;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get comments.");
   }
 };
 
@@ -276,10 +325,11 @@ export {
   createPost,
   deletePost,
   findPost,
-  findProfilePosts,
   getComment,
   getComments,
   getFeedPosts,
+  getProfileComments,
+  getProfilePosts,
   likePost,
   unLikePost,
 };

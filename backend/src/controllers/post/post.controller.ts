@@ -9,13 +9,12 @@ import {
   createPost,
   deletePost,
   findPost,
-  findProfilePosts,
   getComments,
   getFeedPosts,
   likePost,
   unLikePost,
 } from "@/services/neon/post.service.js";
-import { findProfile, getLikedPost } from "@/services/neon/profile.service.js";
+import { getLikedPost } from "@/services/neon/profile.service.js";
 import { CloudinaryAsset } from "@/types/index.js";
 import { Request, Response } from "express";
 import fs from "fs";
@@ -125,29 +124,6 @@ const findPostController = async (req: Request, res: Response) => {
   }
 };
 
-const findProfilePostsController = async (req: Request, res: Response) => {
-  try {
-    const { username } = req.params;
-    const { lastPostId } = req.query as { lastPostId: string | undefined };
-
-    const profile = await findProfile({ username });
-    if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
-      return;
-    }
-    const posts = await findProfilePosts({ profileId: profile.id, lastCursor: lastPostId });
-
-    const postsDto = posts.map((post) => ({
-      ...post,
-      images: post.images.map(({ publicId }) => publicId),
-    }));
-    res.status(200).json({ posts: postsDto });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error." });
-  }
-};
-
 const getCommentsController = async (req: Request, res: Response) => {
   try {
     const { id: commentOnId } = req.params;
@@ -184,7 +160,6 @@ export {
   createPostController,
   deletePostController,
   findPostController,
-  findProfilePostsController,
   getCommentsController,
   getFeedPostsController,
   likeUnlikePostController,

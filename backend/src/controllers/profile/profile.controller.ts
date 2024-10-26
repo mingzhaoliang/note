@@ -1,6 +1,7 @@
-import { createProfileDto } from "@/lib/utils/createDto.js";
+import { createProfileCommentDto, createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
+import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
   findProfile,
   followProfile,
@@ -136,9 +137,57 @@ const followProfileController = async (req: Request, res: Response) => {
   }
 };
 
+const getProfilePostsController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { lastPostId } = req.query as { lastPostId: string | undefined };
+
+    const profile = await getProfile({ username });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+    const posts = await getProfilePosts({ profileId: profile.id, lastCursor: lastPostId });
+
+    const postsDto = posts.map((post) => ({
+      ...post,
+      images: post.images.map(({ publicId }) => publicId),
+    }));
+    res.status(200).json({ posts: postsDto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const getProfileCommentsController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { lastCommentId } = req.query as { lastCommentId: string | undefined };
+    const profile = await getProfile({ username });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+    const profileComments = await getProfileComments({
+      profileId: profile.id,
+      lastCursor: lastCommentId,
+    });
+
+    const profileCommentsDto = profileComments.map((comment) => createProfileCommentDto(comment));
+
+    res.status(200).json({ comments: profileCommentsDto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 export {
   deleteAvatarController,
   editProfileController,
   followProfileController,
+  getProfileCommentsController,
   getProfileController,
+  getProfilePostsController,
 };

@@ -1,9 +1,10 @@
-import { findProfilePostsController } from "@/controllers/post/post.controller.js";
 import {
   deleteAvatarController,
   editProfileController,
   followProfileController,
+  getProfileCommentsController,
   getProfileController,
+  getProfilePostsController,
 } from "@/controllers/profile/profile.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { profileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
@@ -14,7 +15,9 @@ const router = Router();
 
 router.get("/:username/overview", getProfileController);
 
-router.get("/:username/posts", findProfilePostsController);
+router.get("/:username/posts", getProfilePostsController);
+
+router.get("/:username/comments", getProfileCommentsController);
 
 router.put("/:username/follow", validateData(actionSchema), followProfileController);
 
