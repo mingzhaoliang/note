@@ -4,7 +4,7 @@ import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import { PostOverview } from "@/types";
 import { Link, useParams } from "@remix-run/react";
 import { LetterTextIcon } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useImmer } from "use-immer";
 
 type ProfilePostsSectionProps = {
@@ -51,10 +51,10 @@ export default function ProfilePostsSection({ posts }: ProfilePostsSectionProps)
               </div>
             )}
             {post.images.length === 0 && (
-              <>
-                <p>{post.text}</p>
+              <div className="relative w-full h-full flex-center p-6">
+                <p className="line-clamp-4">{post.text}</p>
                 <LetterTextIcon className="absolute top-4 right-4" />
-              </>
+              </div>
             )}
           </Link>
         ))}
