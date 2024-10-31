@@ -157,4 +157,13 @@ body {
   .responsive-dialog-content {
     @apply md:!rounded-3xl md:max-w-screen-sm bg-primary-foreground no-highlight;
   }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

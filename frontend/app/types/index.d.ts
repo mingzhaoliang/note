@@ -90,10 +90,33 @@ type ProfileComment = {
   };
 };
 
+type BaseConversation = {
+  id: string;
+  participants: Profile[];
+};
+
+type Conversation = BaseConversation & {
+  lastMessage: Message | null;
+};
+
+type Message = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  sender: Profile;
+  seen: boolean;
+  seenAt: string | null;
+  text: string;
+  createdAt: string;
+};
+
 export type {
+  BaseConversation,
   BaseProfile,
   CloudinaryAsset,
   Comment,
+  Conversation,
+  Message,
   Post,
   PostOverview,
   Profile,
