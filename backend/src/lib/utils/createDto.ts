@@ -1,3 +1,4 @@
+import { getConversation, getConversations } from "@/services/neon/conversation.service.js";
 import { findPost, getComment, getProfileComments } from "@/services/neon/post.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
 
@@ -92,4 +93,23 @@ const createProfileCommentDto = (
   };
 };
 
-export { createCommentDto, createPostDto, createProfileDto, createProfileCommentDto };
+const createConversationDto = (
+  conversation: (Awaited<ReturnType<typeof getConversation>> & { messages?: any[] }) | null
+) => {
+  if (!conversation) {
+    return null;
+  }
+  return {
+    id: conversation.id,
+    participants: conversation.participants.map(({ profile }) => profile),
+    lastMessage: conversation.messages?.[0] || null,
+  };
+};
+
+export {
+  createCommentDto,
+  createConversationDto,
+  createPostDto,
+  createProfileCommentDto,
+  createProfileDto,
+};
