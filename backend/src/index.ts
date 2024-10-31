@@ -8,6 +8,7 @@ import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
 import postRoute from "./routes/post/post.route.js";
 import profileRouter from "./routes/profile/profile.route.js";
+import conversationRoute from "./routes/conversation/conversation.route.js";
 
 const { PORT } = envConfig;
 
@@ -37,6 +38,8 @@ app.use("/api/auth", authRoute);
 app.use("/api/profile", profileRouter);
 
 app.use("/api/post", postRoute);
+
+app.use("/api/conversation", conversationRoute);
 
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
