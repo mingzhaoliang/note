@@ -5,7 +5,6 @@ import PostImages from "@/components/post/post-card/post-images";
 import CldAvatar from "@/components/shared/cld-avatar";
 import TagButton from "@/components/shared/tag-button";
 import UsernameButton from "@/components/shared/username-button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
 import { postDateFormat } from "@/lib/utils/formatter";

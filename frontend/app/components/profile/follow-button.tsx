@@ -34,7 +34,7 @@ const FollowButton = ({ isFollowing, username }: FollowButtonProps) => {
     <Button
       variant={optimisticIsFollowing ? "outline" : "default"}
       size="sm"
-      className="ml-2 space-x-2 rounded-xl"
+      className="space-x-2 rounded-xl"
       onClick={handleClick}
     >
       <p>{optimisticIsFollowing ? "Unfollow" : "Follow"}</p>
