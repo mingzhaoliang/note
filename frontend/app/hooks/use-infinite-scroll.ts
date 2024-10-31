@@ -1,14 +1,16 @@
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
+export type OnLoad<T> = (data: T) => void;
+
 type UseInfiniteScrollProps<T> = {
   loaderRoute: string;
   inView: boolean;
-  onLoad: (posts: T[]) => void;
+  onLoad: OnLoad<T>;
 };
 
 const useInfiniteScroll = <T>({ loaderRoute, inView, onLoad }: UseInfiniteScrollProps<T>) => {
-  const fetcher = useFetcher<{ posts: any }>();
+  const fetcher = useFetcher<T & { remaining: number }>();
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
@@ -18,9 +20,8 @@ const useInfiniteScroll = <T>({ loaderRoute, inView, onLoad }: UseInfiniteScroll
 
   useEffect(() => {
     if (!fetcher.data) return;
-    onLoad(fetcher.data.posts);
-    const hasMorePosts = fetcher.data.posts?.length > 0;
-    setHasMore(hasMorePosts);
+    setHasMore(fetcher.data.remaining > 0);
+    onLoad(fetcher.data as T);
   }, [JSON.stringify(fetcher.data), onLoad]);
 
   return { hasMore };

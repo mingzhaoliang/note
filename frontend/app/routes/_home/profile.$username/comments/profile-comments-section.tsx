@@ -16,10 +16,10 @@ export default function ProfileCommentsSection({ comments }: ProfilePostsSection
   const lastCommentId = profileComments[profileComments.length - 1]?.id;
   const { username } = useParams();
 
-  const handleNewProfileComments = useCallback((newComments: ProfileComment[] | null) => {
-    if (!newComments) return;
+  const handleLoadProfileComments = useCallback(({ comments }: { comments: ProfileComment[] }) => {
+    if (!comments) return;
     setProfileComments((draft) => {
-      draft.push(...newComments);
+      draft.push(...comments);
     });
   }, []);
 
@@ -37,7 +37,7 @@ export default function ProfileCommentsSection({ comments }: ProfilePostsSection
       {lastCommentId && (
         <InfiniteScrollTrigger
           loaderRoute={`/profile/${username}/comments?index&lastCommentId=${lastCommentId}`}
-          onLoad={handleNewProfileComments}
+          onLoad={handleLoadProfileComments}
           className="!mt-12"
         />
       )}

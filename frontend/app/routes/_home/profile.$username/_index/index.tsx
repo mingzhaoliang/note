@@ -13,8 +13,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const baseSession = await getBaseSession(request.headers.get("Cookie"));
   const _action = baseSession.get("_action");
 
-  let posts: PostOverview[] = [];
-
   const lastPostId = new URL(request.url).searchParams.get("lastPostId");
 
   const response = await fetch(
@@ -23,13 +21,17 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!response.ok) {
     const { error } = await response.json();
-    if (error === "Profile not found." && _action === "edit-profile") return json({ posts });
+    if (error === "Profile not found." && _action === "edit-profile")
+      return json({ posts: [], totalPosts: 0 });
     throw new Error("Oops! Something went wrong!");
   }
 
-  posts = (await response.json()).posts;
+  const { posts, totalPosts } = (await response.json()) as {
+    posts: PostOverview[];
+    totalPosts: number;
+  };
 
-  return json({ posts });
+  return json({ posts, totalPosts });
 }
 
 export default function ProfilePosts() {

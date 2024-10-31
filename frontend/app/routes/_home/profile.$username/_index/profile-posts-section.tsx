@@ -16,10 +16,10 @@ export default function ProfilePostsSection({ posts }: ProfilePostsSectionProps)
   const lastPostId = profilePosts[profilePosts.length - 1]?.id;
   const { username } = useParams();
 
-  const handleNewProfilePosts = useCallback((newPosts: PostOverview[] | null) => {
-    if (!newPosts) return;
+  const handleLoadProfilePosts = useCallback(({ posts }: { posts: PostOverview[] | null }) => {
+    if (!posts) return;
     setProfilePosts((draft) => {
-      draft.push(...newPosts);
+      draft.push(...posts);
     });
   }, []);
 
@@ -62,7 +62,7 @@ export default function ProfilePostsSection({ posts }: ProfilePostsSectionProps)
       {lastPostId && (
         <InfiniteScrollTrigger
           loaderRoute={`/profile/${username}?index&lastPostId=${lastPostId}`}
-          onLoad={handleNewProfilePosts}
+          onLoad={handleLoadProfilePosts}
           className="!mt-12"
         />
       )}

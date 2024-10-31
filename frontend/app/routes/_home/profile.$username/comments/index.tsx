@@ -10,8 +10,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const baseSession = await getBaseSession(request.headers.get("Cookie"));
   const _action = baseSession.get("_action");
 
-  let comments: ProfileComment[] = [];
-
   const lastCommentId = new URL(request.url).searchParams.get("lastCommentId");
 
   const response = await fetch(
@@ -22,13 +20,17 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!response.ok) {
     const { error } = await response.json();
-    if (error === "Profile not found." && _action === "edit-profile") return json({ comments });
+    if (error === "Profile not found." && _action === "edit-profile")
+      return json({ comments: [], totalComments: 0 });
     throw new Error("Oops! Something went wrong!");
   }
 
-  comments = (await response.json()).comments;
+  const { comments, totalComments } = (await response.json()) as {
+    comments: ProfileComment[];
+    totalComments: number;
+  };
 
-  return json({ comments });
+  return json({ comments, totalComments });
 }
 
 export default function ProfileComments() {

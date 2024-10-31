@@ -1,6 +1,4 @@
-import PostCard from "@/components/post/post-card/post-card";
 import InfinitePosts from "@/components/shared/infinite-posts";
-import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import envConfig from "@/config/env.config.server";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { requireUser } from "@/session/guard.server";
@@ -8,7 +6,7 @@ import { addFeedPosts, initialiseFeed, RevalidatePost } from "@/store/redux/feat
 import { useAppDispatch, useAppSelector } from "@/store/redux/hooks";
 import { Post } from "@/types";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -27,9 +25,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  const posts: Post[] = (await response.json()).posts;
+  const { posts, totalPosts } = (await response.json()) as { posts: Post[]; totalPosts: number };
 
-  return json({ posts, user }, { headers });
+  return json({ posts, totalPosts, user }, { headers });
 }
 
 export default function Index() {
@@ -40,19 +38,13 @@ export default function Index() {
 
   const lastPostId = feedPosts[feedPosts.length - 1]?.id;
 
-  const handleNewFeedPosts = useCallback(
-    (newPosts: Post[]) => {
-      dispatch(addFeedPosts(newPosts));
-    },
-    [dispatch]
-  );
+  const handleLoadFeedPosts = useCallback(({ posts }: { posts: Post[] }) => {
+    dispatch(addFeedPosts(posts));
+  }, []);
 
-  const handleRevalidate: OnRevalidate = useCallback(
-    (updatedPost, actionState) => {
-      dispatch(RevalidatePost({ updatedPost, ...actionState }));
-    },
-    [dispatch]
-  );
+  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
+    dispatch(RevalidatePost({ updatedPost, ...actionState }));
+  }, []);
 
   useRevalidatePost(fetcher, handleRevalidate);
 
@@ -66,7 +58,7 @@ export default function Index() {
         posts={feedPosts}
         user={user}
         loaderRoute={`/?index&lastPostId=${lastPostId}`}
-        onLoad={handleNewFeedPosts}
+        onLoad={handleLoadFeedPosts}
       />
     </div>
   );

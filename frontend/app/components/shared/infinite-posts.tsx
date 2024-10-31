@@ -1,21 +1,17 @@
 import PostCard from "@/components/post/post-card/post-card";
 import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
+import { OnLoad } from "@/hooks/use-infinite-scroll";
 import { Post, User } from "@/types";
 import { Link } from "@remix-run/react";
 
-type InfinitePostsProps<T> = {
+type InfinitePostsProps = {
   posts: Post[];
   user: User | null;
   loaderRoute: string;
-  onLoad: (posts: T[]) => void;
+  onLoad: OnLoad<{ posts: Post[]; remaining: number }>;
 };
 
-export default function InfinitePosts<T>({
-  posts,
-  user,
-  loaderRoute,
-  onLoad,
-}: InfinitePostsProps<T>) {
+export default function InfinitePosts({ posts, user, loaderRoute, onLoad }: InfinitePostsProps) {
   const lastPostId = posts[posts.length - 1]?.id;
 
   return (

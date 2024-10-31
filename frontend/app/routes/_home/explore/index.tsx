@@ -25,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const lastPostId = searchParams.get("lastPostId");
 
   if (!q) {
-    return json({ posts: [], user }, { headers });
+    return json({ posts: [], totalPosts: 0, user }, { headers });
   }
 
   const response = await fetch(
@@ -38,9 +38,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  const posts: Post[] = (await response.json()).posts;
+  const { posts, totalPosts } = (await response.json()) as { posts: Post[]; totalPosts: number };
 
-  return json({ posts, user }, { headers });
+  return json({ posts, totalPosts, user }, { headers });
 }
 
 export default function Explore() {
@@ -53,19 +53,13 @@ export default function Explore() {
 
   const lastPostId = searchedPosts[searchedPosts.length - 1]?.id;
 
-  const handleNewSearchedPosts = useCallback(
-    (newPosts: Post[]) => {
-      dispatch(addSearchedPosts(newPosts));
-    },
-    [dispatch]
-  );
+  const handleLoadSearchedPosts = useCallback(({ posts }: { posts: Post[] }) => {
+    dispatch(addSearchedPosts(posts));
+  }, []);
 
-  const handleRevalidate: OnRevalidate = useCallback(
-    (updatedPost, actionState) => {
-      dispatch(RevalidatePost({ updatedPost, ...actionState }));
-    },
-    [dispatch]
-  );
+  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
+    dispatch(RevalidatePost({ updatedPost, ...actionState }));
+  }, []);
 
   useRevalidatePost(fetcher, handleRevalidate);
 
@@ -93,7 +87,7 @@ export default function Explore() {
           posts={searchedPosts}
           user={user}
           loaderRoute={"/explore?" + new URLSearchParams({ q: query, lastPostId }).toString()}
-          onLoad={handleNewSearchedPosts}
+          onLoad={handleLoadSearchedPosts}
         />
       )}
     </div>
