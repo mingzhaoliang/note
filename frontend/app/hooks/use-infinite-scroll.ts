@@ -24,7 +24,7 @@ const useInfiniteScroll = <T>({ loaderRoute, inView, onLoad }: UseInfiniteScroll
     onLoad(fetcher.data as T);
   }, [JSON.stringify(fetcher.data), onLoad]);
 
-  return { hasMore };
+  return { hasMore, state: fetcher.state };
 };
 
 export { useInfiniteScroll };
