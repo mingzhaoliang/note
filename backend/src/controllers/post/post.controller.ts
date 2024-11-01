@@ -11,8 +11,8 @@ import {
   findPost,
   getComments,
   getFeedPosts,
-  getPostsByTag,
   likePost,
+  searchPosts,
   unLikePost,
 } from "@/services/neon/post.service.js";
 import { getLikedPost } from "@/services/neon/profile.service.js";
@@ -61,11 +61,11 @@ const createPostController = async (req: Request, res: Response) => {
 const getFeedPostsController = async (req: Request, res: Response) => {
   try {
     const { lastPostId } = req.query as { lastPostId: string | undefined };
-    const posts = await getFeedPosts({ lastCursor: lastPostId });
+    const { posts, remainingPosts } = await getFeedPosts({ lastCursor: lastPostId });
 
     const postsDto = posts.map((post) => createPostDto(post));
 
-    res.status(200).json({ posts: postsDto });
+    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -161,10 +161,10 @@ const searchPostsController = async (req: Request, res: Response) => {
   try {
     const { q, lastPostId } = req.query as { q: string; lastPostId: string | undefined };
 
-    const posts = await getPostsByTag({ q, lastPostId });
+    const { posts, remainingPosts } = await searchPosts({ q, lastPostId });
     const postsDto = posts.map((post) => createPostDto(post));
 
-    res.status(200).json({ posts: postsDto });
+    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

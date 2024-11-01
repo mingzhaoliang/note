@@ -147,13 +147,16 @@ const getProfilePostsController = async (req: Request, res: Response) => {
       res.status(404).json({ error: "Profile not found." });
       return;
     }
-    const posts = await getProfilePosts({ profileId: profile.id, lastCursor: lastPostId });
+    const { posts, remainingPosts } = await getProfilePosts({
+      profileId: profile.id,
+      lastCursor: lastPostId,
+    });
 
     const postsDto = posts.map((post) => ({
       ...post,
       images: post.images.map(({ publicId }) => publicId),
     }));
-    res.status(200).json({ posts: postsDto });
+    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });
@@ -169,14 +172,14 @@ const getProfileCommentsController = async (req: Request, res: Response) => {
       res.status(404).json({ error: "Profile not found." });
       return;
     }
-    const profileComments = await getProfileComments({
+    const { comments, remainingComments } = await getProfileComments({
       profileId: profile.id,
       lastCursor: lastCommentId,
     });
 
-    const profileCommentsDto = profileComments.map((comment) => createProfileCommentDto(comment));
+    const profileCommentsDto = comments.map((comment) => createProfileCommentDto(comment));
 
-    res.status(200).json({ comments: profileCommentsDto });
+    res.status(200).json({ comments: profileCommentsDto, remaining: remainingComments });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

@@ -1,4 +1,4 @@
-import { getConversation, getConversations } from "@/services/neon/conversation.service.js";
+import { getConversation } from "@/services/neon/conversation.service.js";
 import { findPost, getComment, getProfileComments } from "@/services/neon/post.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
 
@@ -65,7 +65,7 @@ const createProfileDto = (profile: Awaited<ReturnType<typeof getProfile>>) => {
 };
 
 const createProfileCommentDto = (
-  comment: Awaited<ReturnType<typeof getProfileComments>>[number]
+  comment: Awaited<ReturnType<typeof getProfileComments>>["comments"][number]
 ) => {
   if (!comment) {
     return null;
