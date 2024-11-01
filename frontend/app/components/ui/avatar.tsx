@@ -31,15 +31,19 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 const CldAvatarImage = ({
   src,
   alt,
+  width,
+  height,
   ...props
 }: React.ComponentPropsWithoutRef<typeof AvatarImage>) => {
   if (!src) return null;
 
   const { CLOUDINARY_CLOUD_NAME } = useRootContext();
 
+  const params = [width && `w_${width}`, height && `h_${height}`].filter(Boolean).join(",");
+
   return (
     <AvatarImage
-      src={`http://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${src}`}
+      src={`http://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${params}/${src}`}
       alt={alt ?? "avatar"}
       {...props}
     />

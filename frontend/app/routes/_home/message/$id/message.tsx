@@ -11,7 +11,7 @@ type MessageProps = {
 const Message = ({ isOwner = false, content, profile }: MessageProps) => {
   return (
     <div className={cn("flex gap-x-3", isOwner && "flex-row-reverse")}>
-      <CldAvatar profile={profile} />
+      <CldAvatar profile={profile} width={120} height={120} />
       <p
         className={cn(
           "max-w-xs rounded-xl px-4 py-2",
