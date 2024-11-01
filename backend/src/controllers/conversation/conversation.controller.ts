@@ -13,8 +13,12 @@ import { Request, Response } from "express";
 const getMessagesController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const messages = await getMessages({ conversationId: id });
-    res.status(200).json({ messages });
+    const { lastMessageId } = req.query as { lastMessageId: string | undefined };
+    const { messages, remainingMessages } = await getMessages({
+      conversationId: id,
+      lastCursor: lastMessageId,
+    });
+    res.status(200).json({ messages, remaining: remainingMessages });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });
@@ -25,9 +29,9 @@ const sendMessageController = async (req: Request, res: Response) => {
   try {
     const { id: conversationId } = req.params;
     const { senderId, text } = req.body as SendMessageSchema;
-    await sendMessage({ senderId, conversationId, text });
+    const { message, conversation } = await sendMessage({ senderId, conversationId, text });
 
-    res.status(200).end();
+    res.status(201).json({ message });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

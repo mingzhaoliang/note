@@ -1,13 +1,37 @@
 import { prisma } from "@/lib/db/prisma.js";
 
-const getMessages = async ({ conversationId }: { conversationId: string }) => {
+const getMessages = async ({
+  conversationId,
+  lastCursor,
+  take = 50,
+}: {
+  conversationId: string;
+  lastCursor?: string;
+  take?: number;
+}) => {
   try {
-    const messages = await prisma.message.findMany({
+    const messagesPromise = prisma.message.findMany({
       where: { conversationId },
+      take,
+      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
       include: { sender: true },
       orderBy: { createdAt: "desc" },
     });
-    return messages;
+
+    const remainingMessagesPromise = prisma.message
+      .findMany({
+        where: { conversationId },
+        ...(lastCursor && { skip: take + 1, cursor: { id: lastCursor } }),
+        orderBy: { createdAt: "desc" },
+      })
+      .then((messages) => messages.length);
+
+    const [messages, remainingMessages] = await Promise.all([
+      messagesPromise,
+      remainingMessagesPromise,
+    ]);
+
+    return { messages, remainingMessages };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get messages.");
@@ -24,17 +48,24 @@ const sendMessage = async ({
   text: string;
 }) => {
   try {
-    const conversation = await prisma.conversation.findUnique({ where: { id: conversationId } });
-
     const message = await prisma.message.create({
       data: {
         conversationId,
         senderId,
         text,
       },
+      include: { sender: true },
     });
 
-    return message;
+    const conversation = await prisma.conversation.update({
+      where: { id: conversationId },
+      data: {
+        updatedAt: new Date(),
+      },
+      include: { participants: { select: { profileId: true } } },
+    });
+
+    return { message, conversation };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to send message.");
