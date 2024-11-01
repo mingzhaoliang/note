@@ -1,23 +1,57 @@
+import InfiniteScrollTrigger from "@/components/shared/infinite-scroll-trigger";
 import { Message as TMessage, User } from "@/types";
-import { useEffect, useRef } from "react";
+import { LoaderIcon } from "lucide-react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from "react";
+import { useImmer } from "use-immer";
 import Message from "./message";
 
+export type MessageContainerRef = {
+  addMessage: (message: TMessage) => void;
+};
+
 type MessageContainerProps = {
-  messages: TMessage[];
+  conversationId: string;
+  initialMessages: TMessage[];
   user: User;
 };
 
-const MessageContainer = ({ messages, user }: MessageContainerProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const MessageContainer = forwardRef<MessageContainerRef, MessageContainerProps>(
+  ({ conversationId, initialMessages, user }, ref) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = useImmer(initialMessages);
+    const lastMessageId = messages[messages.length - 1]?.id;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    containerRef.current.scrollTop = containerRef.current.scrollHeight;
-  }, []);
+    const handleLoadMessages = useCallback(
+      ({ messages: loadedMessages }: { messages: TMessage[] | null }) => {
+        if (!loadedMessages) return;
+        setMessages((draft) => {
+          draft.push(...loadedMessages);
+        });
+      },
+      []
+    );
 
-  return (
-    <div ref={containerRef} className="flex-1 overflow-auto hide-scrollbar scroll-smooth">
-      <div className="p-4 flex flex-col-reverse gap-y-4 pb-16">
+    useImperativeHandle(ref, () => {
+      return {
+        addMessage(message) {
+          setMessages((draft) => {
+            draft.unshift(message);
+          });
+          containerRef.current!.scrollTop = containerRef.current!.scrollHeight;
+        },
+      };
+    });
+
+    useEffect(() => {
+      if (!containerRef.current) return;
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }, []);
+
+    return (
+      <div
+        ref={containerRef}
+        className="flex flex-col-reverse gap-y-4 hide-scrollbar p-4 pb-16 overflow-auto"
+      >
         {messages.map((message) => (
           <Message
             key={message.id}
@@ -26,9 +60,14 @@ const MessageContainer = ({ messages, user }: MessageContainerProps) => {
             profile={message.sender}
           />
         ))}
+        <InfiniteScrollTrigger
+          onLoad={handleLoadMessages}
+          loaderRoute={`/message/${conversationId}?lastMessageId=${lastMessageId}`}
+          loaderComponent={<LoaderIcon className="animate-spin text-inactive" />}
+        />
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 export default MessageContainer;

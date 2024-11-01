@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { BaseConversation, Message as TMessage } from "@/types";
+import { BaseConversation, Message } from "@/types";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, json, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { SendHorizonalIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
-import MessageContainer from "./message-container";
+import MessageContainer, { MessageContainerRef } from "./message-container";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { authHeader, user } = await redirectIfUnauthenticated(request);
@@ -17,26 +17,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { id: conversationId } = params;
 
+  const lastMessageId = new URL(request.url).searchParams.get("lastMessageId");
+
   const conversationResponse = await fetch(`${envConfig.API_URL}/conversation/${conversationId}`);
 
   if (!conversationResponse.ok) throw new Error("Oops! Something went wrong!");
 
   const messagesResponse = await fetch(
-    `${envConfig.API_URL}/conversation/${conversationId}/messages`
+    `${envConfig.API_URL}/conversation/${conversationId}/messages` +
+      (lastMessageId ? `?lastMessageId=${lastMessageId}` : "")
   );
 
   if (!messagesResponse.ok) throw new Error("Oops! Something went wrong!");
 
   const conversation: BaseConversation = (await conversationResponse.json()).conversation;
 
-  const messages: TMessage[] = (await messagesResponse.json()).messages;
+  const { messages, remaining } = (await messagesResponse.json()) as {
+    messages: Message[];
+    remaining: number;
+  };
 
-  return json({ conversation, messages, user }, { headers });
+  return json({ conversation, messages, remaining, user }, { headers });
 }
 
 export default function Index() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const msgContainerRef = useRef<MessageContainerRef>(null);
   const { conversation, messages, user } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
@@ -44,15 +51,17 @@ export default function Index() {
   const recipientProfile = conversation.participants.filter((profile) => profile.id !== user.id)[0];
 
   useEffect(() => {
-    if (navigation.state !== "idle") return;
+    if (navigation.state !== "idle" || !actionData) return;
+    const { newMessage, actionState } = actionData;
 
-    if (actionData?.actionState.message) {
+    if (actionState.message) {
       toast({
         variant: "primary",
-        title: actionData.actionState.message,
+        title: actionState.message,
       });
     } else {
       formRef.current?.reset();
+      msgContainerRef.current?.addMessage(newMessage);
     }
   }, [actionData, navigation.state]);
 
@@ -62,7 +71,12 @@ export default function Index() {
         <CldAvatar profile={recipientProfile} className="w-12 h-12" />
         <p className="font-semibold">{recipientProfile.username}</p>
       </div>
-      <MessageContainer messages={messages} user={user} />
+      <MessageContainer
+        ref={msgContainerRef}
+        conversationId={conversation.id}
+        initialMessages={messages}
+        user={user}
+      />
       <Form
         ref={formRef}
         method="POST"
@@ -104,8 +118,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   if (!response.ok) {
     const error = (await response.json()).error;
-    return json({ actionState: { message: error } }, { headers });
+    return json({ newMessage: null, actionState: { message: error } }, { headers });
   }
 
-  return json(null, { headers });
+  const newMessage = (await response.json()).message;
+
+  return json({ newMessage, actionState: { message: null } }, { headers });
 }
