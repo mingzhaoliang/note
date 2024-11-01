@@ -4,7 +4,7 @@ import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
 import UsernameButton from "@/components/shared/username-button";
 import { postDateFormat } from "@/lib/utils/formatter";
-import { Comment, BaseProfile, User } from "@/types";
+import { BaseProfile, Comment, User } from "@/types";
 import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
@@ -32,11 +32,15 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
             <>
               <LikeButton
                 id={comment.id}
-                type="comment"
                 hasLiked={hasLiked}
                 count={comment.likes.length}
+                onRevalidate={() => {}}
               />
-              <CommentButton commentOnId={comment.id} count={comment.commentCount} />
+              <CommentButton
+                commentOnId={comment.id}
+                count={comment.commentCount}
+                onRevalidate={() => {}}
+              />
             </>
           )}
           {!user && (
