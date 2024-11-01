@@ -2,7 +2,7 @@ import FollowButton from "@/components/profile/follow-button";
 import MessageButton from "@/components/profile/message-button";
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
-import { useSession } from "@/store/session.context";
+import { useSession } from "@/store/context/session.context";
 import { Profile } from "@/types";
 
 type ProfileInfoProps = {

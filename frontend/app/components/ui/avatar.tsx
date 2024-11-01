@@ -2,7 +2,7 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
 
 import { cn } from "@/lib/utils/cn";
-import { useRootContext } from "@/store/context/root.context";
+import { usePublicEnv } from "@/store/context/public-env.context";
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -37,7 +37,7 @@ const CldAvatarImage = ({
 }: React.ComponentPropsWithoutRef<typeof AvatarImage>) => {
   if (!src) return null;
 
-  const { CLOUDINARY_CLOUD_NAME } = useRootContext();
+  const { CLOUDINARY_CLOUD_NAME } = usePublicEnv();
 
   const params = [width && `w_${width}`, height && `h_${height}`].filter(Boolean).join(",");
 

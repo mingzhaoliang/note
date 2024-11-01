@@ -7,7 +7,7 @@ import LikeButton from "@/components/shared/like-button";
 import UsernameButton from "@/components/shared/username-button";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { postDateFormat } from "@/lib/utils/formatter";
-import { useSession } from "@/store/session.context";
+import { useSession } from "@/store/context/session.context";
 import { ProfileComment } from "@/types";
 import { Link, useFetcher } from "@remix-run/react";
 import { useCallback } from "react";

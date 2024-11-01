@@ -1,8 +1,8 @@
 import LoginModal from "@/components/auth/login-modal";
 import CreatePostDialog from "@/components/post/create-post-dialog";
+import { useSession } from "@/store/context/session.context";
 import { PlusIcon } from "lucide-react";
 import NavIcon from "./nav-icon";
-import { useSession } from "@/store/session.context";
 
 export default function CreatePostButton() {
   const { user } = useSession();

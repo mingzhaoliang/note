@@ -1,5 +1,5 @@
 import { requireUser } from "@/session/guard.server";
-import { SessionProvider } from "@/store/session.context";
+import { SessionProvider } from "@/store/context/session.context";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, useLoaderData } from "@remix-run/react";
 import MobileHeader from "./mobile-header";

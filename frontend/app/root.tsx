@@ -6,7 +6,7 @@ import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
 import { Toaster } from "./components/ui/toaster";
 import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";
-import { RootProvider } from "./store/context/root.context";
+import { PublicEnvProvider } from "./store/context/public-env.context";
 import { store } from "./store/redux/store";
 
 import "./tailwind.css";
@@ -74,9 +74,9 @@ function App() {
   return (
     <Document>
       <ReduxProvider store={store}>
-        <RootProvider {...ENV}>
+        <PublicEnvProvider {...ENV}>
           <Outlet />
-        </RootProvider>
+        </PublicEnvProvider>
         <Toaster />
       </ReduxProvider>
     </Document>

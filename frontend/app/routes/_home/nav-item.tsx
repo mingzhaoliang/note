@@ -1,6 +1,6 @@
 import LoginModal from "@/components/auth/login-modal";
 import { cn } from "@/lib/utils/cn";
-import { useSession } from "@/store/session.context";
+import { useSession } from "@/store/context/session.context";
 import { NavLink } from "@remix-run/react";
 import NavIcon from "./nav-icon";
 

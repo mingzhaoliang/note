@@ -1,9 +1,9 @@
 import Mark from "@/components/shared/mark";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/store/context/session.context";
 import { Link } from "@remix-run/react";
 import { AlignRightIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
-import { useSession } from "@/store/session.context";
 
 export default function MobileHeader() {
   const { user } = useSession();

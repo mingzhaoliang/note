@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/cn";
-import { useRootContext } from "@/store/context/root.context";
+import { usePublicEnv } from "@/store/context/public-env.context";
 import { cloudinaryLoader, Image, ImageProps } from "@udisc/remix-image";
 
 export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
@@ -7,7 +7,7 @@ export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimiz
 };
 
 export default function CldImage({ src, className, options, shimmer, ...props }: CldImageProps) {
-  const { CLOUDINARY_CLOUD_NAME } = useRootContext();
+  const { CLOUDINARY_CLOUD_NAME } = usePublicEnv();
 
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>

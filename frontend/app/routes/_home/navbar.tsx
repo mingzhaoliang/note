@@ -1,5 +1,5 @@
 import { Home, HomeFilled, Message, MessageFilled, Person, PersonFilled } from "@/components/icons";
-import { useSession } from "@/store/session.context";
+import { useSession } from "@/store/context/session.context";
 import { PaletteIcon } from "lucide-react";
 import CreatePostButton from "./create-post-button";
 import NavItem from "./nav-item";

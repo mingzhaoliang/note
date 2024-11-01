@@ -1,10 +1,10 @@
 import Logo from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/store/context/session.context";
 import { Link } from "@remix-run/react";
 import { AlignLeftIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
 import Navbar from "./navbar";
-import { useSession } from "@/store/session.context";
 
 export default function Sidebar() {
   const { user } = useSession();
