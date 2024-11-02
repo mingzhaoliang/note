@@ -14,10 +14,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const headers = new Headers();
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
-  const lastPostId = new URL(request.url).searchParams.get("lastPostId");
+  const lastPostId = new URL(request.url).searchParams.get("last");
 
   const response = await fetch(
-    `${envConfig.API_URL}/post/feed${lastPostId ? `?lastPostId=${lastPostId}` : ""}`
+    `${envConfig.API_URL}/post/feed${lastPostId ? `?last=${lastPostId}` : ""}`
   );
 
   if (!response.ok) {
@@ -25,9 +25,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  const { posts, totalPosts } = (await response.json()) as { posts: Post[]; totalPosts: number };
+  const { posts, remaining } = (await response.json()) as { posts: Post[]; remaining: number };
 
-  return json({ posts, totalPosts, user }, { headers });
+  return json({ posts, remaining, user }, { headers });
 }
 
 export default function Index() {
@@ -57,7 +57,7 @@ export default function Index() {
       <InfinitePosts
         posts={feedPosts}
         user={user}
-        loaderRoute={`/?index&lastPostId=${lastPostId}`}
+        loaderRoute={`/?index&last=${lastPostId}`}
         onLoad={handleLoadFeedPosts}
       />
     </div>
