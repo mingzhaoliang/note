@@ -60,12 +60,12 @@ const createPostController = async (req: Request, res: Response) => {
 
 const getFeedPostsController = async (req: Request, res: Response) => {
   try {
-    const { lastPostId } = req.query as { lastPostId: string | undefined };
-    const { posts, remainingPosts } = await getFeedPosts({ lastCursor: lastPostId });
+    const { last } = req.query as { last: string | undefined };
+    const { posts, remaining } = await getFeedPosts({ last: last });
 
     const postsDto = posts.map((post) => createPostDto(post));
 
-    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
+    res.status(200).json({ posts: postsDto, remaining });
   } catch (error) {
     console.error(error);
     res.status(500).json("Internal server error.");
@@ -159,12 +159,12 @@ const createCommentController = async (req: Request, res: Response) => {
 
 const searchPostsController = async (req: Request, res: Response) => {
   try {
-    const { q, lastPostId } = req.query as { q: string; lastPostId: string | undefined };
+    const { q, last } = req.query as { q: string; last: string | undefined };
 
-    const { posts, remainingPosts } = await searchPosts({ q, lastPostId });
+    const { posts, remaining } = await searchPosts({ q, last });
     const postsDto = posts.map((post) => createPostDto(post));
 
-    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
+    res.status(200).json({ posts: postsDto, remaining });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

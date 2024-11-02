@@ -81,32 +81,27 @@ const createComment = async ({ profileId, text, commentOnId }: CreateCommentSche
   }
 };
 
-type getInfinitePostsArgs = {
-  lastCursor?: string;
-  take?: number;
-};
-
-const getFeedPosts = async ({ lastCursor, take = 10 }: getInfinitePostsArgs) => {
+const getFeedPosts = async ({ last, take = 20 }: { last?: string; take?: number }) => {
   try {
     const postsPromise = prisma.post.findMany({
       take,
       where: { commentOnId: null },
-      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
+      ...(last && { skip: 1, cursor: { id: last } }),
       select: basicPostSelect,
       orderBy: { createdAt: "desc" },
     });
 
-    const remainingPostsPromise = prisma.post
+    const remainingPromise = prisma.post
       .findMany({
         where: { commentOnId: null },
-        ...(lastCursor && { skip: take + 1, cursor: { id: lastCursor } }),
+        ...(last && { skip: take + 1, cursor: { id: last } }),
         orderBy: { createdAt: "desc" },
       })
       .then((posts) => posts.length);
 
-    const [posts, remainingPosts] = await Promise.all([postsPromise, remainingPostsPromise]);
+    const [posts, remaining] = await Promise.all([postsPromise, remainingPromise]);
 
-    return { posts, remainingPosts };
+    return { posts, remaining };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get the posts.");
@@ -349,39 +344,34 @@ const getComments = async ({
   }
 };
 
-const searchPosts = async ({
-  q,
-  lastPostId,
-  take = 10,
-}: {
-  q: string;
-  lastPostId?: string;
-  take?: number;
-}) => {
+const searchPosts = async ({ q, last, take = 10 }: { q: string; last?: string; take?: number }) => {
   try {
     const postsPromise = prisma.post.findMany({
       take,
-      ...(lastPostId && { skip: 1, cursor: { id: lastPostId } }),
+      ...(last && { skip: 1, cursor: { id: last } }),
       where: {
-        OR: [{ text: { contains: q } }, { tags: { some: { tag: { name: { contains: q } } } } }],
+        OR: [
+          { text: { contains: q, mode: "insensitive" } },
+          { tags: { some: { tag: { name: { contains: q, mode: "insensitive" } } } } },
+        ],
       },
       select: basicPostSelect,
       orderBy: { createdAt: "desc" },
     });
 
-    const remainingPostsPromise = prisma.post
+    const remainingPromise = prisma.post
       .findMany({
         where: {
           OR: [{ text: { contains: q } }, { tags: { some: { tag: { name: { contains: q } } } } }],
         },
-        ...(lastPostId && { skip: take + 1, cursor: { id: lastPostId } }),
+        ...(last && { skip: take + 1, cursor: { id: last } }),
         orderBy: { createdAt: "desc" },
       })
       .then((posts) => posts.length);
 
-    const [posts, remainingPosts] = await Promise.all([postsPromise, remainingPostsPromise]);
+    const [posts, remaining] = await Promise.all([postsPromise, remainingPromise]);
 
-    return { posts, remainingPosts };
+    return { posts, remaining };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get posts by tag.");
