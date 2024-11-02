@@ -1,7 +1,10 @@
 import CldAvatar from "@/components/shared/cld-avatar";
 import { cn } from "@/lib/utils/cn";
-import { Conversation, User } from "@/types";
+import { useSocket } from "@/store/context/socket.context";
+import { Conversation, Message, User } from "@/types";
 import { NavLink } from "@remix-run/react";
+import { useEffect } from "react";
+import { useImmer } from "use-immer";
 
 type ConversationProps = {
   conversation: Conversation;
@@ -10,8 +13,19 @@ type ConversationProps = {
 
 const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
   const profile = conversation.participants.filter((participant) => participant.id !== user.id)[0];
-  const lastMessage = conversation.lastMessage;
+  const [lastMessage, setLastMessage] = useImmer(conversation.lastMessage);
   const isLastMessageMine = lastMessage?.senderId === user.id;
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("newMessage", (message: Message) => {
+      if (message.conversationId !== conversation.id) return;
+
+      setLastMessage(message);
+    });
+  }, [socket]);
 
   return (
     <NavLink

@@ -2,10 +2,12 @@ import { createContext, useContext } from "react";
 
 type PublicEnvContext = {
   CLOUDINARY_CLOUD_NAME: string;
+  APP_URL: string;
 };
 
 const publicEnvContext = createContext<PublicEnvContext>({
   CLOUDINARY_CLOUD_NAME: "",
+  APP_URL: "",
 });
 
 const usePublicEnv = () => {

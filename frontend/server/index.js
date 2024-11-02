@@ -3,11 +3,19 @@ import compression from "compression";
 import "dotenv/config";
 import express from "express";
 import http from "http";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import morgan from "morgan";
 
 const app = express();
 
 const server = http.createServer(app);
+
+const socketProxy = createProxyMiddleware({
+  target: process.env.SERVER_URL,
+  changeOrigin: true,
+  ws: true,
+  pathFilter: "/socket.io",
+});
 
 const viteDevServer =
   process.env.NODE_ENV === "production"
@@ -42,6 +50,8 @@ if (viteDevServer) {
 app.use(express.static("build/client", { maxAge: "1h" }));
 
 app.use(morgan("tiny"));
+
+app.use(socketProxy);
 
 // handle SSR requests
 app.all("*", remixHandler);

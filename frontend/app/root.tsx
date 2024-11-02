@@ -30,6 +30,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     theme: getTheme(),
     ENV: {
       CLOUDINARY_CLOUD_NAME: envConfig.CLOUDINARY_CLOUD_NAME,
+      APP_URL: envConfig.APP_URL,
     },
   };
 }
