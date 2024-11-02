@@ -1,5 +1,4 @@
 import InfinitePosts from "@/components/shared/infinite-posts";
-import { Input } from "@/components/ui/input";
 import envConfig from "@/config/env.config.server";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { requireUser } from "@/session/guard.server";
@@ -11,8 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/redux/hooks";
 import { Post } from "@/types";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
-import { SearchIcon } from "lucide-react";
+import { json, redirect, useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,15 +20,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const searchParams = new URL(request.url).searchParams;
   const q = searchParams.get("q");
-  const lastPostId = searchParams.get("lastPostId");
+  const lastPostId = searchParams.get("last");
 
   if (!q) {
-    return json({ posts: [], totalPosts: 0, user }, { headers });
+    return redirect("/explore", { headers });
   }
 
   const response = await fetch(
     `${envConfig.API_URL}/post/explore?` +
-      new URLSearchParams({ q, ...(lastPostId && { lastPostId }) }).toString()
+      new URLSearchParams({ q, ...(lastPostId && { last: lastPostId }) }).toString()
   );
 
   if (!response.ok) {
@@ -38,14 +36,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  const { posts, totalPosts } = (await response.json()) as { posts: Post[]; totalPosts: number };
+  const { posts, remaining } = (await response.json()) as { posts: Post[]; remaining: number };
 
-  return json({ posts, totalPosts, user }, { headers });
+  return json({ posts, remaining, user }, { headers });
 }
 
-export default function Explore() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get("q");
+export default function Index() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q")!;
   const searchedPosts = useAppSelector((state) => state.post.searchedPosts);
   const { posts: loadedPosts, user } = useLoaderData<typeof loader>();
   const dispatch = useAppDispatch();
@@ -68,28 +66,15 @@ export default function Explore() {
   }, [loadedPosts, query, dispatch]);
 
   return (
-    <div className="flex-1 flex flex-col items-center p-6 w-full md:max-w-2xl mx-auto">
-      <Form className="flex items-center gap-2 w-full bg-muted rounded-full px-4 py-2">
-        <SearchIcon />
-        <Input
-          type="search"
-          name="q"
-          defaultValue={query || ""}
-          placeholder="Search"
-          className="masked-input no-highlight"
-          autoFocus
-          autoCapitalize="off"
-          autoCorrect="off"
-        />
-      </Form>
-      {query && (
-        <InfinitePosts
-          posts={searchedPosts}
-          user={user}
-          loaderRoute={"/explore?" + new URLSearchParams({ q: query, lastPostId }).toString()}
-          onLoad={handleLoadSearchedPosts}
-        />
-      )}
+    <div className="flex-1 flex flex-col items-center py-6 w-full md:max-w-2xl mx-auto">
+      <InfinitePosts
+        posts={searchedPosts}
+        user={user}
+        loaderRoute={
+          "/explore/posts?" + new URLSearchParams({ q: query, last: lastPostId }).toString()
+        }
+        onLoad={handleLoadSearchedPosts}
+      />
     </div>
   );
 }
