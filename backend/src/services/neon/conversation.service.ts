@@ -139,4 +139,23 @@ const createConversation = async ({
   }
 };
 
-export { createConversation, getConversation, getConversations, getMessages, sendMessage };
+const markAsSeen = async ({ conversationId }: { conversationId: string }) => {
+  try {
+    const messages = await prisma.message.updateMany({
+      where: { conversationId, seen: false },
+      data: { seen: true, seenAt: new Date() },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to mark as seen.");
+  }
+};
+
+export {
+  createConversation,
+  getConversation,
+  getConversations,
+  getMessages,
+  markAsSeen,
+  sendMessage,
+};

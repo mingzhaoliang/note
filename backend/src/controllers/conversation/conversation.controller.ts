@@ -8,6 +8,7 @@ import {
   getMessages,
   sendMessage,
 } from "@/services/neon/conversation.service.js";
+import { getRecipientSocketId, io } from "@/socket/socket.js";
 import { Request, Response } from "express";
 
 const getMessagesController = async (req: Request, res: Response) => {
@@ -30,6 +31,15 @@ const sendMessageController = async (req: Request, res: Response) => {
     const { id: conversationId } = req.params;
     const { senderId, text } = req.body as SendMessageSchema;
     const { message, conversation } = await sendMessage({ senderId, conversationId, text });
+
+    const recipientSocketIds = conversation.participants
+      .filter((participant) => participant.profileId !== senderId)
+      .map((participant) => getRecipientSocketId(participant.profileId));
+
+    recipientSocketIds.forEach((socketId) => {
+      if (!socketId) return;
+      io.to(socketId).emit("newMessage", message);
+    });
 
     res.status(201).json({ message });
   } catch (error) {

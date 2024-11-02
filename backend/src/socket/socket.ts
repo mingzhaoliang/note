@@ -22,6 +22,20 @@ io.on("connection", (socket) => {
 
   if (userId) userSocketMap.set(userId, socket.id);
 
+  socket.on(
+    "markMessageAsSeen",
+    async ({ conversationId, senderId }: { conversationId: string; senderId: string }) => {
+      try {
+        await markAsSeen({ conversationId });
+
+        const socketId = getRecipientSocketId(senderId);
+
+        socketId && io.to(socketId).emit("messageSeen", { conversationId, seenAt: new Date() });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  );
 });
 
 export { app, getRecipientSocketId, httpServer, io };
