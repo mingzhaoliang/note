@@ -155,7 +155,7 @@ body {
   }
 
   .responsive-dialog-content {
-    @apply md:!rounded-3xl md:max-w-screen-sm bg-primary-foreground no-highlight;
+    @apply md:!rounded-3xl md:max-w-screen-sm !bg-primary-foreground no-highlight;
   }
 
   .hide-scrollbar {
