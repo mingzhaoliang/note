@@ -136,4 +136,61 @@ const unfollowProfile = async ({
   }
 };
 
-export { findProfile, followProfile, getLikedPost, getProfile, unfollowProfile, updateProfile };
+const searchProfiles = async ({
+  q,
+  last,
+  take = 20,
+}: {
+  q: string;
+  last?: string;
+  take?: number;
+}) => {
+  try {
+    const profilesPromise = prisma.profile.findMany({
+      take,
+      ...(last && { skip: 1, cursor: { id: last } }),
+      where: {
+        OR: [
+          { username: { contains: q, mode: "insensitive" } },
+          { name: { contains: q, mode: "insensitive" } },
+          { bio: { contains: q, mode: "insensitive" } },
+        ],
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        avatar: true,
+        bio: true,
+        follower: { select: { followerId: true } },
+        following: { select: { followingId: true } },
+      },
+    });
+
+    const remainingPromise = prisma.profile
+      .findMany({
+        where: {
+          OR: [{ username: { contains: q } }, { bio: { contains: q } }],
+        },
+        ...(last && { skip: 1, cursor: { id: last } }),
+      })
+      .then((profiles) => profiles.length);
+
+    const [profiles, remaining] = await Promise.all([profilesPromise, remainingPromise]);
+
+    return { profiles, remaining };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get posts by tag.");
+  }
+};
+
+export {
+  findProfile,
+  followProfile,
+  getLikedPost,
+  getProfile,
+  searchProfiles,
+  unfollowProfile,
+  updateProfile,
+};

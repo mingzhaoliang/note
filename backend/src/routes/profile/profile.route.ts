@@ -5,6 +5,7 @@ import {
   getProfileCommentsController,
   getProfileController,
   getProfilePostsController,
+  searchProfilesController,
 } from "@/controllers/profile/profile.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { profileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
@@ -12,6 +13,8 @@ import { actionSchema } from "@/schemas/shared/action.schema.js";
 import { Router } from "express";
 
 const router = Router();
+
+router.get("/explore", searchProfilesController);
 
 router.get("/:username/overview", getProfileController);
 
