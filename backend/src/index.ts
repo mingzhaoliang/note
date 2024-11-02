@@ -6,15 +6,14 @@ import helmet from "helmet";
 import envConfig from "./config/env.config.js";
 import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
+import conversationRoute from "./routes/conversation/conversation.route.js";
 import postRoute from "./routes/post/post.route.js";
 import profileRouter from "./routes/profile/profile.route.js";
-import conversationRoute from "./routes/conversation/conversation.route.js";
+import { app, httpServer } from "./socket/socket.js";
 
 const { PORT } = envConfig;
 
 connectDB();
-
-const app = express();
 
 app.use(cookieParser());
 
@@ -45,6 +44,6 @@ app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
