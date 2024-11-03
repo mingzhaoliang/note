@@ -15,8 +15,14 @@ export default function Navbar() {
 
   return (
     <nav className="max-md:navbar-mobile md:navbar">
-      <NavItem to="/" preventScrollReset DefaultIcon={Home} ActiveIcon={HomeFilled} />
-      <NavItem to="/explore" DefaultIcon={PaletteIcon} />
+      <NavItem
+        to="/"
+        preventScrollReset
+        DefaultIcon={Home}
+        ActiveIcon={HomeFilled}
+        prefetch="intent"
+      />
+      <NavItem to="/explore" DefaultIcon={PaletteIcon} prefetch="intent" />
       <CreatePostButton />
       <MessageButton />
       <NavItem
@@ -25,6 +31,7 @@ export default function Navbar() {
         ActiveIcon={PersonFilled}
         isProtected
         end
+        prefetch="intent"
       />
     </nav>
   );
@@ -62,7 +69,13 @@ const MessageButton = () => {
 
   return (
     <div className="relative">
-      <NavItem to="/message" DefaultIcon={Message} ActiveIcon={MessageFilled} isProtected />
+      <NavItem
+        to="/message"
+        DefaultIcon={Message}
+        ActiveIcon={MessageFilled}
+        isProtected
+        prefetch="intent"
+      />
       {hasUnseenMessages && (
         <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-destructive" />
       )}
