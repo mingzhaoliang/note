@@ -1,7 +1,26 @@
 import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { ActionFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/react";
+import { Conversation as TConversation } from "@/types";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect, replace } from "@remix-run/react";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { authHeader, user } = await redirectIfUnauthenticated(request);
+  const headers = new Headers();
+  if (authHeader) headers.append("Set-Cookie", authHeader);
+
+  const response = await fetch(`${envConfig.API_URL}/conversation?profileId=${user.id}`);
+
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
+
+  const conversations: TConversation[] = (await response.json()).conversations;
+
+  if (conversations.length) {
+    return replace(`/message/${conversations[0].id}`, { headers });
+  }
+
+  return json(null, { headers });
+}
 
 export default function Index() {
   return (

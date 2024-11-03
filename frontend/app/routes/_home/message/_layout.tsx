@@ -6,7 +6,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, useLoaderData } from "@remix-run/react";
 import ConversationNavLink from "./conversation-nav-link";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { authHeader, user } = await redirectIfUnauthenticated(request);
   const headers = new Headers();
   if (authHeader) headers.append("Set-Cookie", authHeader);
