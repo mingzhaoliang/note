@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "usehooks-ts";
 
-type ResponsiveDialogChildren = {
+export type ResponsiveDialogChildren = {
   Header: typeof DialogHeader | typeof DrawerHeader;
   Title: typeof DialogTitle | typeof DrawerTitle;
   Content: typeof DialogContent | typeof DrawerContent;
@@ -30,7 +30,7 @@ type ResponsiveDialogChildren = {
   Trigger: typeof DialogTrigger | typeof DrawerTrigger;
 };
 
-type ResponsiveDialogProps = Omit<
+export type ResponsiveDialogProps = Omit<
   React.ComponentProps<typeof Dialog | typeof Drawer>,
   "children"
 > & {

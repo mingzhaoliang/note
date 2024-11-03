@@ -17,7 +17,7 @@ export default function CreatePostButton() {
 
   return (
     <>
-      {user && <CreatePostDialog trigger={postButton} />}
+      {user && <CreatePostDialog>{postButton}</CreatePostDialog>}
       {!user && <LoginModal>{postButton}</LoginModal>}
     </>
   );
