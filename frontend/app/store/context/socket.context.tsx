@@ -23,13 +23,14 @@ const SocketProvider = ({
   const { APP_URL } = usePublicEnv();
 
   useEffect(() => {
+    if (!userId) return;
     const connection = io(APP_URL, { query: { userId } });
     setSocket(connection);
 
     return () => {
       connection.disconnect();
     };
-  }, []);
+  }, [userId, APP_URL]);
 
   return <socketContext.Provider value={socket}>{children}</socketContext.Provider>;
 };

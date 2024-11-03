@@ -4,6 +4,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Outlet, useLoaderData } from "@remix-run/react";
 import MobileHeader from "./mobile-header";
 import Sidebar from "./sidebar";
+import { SocketProvider } from "@/store/context/socket.context";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { authHeader, user } = await requireUser(request);
@@ -15,13 +16,15 @@ export default function HomeLayout() {
 
   return (
     <SessionProvider user={user}>
-      <div className="h-full min-h-screen md:pl-20 flex flex-col md:flex-row">
-        <MobileHeader />
-        <div className="flex-1">
-          <Outlet />
+      <SocketProvider userId={user?.id}>
+        <div className="h-full min-h-screen md:pl-20 flex flex-col md:flex-row">
+          <MobileHeader />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <Sidebar />
         </div>
-        <Sidebar />
-      </div>
+      </SocketProvider>
     </SessionProvider>
   );
 }

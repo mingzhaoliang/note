@@ -78,6 +78,7 @@ export default function Index() {
       </div>
       <MessageContainer
         ref={msgContainerRef}
+        key={conversation.id}
         conversationId={conversation.id}
         initialMessages={messages}
         user={user}

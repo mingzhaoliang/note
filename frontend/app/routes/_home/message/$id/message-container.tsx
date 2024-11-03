@@ -96,6 +96,7 @@ const MessageContainer = forwardRef<MessageContainerRef, MessageContainerProps>(
               socket.emit("markMessageAsSeen", {
                 conversationId,
                 senderId: latestMessage.senderId,
+                recipientId: user.id,
               });
 
               setMessages((draft) => {

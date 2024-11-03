@@ -24,13 +24,23 @@ io.on("connection", (socket) => {
 
   socket.on(
     "markMessageAsSeen",
-    async ({ conversationId, senderId }: { conversationId: string; senderId: string }) => {
+    async ({
+      conversationId,
+      senderId,
+      recipientId,
+    }: {
+      conversationId: string;
+      senderId: string;
+      recipientId: string;
+    }) => {
       try {
         await markAsSeen({ conversationId });
 
-        const socketId = getRecipientSocketId(senderId);
+        const socketIds = [getRecipientSocketId(senderId), getRecipientSocketId(recipientId)];
 
-        socketId && io.to(socketId).emit("messageSeen", { conversationId, seenAt: new Date() });
+        socketIds.forEach((socketId) => {
+          socketId && io.to(socketId).emit("messageSeen", { conversationId, seenAt: new Date() });
+        });
       } catch (error) {
         console.error(error);
       }

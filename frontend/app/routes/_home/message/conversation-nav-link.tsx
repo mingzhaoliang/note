@@ -25,6 +25,15 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
 
       setLastMessage(message);
     });
+
+    socket.on("messageSeen", ({ conversationId }) => {
+      if (conversationId !== conversation.id) return;
+
+      setLastMessage((draft) => {
+        if (!draft) return;
+        draft.seen = true;
+      });
+    });
   }, [socket]);
 
   return (
@@ -35,13 +44,20 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
       }
       end
     >
-      <CldAvatar profile={profile} className="w-16 h-16" />
-      <div className="flex-1 flex flex-col justify-between gap-y-2 overflow-hidden">
-        <p className="text-sm font-semibold">{profile.username}</p>
-        <p className="text-xs text-ellipsis text-nowrap overflow-hidden">
-          {(isLastMessageMine ? "You: " : "") + lastMessage?.text}
-        </p>
-      </div>
+      {({ isActive }) => (
+        <>
+          <CldAvatar profile={profile} className="w-16 h-16" />
+          <div className="flex-1 flex flex-col justify-between gap-y-2 overflow-hidden">
+            <p className="text-sm font-semibold">{profile.username}</p>
+            <p className="text-xs text-ellipsis text-nowrap overflow-hidden">
+              {(isLastMessageMine ? "You: " : "") + lastMessage?.text}
+            </p>
+          </div>
+          {!isActive && lastMessage && !isLastMessageMine && !lastMessage.seen && (
+            <div className="self-start mt-1 w-2 h-2 rounded-full bg-destructive" />
+          )}
+        </>
+      )}
     </NavLink>
   );
 };
