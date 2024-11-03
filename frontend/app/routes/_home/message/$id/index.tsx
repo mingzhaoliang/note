@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { BaseConversation, Message } from "@/types";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, json, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { SendHorizonalIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import MessageContainer, { MessageContainerRef } from "./message-container";
@@ -69,7 +69,12 @@ export default function Index() {
     <div className="relative w-full bg-muted/20 rounded-xl h-full flex flex-col">
       <div className="flex items-center gap-x-3 p-4 border-b border-muted">
         <CldAvatar profile={recipientProfile} className="w-12 h-12" />
-        <p className="font-semibold">{recipientProfile.username}</p>
+        <Link
+          to={`/profile/${recipientProfile.username}`}
+          className="font-semibold hover:underline"
+        >
+          {recipientProfile.username}
+        </Link>
       </div>
       <MessageContainer
         ref={msgContainerRef}
