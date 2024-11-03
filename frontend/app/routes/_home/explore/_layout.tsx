@@ -28,7 +28,7 @@ export default function ExploreLayout() {
         />
       </Form>
       {query && <ExploreNavbar />}
-      <Outlet />
+      <Outlet key={query} />
     </div>
   );
 }
