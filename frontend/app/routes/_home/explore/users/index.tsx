@@ -5,6 +5,7 @@ import { requireUser } from "@/session/guard.server";
 import { Profile } from "@/types";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, redirect, useLoaderData, useSearchParams } from "@remix-run/react";
+import { LetterTextIcon } from "lucide-react";
 import { useCallback } from "react";
 import { useImmer } from "use-immer";
 
@@ -54,27 +55,33 @@ export default function Index() {
 
   return (
     <div className="flex-1 flex flex-col items-center gap-y-6 py-6 w-full md:max-w-2xl mx-auto">
-      {profiles
-        .filter((profile) => profile.username !== user?.username)
-        .map((profile) => (
-          <Link
-            key={profile.username}
-            to={`/profile/${profile.username}`}
-            prefetch="intent"
-            className="w-full flex-between gap-x-4"
-          >
-            <CldAvatar profile={profile} className="w-12 h-12" width={120} height={120} />
-            <div className="flex-1 text-sm flex justify-between flex-col gap-y-1">
-              <p className="text-primary">{profile.username}</p>
-              <p className="text-inactive">{profile.name}</p>
-            </div>
-          </Link>
-        ))}
-      {lastUserId && (
-        <InfiniteScrollTrigger
-          loaderRoute={`/explore/users?q=${query}&last=${lastUserId}`}
-          onLoad={handleLoadMore}
-        />
+      {profiles.length > 0 ? (
+        <>
+          {profiles
+            .filter((profile) => profile.username !== user?.username)
+            .map((profile) => (
+              <Link
+                key={profile.username}
+                to={`/profile/${profile.username}`}
+                prefetch="intent"
+                className="w-full flex-between gap-x-4"
+              >
+                <CldAvatar profile={profile} className="w-12 h-12" width={120} height={120} />
+                <div className="flex-1 text-sm flex justify-between flex-col gap-y-1">
+                  <p className="text-primary">{profile.username}</p>
+                  <p className="text-inactive">{profile.name}</p>
+                </div>
+              </Link>
+            ))}
+          {lastUserId && (
+            <InfiniteScrollTrigger
+              loaderRoute={`/explore/users?q=${query}&last=${lastUserId}`}
+              onLoad={handleLoadMore}
+            />
+          )}
+        </>
+      ) : (
+        <div className="flex-1 flex-center py-6 w-full md:max-w-2xl mx-auto">No users found.</div>
       )}
     </div>
   );

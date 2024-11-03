@@ -67,14 +67,18 @@ export default function Index() {
 
   return (
     <div className="flex-1 flex flex-col items-center py-6 w-full md:max-w-2xl mx-auto">
-      <InfinitePosts
-        posts={searchedPosts}
-        user={user}
-        loaderRoute={
-          "/explore/posts?" + new URLSearchParams({ q: query, last: lastPostId }).toString()
-        }
-        onLoad={handleLoadSearchedPosts}
-      />
+      {searchedPosts.length > 0 ? (
+        <InfinitePosts
+          posts={searchedPosts}
+          user={user}
+          loaderRoute={
+            "/explore/posts?" + new URLSearchParams({ q: query, last: lastPostId }).toString()
+          }
+          onLoad={handleLoadSearchedPosts}
+        />
+      ) : (
+        <div className="flex-1 flex-center py-6 w-full md:max-w-2xl mx-auto">No posts found.</div>
+      )}
     </div>
   );
 }
