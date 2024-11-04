@@ -22,7 +22,14 @@ export default function InfiniteScrollTrigger<T>({
   const { hasMore, state } = useInfiniteScroll({ loaderRoute, inView, onLoad });
 
   return (
-    <div ref={targetRef} className={cn("w-full flex-center", className)}>
+    <div
+      ref={targetRef}
+      className={cn(
+        "w-full flex-center transition-all duration-500",
+        className,
+        hasMore ? "scale-y-100" : "scale-y-0 p-0 m-0"
+      )}
+    >
       {hasMore && (
         <Slot
           className={cn("transition-all", inView || state !== "idle" ? "opacity-100" : "opacity-0")}

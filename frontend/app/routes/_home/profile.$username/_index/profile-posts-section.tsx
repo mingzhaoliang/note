@@ -84,7 +84,7 @@ export default function ProfilePostsSection({ posts }: ProfilePostsSectionProps)
         <InfiniteScrollTrigger
           loaderRoute={`/profile/${username}?index&lastPostId=${lastPostId}`}
           onLoad={handleLoadProfilePosts}
-          className="!mt-12"
+          className="py-4"
         />
       )}
     </>

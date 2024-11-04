@@ -33,7 +33,7 @@ export default function InfinitePosts({ posts, user, loaderRoute, onLoad }: Infi
         );
       })}
       {lastPostId && (
-        <InfiniteScrollTrigger loaderRoute={loaderRoute} onLoad={onLoad} className="my-4" />
+        <InfiniteScrollTrigger loaderRoute={loaderRoute} onLoad={onLoad} className="py-4" />
       )}
     </>
   );

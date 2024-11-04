@@ -31,7 +31,7 @@ export default function NavItem({
           {({ isActive }) => (
             <NavIcon
               Icon={isActive ? ActiveIcon || DefaultIcon : DefaultIcon}
-              className={cn(isActive ? "text-primary" : "", className)}
+              className={cn(isActive ? "text-primary" : "text-primary/50", className)}
             />
           )}
         </NavLink>

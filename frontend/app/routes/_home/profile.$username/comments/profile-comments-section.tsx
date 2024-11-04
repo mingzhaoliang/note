@@ -58,7 +58,7 @@ export default function ProfileCommentsSection({ comments }: ProfilePostsSection
         <InfiniteScrollTrigger
           loaderRoute={`/profile/${username}/comments?index&lastCommentId=${lastCommentId}`}
           onLoad={handleLoadProfileComments}
-          className="!mt-12"
+          className="my-4"
         />
       )}
     </>
