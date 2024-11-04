@@ -18,7 +18,7 @@ export default function InfinitePosts({ posts, user, loaderRoute, onLoad }: Infi
     <>
       {posts.map((post) => {
         if (post.id.startsWith("tmp-")) {
-          <PostCard key={post.id} {...post} userId={user?.id} />;
+          return <PostCard key={post.id} {...post} userId={user?.id} />;
         }
 
         return (

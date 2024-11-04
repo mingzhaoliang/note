@@ -19,17 +19,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
   const searchParams = new URL(request.url).searchParams;
+
   const q = searchParams.get("q");
-  const lastPostId = searchParams.get("last");
+  if (!q) return redirect("/explore", { headers });
 
-  if (!q) {
-    return redirect("/explore", { headers });
-  }
-
-  const response = await fetch(
-    `${envConfig.API_URL}/post/explore?` +
-      new URLSearchParams({ q, ...(lastPostId && { last: lastPostId }) }).toString()
-  );
+  if (user) searchParams.append("userId", user.id);
+  const response = await fetch(`${envConfig.API_URL}/post/explore?` + searchParams.toString());
 
   if (!response.ok) {
     console.log(await response.text());

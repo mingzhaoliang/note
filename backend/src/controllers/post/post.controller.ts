@@ -60,8 +60,8 @@ const createPostController = async (req: Request, res: Response) => {
 
 const getFeedPostsController = async (req: Request, res: Response) => {
   try {
-    const { last } = req.query as { last: string | undefined };
-    const { posts, remaining } = await getFeedPosts({ last: last });
+    const { last, userId } = req.query as { last: string | undefined; userId: string | undefined };
+    const { posts, remaining } = await getFeedPosts({ last, userId });
 
     const postsDto = posts.map((post) => createPostDto(post));
 
@@ -159,9 +159,13 @@ const createCommentController = async (req: Request, res: Response) => {
 
 const searchPostsController = async (req: Request, res: Response) => {
   try {
-    const { q, last } = req.query as { q: string; last: string | undefined };
+    const { q, last, userId } = req.query as {
+      q: string;
+      last: string | undefined;
+      userId: string | undefined;
+    };
 
-    const { posts, remaining } = await searchPosts({ q, last });
+    const { posts, remaining } = await searchPosts({ q, last, userId });
     const postsDto = posts.map((post) => createPostDto(post));
 
     res.status(200).json({ posts: postsDto, remaining });

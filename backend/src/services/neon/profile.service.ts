@@ -191,7 +191,11 @@ const searchProfiles = async ({
     const remainingPromise = prisma.profile
       .findMany({
         where: {
-          OR: [{ username: { contains: q } }, { bio: { contains: q } }],
+          OR: [
+            { username: { contains: q, mode: "insensitive" } },
+            { name: { contains: q, mode: "insensitive" } },
+            { bio: { contains: q, mode: "insensitive" } },
+          ],
         },
         ...(last && { skip: 1, cursor: { id: last } }),
       })

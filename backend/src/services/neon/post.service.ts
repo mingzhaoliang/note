@@ -81,11 +81,27 @@ const createComment = async ({ profileId, text, commentOnId }: CreateCommentSche
   }
 };
 
-const getFeedPosts = async ({ last, take = 20 }: { last?: string; take?: number }) => {
+const getFeedPosts = async ({
+  take = 20,
+  last,
+  userId,
+}: {
+  take?: number;
+  last?: string;
+  userId?: string;
+}) => {
   try {
     const postsPromise = prisma.post.findMany({
       take,
-      where: { commentOnId: null },
+      where: {
+        commentOnId: null,
+        profile: {
+          OR: [
+            { private: false },
+            { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+          ],
+        },
+      },
       ...(last && { skip: 1, cursor: { id: last } }),
       select: basicPostSelect,
       orderBy: { createdAt: "desc" },
@@ -93,7 +109,15 @@ const getFeedPosts = async ({ last, take = 20 }: { last?: string; take?: number 
 
     const remainingPromise = prisma.post
       .findMany({
-        where: { commentOnId: null },
+        where: {
+          commentOnId: null,
+          profile: {
+            OR: [
+              { private: false },
+              { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+            ],
+          },
+        },
         ...(last && { skip: take + 1, cursor: { id: last } }),
         orderBy: { createdAt: "desc" },
       })
@@ -344,7 +368,17 @@ const getComments = async ({
   }
 };
 
-const searchPosts = async ({ q, last, take = 10 }: { q: string; last?: string; take?: number }) => {
+const searchPosts = async ({
+  q,
+  last,
+  take = 10,
+  userId,
+}: {
+  q: string;
+  last?: string;
+  take?: number;
+  userId?: string;
+}) => {
   try {
     const postsPromise = prisma.post.findMany({
       take,
@@ -354,6 +388,12 @@ const searchPosts = async ({ q, last, take = 10 }: { q: string; last?: string; t
           { text: { contains: q, mode: "insensitive" } },
           { tags: { some: { tag: { name: { contains: q, mode: "insensitive" } } } } },
         ],
+        profile: {
+          OR: [
+            { private: false },
+            { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+          ],
+        },
       },
       select: basicPostSelect,
       orderBy: { createdAt: "desc" },
@@ -362,7 +402,16 @@ const searchPosts = async ({ q, last, take = 10 }: { q: string; last?: string; t
     const remainingPromise = prisma.post
       .findMany({
         where: {
-          OR: [{ text: { contains: q } }, { tags: { some: { tag: { name: { contains: q } } } } }],
+          OR: [
+            { text: { contains: q, mode: "insensitive" } },
+            { tags: { some: { tag: { name: { contains: q, mode: "insensitive" } } } } },
+          ],
+          profile: {
+            OR: [
+              { private: false },
+              { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+            ],
+          },
         },
         ...(last && { skip: take + 1, cursor: { id: last } }),
         orderBy: { createdAt: "desc" },

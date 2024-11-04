@@ -9,9 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { requireUser } from "@/session/guard.server";
-import { Comment, Post } from "@/types";
+import { Comment, Post, Profile } from "@/types";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { Await, defer, redirect, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { Suspense } from "react";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -31,6 +31,14 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const post = await fetch(`${envConfig.API_URL}/post/${postId}`)
     .then((response) => response.json())
     .then((data) => data.post as Post);
+
+  const postOwner = await fetch(`${envConfig.API_URL}/profile/${post.profile.username}/overview`)
+    .then((response) => response.json())
+    .then((data) => data.profile as Profile);
+
+  if (postOwner.private && postOwner.follower.every((followerId) => followerId !== user?.id)) {
+    return redirect("/", { headers });
+  }
 
   return defer({ user, post, comments }, { headers });
 }

@@ -14,11 +14,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const headers = new Headers();
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
-  const lastPostId = new URL(request.url).searchParams.get("last");
+  const searchParams = new URL(request.url).searchParams;
+  if (user) searchParams.append("userId", user.id);
 
-  const response = await fetch(
-    `${envConfig.API_URL}/post/feed${lastPostId ? `?last=${lastPostId}` : ""}`
-  );
+  const response = await fetch(`${envConfig.API_URL}/post/feed?` + searchParams.toString());
 
   if (!response.ok) {
     console.error(await response.text());
