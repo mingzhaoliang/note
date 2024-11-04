@@ -3,14 +3,14 @@ import MessageButton from "@/components/profile/message-button";
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
-import { Profile } from "@/types";
+import { Profile, User } from "@/types";
 
 type ProfileInfoProps = {
   profile: Profile;
+  user: User | null;
 };
 
-export default function ProfileInfo({ profile }: ProfileInfoProps) {
-  const { user } = useSession();
+export default function ProfileInfo({ profile, user }: ProfileInfoProps) {
   const isOwner = user?.id === profile.id;
   const isFollowing = profile.follower.some((followerId) => followerId === user?.id);
 
@@ -41,7 +41,11 @@ export default function ProfileInfo({ profile }: ProfileInfoProps) {
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
         {!isOwner && (
           <div className="flex gap-x-2">
-            <FollowButton isFollowing={isFollowing} username={profile.username} />
+            <FollowButton
+              isFollowing={isFollowing}
+              usernameToFollow={profile.username}
+              username={user!.username}
+            />
             <MessageButton profileId={profile.id} />
           </div>
         )}

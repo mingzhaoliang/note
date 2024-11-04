@@ -1,5 +1,6 @@
 import { createProfileCommentDto, createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
+import { ProfileFollowSchema } from "@/schemas/profile/profile-follow.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
@@ -115,8 +116,8 @@ const deleteAvatarController = async (req: Request, res: Response) => {
 
 const followProfileController = async (req: Request, res: Response) => {
   try {
-    const { username } = req.params;
-    const { profileId } = req.body;
+    const { id } = req.params;
+    const { username } = req.body as ProfileFollowSchema;
 
     const profileToFollow = await getProfile({ username });
     if (!profileToFollow) {
@@ -124,11 +125,11 @@ const followProfileController = async (req: Request, res: Response) => {
       return;
     }
 
-    const isFollowing = profileToFollow.follower.some(({ followerId }) => followerId === profileId);
+    const isFollowing = profileToFollow.follower.some(({ followerId }) => followerId === id);
     if (isFollowing) {
-      await unfollowProfile({ followingId: profileToFollow.id, followerId: profileId });
+      await unfollowProfile({ followingId: profileToFollow.id, followerId: id });
     } else {
-      await followProfile({ followingId: profileToFollow.id, followerId: profileId });
+      await followProfile({ followingId: profileToFollow.id, followerId: id });
     }
 
     res.status(200).end();

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { action } from "@/routes/api+/profile+/$username+/follow";
+import { action } from "@/routes/_home/profile.$username/_layout";
 import { Slot } from "@radix-ui/react-slot";
 import { useFetcher } from "@remix-run/react";
 import { UserRoundMinusIcon, UserRoundPlusIcon } from "lucide-react";
@@ -9,16 +9,20 @@ import { useEffect } from "react";
 type FollowButtonProps = {
   isFollowing: boolean;
   username: string;
+  usernameToFollow: string;
 };
 
-const FollowButton = ({ isFollowing, username }: FollowButtonProps) => {
+const FollowButton = ({ isFollowing, username, usernameToFollow }: FollowButtonProps) => {
   const { toast } = useToast();
   const fetcher = useFetcher<typeof action>();
   const isSubmitting = fetcher.state !== "idle";
   const optimisticIsFollowing = isSubmitting ? !isFollowing : isFollowing;
 
   const handleClick = () => {
-    fetcher.submit(null, { method: "PUT", action: `/api/profile/${username}/follow` });
+    fetcher.submit(
+      { _action: "follow", usernameToFollow },
+      { method: "PUT", action: `/profile/${username}` }
+    );
   };
 
   useEffect(() => {

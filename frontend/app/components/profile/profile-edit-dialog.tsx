@@ -22,7 +22,7 @@ import { Input } from "../ui/input";
 import { ResponsiveDialog } from "../ui/responsive-dialog";
 import { Textarea } from "../ui/textarea";
 
-export default function ProfileEditDialog({ id, username, name, bio, avatar }: Profile) {
+export default function ProfileEditDialog({ username, name, bio, avatar }: Profile) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const fetcher = useFetcher({ key: "edit-profile" });
@@ -58,7 +58,7 @@ export default function ProfileEditDialog({ id, username, name, bio, avatar }: P
   const onSubmit: SubmitHandler<ProfileEditSchema> = (data, event) => {
     fetcher.submit(event?.target, {
       method: "PUT",
-      action: `/profile/${username}?index`,
+      action: `/profile/${username}`,
       encType: data.avatar ? "multipart/form-data" : undefined,
     });
 

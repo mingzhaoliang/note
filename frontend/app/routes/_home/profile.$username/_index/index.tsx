@@ -1,10 +1,9 @@
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
-import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
-import { redirectIfUnauthenticated } from "@/session/guard.server";
-import { BaseProfile, PostOverview } from "@/types";
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
-import { replace, useFetcher, useLoaderData, useParams } from "@remix-run/react";
+import { getBaseSession } from "@/session/base-session.server";
+import { PostOverview } from "@/types";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { useFetcher, useLoaderData, useParams } from "@remix-run/react";
 import { useEffect } from "react";
 import ProfilePostsSection from "./profile-posts-section";
 
@@ -21,8 +20,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!response.ok) {
     const { error } = await response.json();
-    if (error === "Profile not found." && _action === "edit-profile")
+    if (error === "Profile not found." && _action === "edit") {
       return json({ posts: [], totalPosts: 0 });
+    }
     throw new Error("Oops! Something went wrong!");
   }
 
@@ -46,43 +46,4 @@ export default function ProfilePosts() {
   }, [fetcher.data?.actionState]);
 
   return <ProfilePostsSection key={username} posts={posts} />;
-}
-
-export async function action({ params, request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
-  const baseSession = await getBaseSession(request.headers.get("Cookie"));
-  baseSession.flash("_action", "edit-profile");
-  headers.append("Set-Cookie", await commitBaseSession(baseSession));
-
-  const { username } = params;
-  if (username !== user.username) {
-    return json({}, { status: 400 });
-  }
-
-  const formData = await request.formData();
-
-  const updateResponse = await fetch(`${envConfig.API_URL}/profile/${user.id}`, {
-    method: "PUT",
-    body: formData,
-  });
-
-  let deleteResponse = null;
-  const avatar = formData.get("avatar") as File | null;
-  if (avatar && avatar.size === 0) {
-    deleteResponse = await fetch(`${envConfig.API_URL}/profile/${user.id}/avatar`, {
-      method: "DELETE",
-    });
-  }
-
-  let error, updatedProfile: BaseProfile;
-  if (!updateResponse.ok || (deleteResponse && !deleteResponse.ok)) {
-    error = (await updateResponse.json()).error;
-    const actionState = { message: error };
-    return json({ actionState }, { status: 400, headers });
-  } else {
-    updatedProfile = (await updateResponse.json()).profile;
-    return replace(`/profile/${updatedProfile.username}`, { headers });
-  }
 }
