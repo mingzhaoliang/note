@@ -27,6 +27,7 @@ type User = {
   username: string;
   name: string;
   avatar: string;
+  private: boolean;
 };
 
 type BaseProfile = {
@@ -35,6 +36,7 @@ type BaseProfile = {
   name: string;
   avatar: string | null;
   bio: string | null;
+  private: boolean;
 };
 
 type Profile = BaseProfile & {
