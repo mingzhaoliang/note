@@ -26,13 +26,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function ProfileLayout() {
   const { profile, user } = useLoaderData<typeof loader>();
+  const allowed =
+    !profile.private ||
+    profile.follower.some((followerId) => followerId === user?.id) ||
+    user?.id === profile.id;
 
   return (
     <div className="flex-1 flex flex-col w-full max-w-screen-lg p-6 md:pb-16 md:p-12 mx-auto gap-8">
       <ProfileInfo profile={profile} user={user} />
       <div className="space-y-4 md:space-y-6">
         <ProfileNavbar username={profile.username} />
-        <Outlet />
+        {allowed && <Outlet />}
+        {!allowed && <p className="text-center py-6">This profile is private.</p>}
       </div>
     </div>
   );
