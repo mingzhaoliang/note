@@ -6,15 +6,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Slot } from "@radix-ui/react-slot";
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
+import { useState } from "react";
 
 type NavDropdownProps = {
   triggerIcon: React.ReactNode;
 };
 
 export default function NavDropdown({ triggerIcon }: NavDropdownProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -25,7 +28,18 @@ export default function NavDropdown({ triggerIcon }: NavDropdownProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-60 p-2 font-medium">
+      <DropdownMenuContent align="start" className="w-60 p-2 font-medium">
+        <DropdownMenuItem
+          className="p-3"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen(false);
+          }}
+        >
+          <Link to="/settings/privacy" className="w-full h-full">
+            Settings
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem className="p-3" asChild>
           <Form method="post" action="/logout">
             <button type="submit" className="w-full h-full flex-start">
