@@ -1,6 +1,7 @@
 import { createProfileCommentDto, createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { ProfileFollowSchema } from "@/schemas/profile/profile-follow.schema.js";
+import { ProfilePrivacySchema } from "@/schemas/profile/profile-privacy.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
@@ -9,6 +10,7 @@ import {
   getProfile,
   searchProfiles,
   unfollowProfile,
+  updatePrivacy,
   updateProfile,
 } from "@/services/neon/profile.service.js";
 import { CloudinaryAsset } from "@/types/index.js";
@@ -199,6 +201,18 @@ const searchProfilesController = async (req: Request, res: Response) => {
   }
 };
 
+const updatePrivacyController = async (req: Request, res: Response) => {
+  try {
+    const { profileId } = req.params;
+    const { isPrivate } = req.body as ProfilePrivacySchema;
+    const updatedProfile = await updatePrivacy({ profileId, isPrivate });
+    res.status(200).json({ profile: updatedProfile });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 export {
   deleteAvatarController,
   editProfileController,
@@ -207,4 +221,5 @@ export {
   getProfileController,
   getProfilePostsController,
   searchProfilesController,
+  updatePrivacyController,
 };

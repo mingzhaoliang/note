@@ -100,6 +100,26 @@ const updateProfile = async ({
   }
 };
 
+const updatePrivacy = async ({
+  profileId,
+  isPrivate,
+}: {
+  profileId: string;
+  isPrivate: boolean;
+}) => {
+  try {
+    const profile = await prisma.profile.update({
+      where: { id: profileId },
+      data: { private: isPrivate },
+    });
+
+    return profile;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to update privacy.");
+  }
+};
+
 const followProfile = async ({
   followingId,
   followerId,
@@ -193,5 +213,6 @@ export {
   getProfile,
   searchProfiles,
   unfollowProfile,
+  updatePrivacy,
   updateProfile,
 };
