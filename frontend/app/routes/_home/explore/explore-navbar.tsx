@@ -1,4 +1,4 @@
-import NavTab from "@/components/ui/nav-tab";
+import { NavTab, NavTabItem } from "@/components/ui/nav-tab";
 import { useSearchParams } from "@remix-run/react";
 
 const ExploreNavbar = () => {
@@ -6,10 +6,10 @@ const ExploreNavbar = () => {
   const query = searchParams.get("q")!;
 
   return (
-    <div className="w-full grid grid-cols-2 gap-4 border-b border-muted">
-      <NavTab to={`posts?q=${query}`} label="Posts" />
-      <NavTab to={`users?q=${query}`} label="Users" />
-    </div>
+    <NavTab>
+      <NavTabItem to={`posts?q=${query}`}>Posts</NavTabItem>
+      <NavTabItem to={`users?q=${query}`}>Users</NavTabItem>
+    </NavTab>
   );
 };
 
