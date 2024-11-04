@@ -1,12 +1,21 @@
 import CldAvatar from "@/components/shared/cld-avatar";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { BaseConversation, Message } from "@/types";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { SendHorizonalIcon } from "lucide-react";
+import {
+  Form,
+  json,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from "@remix-run/react";
+import { ArrowLeftIcon, SendHorizonalIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import MessageContainer, { MessageContainerRef } from "./message-container";
 
@@ -47,6 +56,7 @@ export default function Index() {
   const { conversation, messages, user } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const navigate = useNavigate();
 
   const recipientProfile = conversation.participants.filter((profile) => profile.id !== user.id)[0];
 
@@ -68,6 +78,14 @@ export default function Index() {
   return (
     <div className="relative w-full bg-muted/20 rounded-xl h-full flex flex-col">
       <div className="flex items-center gap-x-3 p-4 border-b border-muted">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="sm:hidden rounded-full"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeftIcon className="w-6 h-6" />
+        </Button>
         <CldAvatar profile={recipientProfile} className="w-12 h-12" />
         <Link
           to={`/profile/${recipientProfile.username}`}

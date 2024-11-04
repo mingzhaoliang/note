@@ -40,13 +40,19 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
     <NavLink
       to={`/message/${conversation.id}`}
       className={({ isActive }) =>
-        cn("p-2 flex-between gap-x-3 rounded-xl hover:bg-muted/40", isActive && "bg-muted/40")
+        cn(
+          "relative py-2 flex-between gap-x-3 rounded-xl md:hover:bg-muted/40",
+          isActive && "md:bg-muted/40"
+        )
       }
       end
     >
       {({ isActive }) => (
         <>
-          <CldAvatar profile={profile} className="w-16 h-16" />
+          <CldAvatar
+            profile={profile}
+            className={cn("w-12 h-12 md:w-16 md:h-16", isActive && "border-2 border-primary")}
+          />
           <div className="flex-1 flex flex-col justify-between gap-y-2 overflow-hidden">
             <p className="text-sm font-semibold">{profile.username}</p>
             <p className="text-xs text-ellipsis text-nowrap overflow-hidden">
@@ -54,7 +60,7 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
             </p>
           </div>
           {!isActive && lastMessage && !isLastMessageMine && !lastMessage.seen && (
-            <div className="self-start mt-1 w-2 h-2 rounded-full bg-destructive" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
           )}
         </>
       )}

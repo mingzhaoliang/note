@@ -23,8 +23,8 @@ export default function MessageLayout() {
   const { conversations, user } = useLoaderData<typeof loader>();
 
   return (
-    <div className="mx-auto w-full md:max-w-5xl h-screen flex gap-x-4 p-6">
-      <div className="w-full max-w-64 flex flex-col gap-y-3">
+    <div className="flex-1 max-h-[calc(100vh-132px)] md:max-h-screen mx-auto w-full md:max-w-5xl flex gap-x-2 md:gap-x-4 sm:p-6">
+      <div className="max-sm:hidden w-1/3 max-w-64 flex flex-col gap-y-3">
         <p className="text-xl font-semibold pb-4">Messages</p>
         {conversations.map((conversation) => (
           <ConversationNavLink key={conversation.id} conversation={conversation} user={user} />

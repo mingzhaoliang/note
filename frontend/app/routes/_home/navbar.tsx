@@ -77,7 +77,7 @@ const MessageButton = () => {
         prefetch="intent"
       />
       {hasUnseenMessages && (
-        <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-destructive" />
+        <div className="absolute top-4 right-10 md:top-3 md:right-3 w-2 h-2 rounded-full bg-destructive" />
       )}
     </div>
   );
