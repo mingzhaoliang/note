@@ -4,6 +4,7 @@ import { useSession } from "@/store/context/session.context";
 import { Link } from "@remix-run/react";
 import { AlignRightIcon, LogInIcon } from "lucide-react";
 import NavDropdown from "./nav-dropdown";
+import NotificationButton from "./notification-button";
 
 export default function MobileHeader() {
   const { user } = useSession();
@@ -14,9 +15,12 @@ export default function MobileHeader() {
         <Link to="/">
           <Mark />
         </Link>
-
-        {user && <NavDropdown triggerIcon={<AlignRightIcon />} />}
-
+        {user && (
+          <div className="flex items-center gap-x-2">
+            <NotificationButton />
+            <NavDropdown triggerIcon={<AlignRightIcon />} />
+          </div>
+        )}
         {!user && (
           <Button variant="ghost" size="icon" className="rounded-full" asChild>
             <Link to="/login">

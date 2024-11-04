@@ -5,9 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Slot } from "@radix-ui/react-slot";
 import { Form, Link } from "@remix-run/react";
 import { useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
 
 type NavDropdownProps = {
   triggerIcon: React.ReactNode;
@@ -15,6 +15,7 @@ type NavDropdownProps = {
 
 export default function NavDropdown({ triggerIcon }: NavDropdownProps) {
   const [open, setOpen] = useState(false);
+  const matches = useMediaQuery("(min-width: 768px)");
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -22,13 +23,16 @@ export default function NavDropdown({ triggerIcon }: NavDropdownProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full text-inactive hover:text-primary hover:bg-transparent"
+          className="rounded-full text-primary/50 hover:text-primary hover:bg-transparent"
         >
-          <Slot className="w-6 h-6">{triggerIcon}</Slot>
+          {triggerIcon}
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-60 p-2 font-medium">
+      <DropdownMenuContent
+        align={matches ? "start" : "end"}
+        className="w-60 p-2 font-medium bg-primary-foreground"
+      >
         <DropdownMenuItem
           className="p-3"
           onClick={(e) => {
