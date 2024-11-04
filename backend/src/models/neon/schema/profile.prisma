@@ -5,6 +5,7 @@ model Profile {
   name          String
   avatar        String?
   bio           String?
+  private       Boolean                   @default(false)
   follower      Follows[]                 @relation("follower")
   following     Follows[]                 @relation("following")
   likes         PostLike[]

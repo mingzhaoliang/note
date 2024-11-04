@@ -31,13 +31,14 @@ const getProfile = async ({ id, username }: FindProfileArgs) => {
     }
 
     const profile = await prisma.profile.findUnique({
-      where: { username },
+      where: { id: id ?? Prisma.skip, username: username ?? Prisma.skip },
       select: {
         id: true,
         username: true,
         name: true,
         avatar: true,
         bio: true,
+        private: true,
         follower: { select: { followerId: true } },
         following: { select: { followingId: true } },
         _count: {
