@@ -9,7 +9,7 @@ type NavIconProps = {
 export default function NavIcon({ Icon, className, still }: NavIconProps) {
   return (
     <div className={cn("relative group w-full h-14 md:w-16 md:h-16 flex-center")}>
-      <Icon className={cn("z-10 text-inactive", className)} />
+      <Icon className={cn("z-10 text-muted-foreground", className)} />
       <div className="absolute inset-0 md:py-1.5 flex-center">
         <div
           className={cn(

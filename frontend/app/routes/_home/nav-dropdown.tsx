@@ -23,7 +23,7 @@ export default function NavDropdown({ triggerIcon }: NavDropdownProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full text-primary/50 hover:text-primary hover:bg-transparent"
+          className="rounded-full text-muted-foreground hover:text-primary hover:bg-transparent"
         >
           {triggerIcon}
         </Button>

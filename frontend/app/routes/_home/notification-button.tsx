@@ -8,7 +8,7 @@ const NotificationButton = () => {
     <Button variant="ghost" size="icon" className="rounded-full" asChild>
       <NavLink to="/notifications">
         {({ isActive }) => (
-          <BellIcon className={cn(isActive ? "text-primary" : "text-primary/50")} />
+          <BellIcon className={cn(isActive ? "text-primary" : "text-muted-foreground")} />
         )}
       </NavLink>
     </Button>

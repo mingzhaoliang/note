@@ -23,7 +23,7 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
             {text}
           </p>
           {isOwner && isLatest && (
-            <p className="text-primary/40 text-xs">
+            <p className="text-inactive text-xs">
               {`${seen ? "Seen" : "Sent"} ${new Date(seen ? seenAt! : createdAt).toLocaleTimeString(
                 "en-AU",
                 {

@@ -12,7 +12,7 @@ const NavTabItem = forwardRef<
     className={({ isActive }) =>
       cn(
         "flex-1 flex-center px-4 py-2 md:py-3 font-medium md:text-lg",
-        isActive ? "border-b-2 border-muted-foreground" : "text-primary/40",
+        isActive ? "border-b-2 border-muted-foreground" : "text-inactive",
         className
       )
     }
