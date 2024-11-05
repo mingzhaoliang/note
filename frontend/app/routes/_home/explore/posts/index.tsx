@@ -46,13 +46,19 @@ export default function Index() {
 
   const lastPostId = searchedPosts[searchedPosts.length - 1]?.id;
 
-  const handleLoadSearchedPosts = useCallback(({ posts }: { posts: Post[] }) => {
-    dispatch(addSearchedPosts(posts));
-  }, []);
+  const handleLoadSearchedPosts = useCallback(
+    ({ posts }: { posts: Post[] }) => {
+      dispatch(addSearchedPosts(posts));
+    },
+    [dispatch]
+  );
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
-    dispatch(RevalidatePost({ updatedPost, ...actionState }));
-  }, []);
+  const handleRevalidate: OnRevalidate = useCallback(
+    (updatedPost, actionState) => {
+      dispatch(RevalidatePost({ updatedPost, ...actionState }));
+    },
+    [dispatch]
+  );
 
   useRevalidatePost(fetcher, handleRevalidate);
 

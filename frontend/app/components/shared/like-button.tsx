@@ -1,6 +1,5 @@
 import { Like, LikeFilled } from "@/components/icons";
 import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
-import { useAppDispatch } from "@/store/redux/hooks";
 import { useFetcher } from "@remix-run/react";
 import { Button } from "../ui/button";
 

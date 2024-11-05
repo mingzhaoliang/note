@@ -82,7 +82,7 @@ const MessageContainer = forwardRef<MessageContainerRef, MessageContainerProps>(
           });
         }
       });
-    }, [socket]);
+    }, [socket, conversationId]);
 
     useEffect(() => {
       if (!socket) return;

@@ -5,7 +5,6 @@ import { requireUser } from "@/session/guard.server";
 import { Profile } from "@/types";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { json, Link, redirect, useLoaderData, useSearchParams } from "@remix-run/react";
-import { LetterTextIcon } from "lucide-react";
 import { useCallback } from "react";
 import { useImmer } from "use-immer";
 

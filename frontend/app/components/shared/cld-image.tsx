@@ -2,11 +2,9 @@ import { cn } from "@/lib/utils/cn";
 import { usePublicEnv } from "@/store/context/public-env.context";
 import { cloudinaryLoader, Image, ImageProps } from "@udisc/remix-image";
 
-export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized"> & {
-  shimmer?: [number, number];
-};
+export type CldImageProps = Omit<ImageProps, "loader" | "loaderUrl" | "unoptimized">;
 
-export default function CldImage({ src, className, options, shimmer, ...props }: CldImageProps) {
+export default function CldImage({ src, className, options, ...props }: CldImageProps) {
   const { CLOUDINARY_CLOUD_NAME } = usePublicEnv();
 
   return (

@@ -8,7 +8,7 @@ import { ACCEPTED_IMAGE_TYPES } from "@/config/shared.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { profileEditSchema, ProfileEditSchema } from "@/schemas/profile/profile-edit.schema";
-import { Profile } from "@/types";
+import { BaseProfile } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useFetcher } from "@remix-run/react";
@@ -22,7 +22,7 @@ import { Input } from "../ui/input";
 import { ResponsiveDialog } from "../ui/responsive-dialog";
 import { Textarea } from "../ui/textarea";
 
-export default function ProfileEditDialog({ username, name, bio, avatar }: Profile) {
+export default function ProfileEditDialog({ username, name, bio, avatar }: BaseProfile) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const fetcher = useFetcher({ key: "edit-profile" });

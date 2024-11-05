@@ -73,7 +73,7 @@ export default function Index() {
       formRef.current?.reset();
       msgContainerRef.current?.addMessage(newMessage);
     }
-  }, [actionData, navigation.state]);
+  }, [actionData, navigation.state, toast]);
 
   return (
     <div className="relative w-full bg-muted/20 rounded-xl h-full flex flex-col">

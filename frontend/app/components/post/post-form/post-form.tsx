@@ -126,7 +126,6 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
                     className="editor-input"
                     aria-placeholder="What's on your mind?"
                     placeholder={<div className="editor-placeholder">What's on your mind?</div>}
-                    autoFocus
                   />
                 }
                 ErrorBoundary={LexicalErrorBoundary}

@@ -16,7 +16,7 @@ const useInfiniteScroll = <T>({ loaderRoute, inView, onLoad }: UseInfiniteScroll
   useEffect(() => {
     if (!inView || !hasMore) return;
     fetcher.load(loaderRoute);
-  }, [inView, hasMore]);
+  }, [inView, hasMore, loaderRoute, fetcher.load]);
 
   useEffect(() => {
     if (!fetcher.data) return;

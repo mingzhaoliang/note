@@ -27,7 +27,7 @@ export default function ResetPasswordRequest() {
       <div className="text-center">
         <p className="font-semibold">Trouble with logging in?</p>
         <p className="font-light text-sm">
-          Enter your email address or username, and we'll send you a link to get back into your
+          Enter your email address or username, and we&apos;ll send you a link to get back into your
           account.
         </p>
       </div>

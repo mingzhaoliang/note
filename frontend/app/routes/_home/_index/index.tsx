@@ -37,13 +37,19 @@ export default function Index() {
 
   const lastPostId = feedPosts[feedPosts.length - 1]?.id;
 
-  const handleLoadFeedPosts = useCallback(({ posts }: { posts: Post[] }) => {
-    dispatch(addFeedPosts(posts));
-  }, []);
+  const handleLoadFeedPosts = useCallback(
+    ({ posts }: { posts: Post[] }) => {
+      dispatch(addFeedPosts(posts));
+    },
+    [dispatch]
+  );
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
-    dispatch(RevalidatePost({ updatedPost, ...actionState }));
-  }, []);
+  const handleRevalidate: OnRevalidate = useCallback(
+    (updatedPost, actionState) => {
+      dispatch(RevalidatePost({ updatedPost, ...actionState }));
+    },
+    [dispatch]
+  );
 
   useRevalidatePost(fetcher, handleRevalidate);
 

@@ -28,7 +28,7 @@ export default function Index() {
 
   useEffect(() => {
     if (matches && conversations.length > 0) navigate(`/message/${conversations[0].id}`);
-  }, [matches]);
+  }, [matches, conversations.length, navigate]);
 
   return (
     <>

@@ -33,7 +33,7 @@ export default function PostImages({ images, isLocal }: PostImagesProps) {
     api.on("scroll", () => {
       throttledHandleScroll();
     });
-  }, [api]);
+  }, [api, throttledHandleScroll]);
 
   return (
     <Carousel setApi={setApi} className="w-full">

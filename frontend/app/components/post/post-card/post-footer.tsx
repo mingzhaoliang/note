@@ -19,10 +19,13 @@ const PostFooter = ({ postId, userId, likes, commentCount }: PostFooterProps) =>
 
   const dispatch = useAppDispatch();
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedPost, actionState) => {
-    if (!updatedPost) return;
-    dispatch(RevalidatePostStats({ updatedPost, postId: actionState.postId }));
-  }, []);
+  const handleRevalidate: OnRevalidate = useCallback(
+    (updatedPost, actionState) => {
+      if (!updatedPost) return;
+      dispatch(RevalidatePostStats({ updatedPost, postId: actionState.postId }));
+    },
+    [dispatch]
+  );
 
   return (
     <div className="mt-2 -ml-3 flex items-center">

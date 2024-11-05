@@ -34,7 +34,7 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
         draft.seen = true;
       });
     });
-  }, [socket]);
+  }, [socket, conversation.id]);
 
   return (
     <NavLink
