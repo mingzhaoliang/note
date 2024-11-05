@@ -199,8 +199,90 @@ const searchProfiles = async ({
   }
 };
 
+const getFollowers = async ({
+  id,
+  last,
+  take = 20,
+  status,
+}: {
+  id: string;
+  last?: string;
+  take?: number;
+  status?: "CONFIRMED" | "PENDING";
+}) => {
+  try {
+    const followersPromise = prisma.relationship
+      .findMany({
+        take,
+        ...(last && { skip: 1, cursor: { fromId_toId: { fromId: last, toId: id } } }),
+        where: { toId: id, status: status ?? Prisma.skip },
+        include: { from: true },
+      })
+      .then((followers) =>
+        followers.map(({ fromId, from, status }) => ({ id: fromId, profile: from, status }))
+      );
+
+    const remainingPromise = prisma.relationship
+      .findMany({
+        take,
+        ...(last && { skip: take + 1, cursor: { fromId_toId: { fromId: last, toId: id } } }),
+        where: { toId: id, status: status ?? Prisma.skip },
+      })
+      .then((followers) => followers.length);
+
+    const [followers, remaining] = await Promise.all([followersPromise, remainingPromise]);
+
+    return { followers, remaining };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get followers.");
+  }
+};
+
+const getFollowing = async ({
+  id,
+  last,
+  take = 20,
+  status,
+}: {
+  id: string;
+  last?: string;
+  take?: number;
+  status?: "CONFIRMED" | "PENDING";
+}) => {
+  try {
+    const followingPromise = prisma.relationship
+      .findMany({
+        take,
+        ...(last && { skip: 1, cursor: { fromId_toId: { fromId: id, toId: last } } }),
+        where: { fromId: id, status: status ?? Prisma.skip },
+        include: { to: true },
+      })
+      .then((following) =>
+        following.map(({ toId, to, status }) => ({ id: toId, profile: to, status }))
+      );
+
+    const remainingPromise = prisma.relationship
+      .findMany({
+        take,
+        ...(last && { skip: take + 1, cursor: { fromId_toId: { fromId: id, toId: last } } }),
+        where: { fromId: id, status: status ?? Prisma.skip },
+      })
+      .then((following) => following.length);
+
+    const [following, remaining] = await Promise.all([followingPromise, remainingPromise]);
+
+    return { following, remaining };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get following.");
+  }
+};
+
 export {
   followProfile,
+  getFollowers,
+  getFollowing,
   getLikedPost,
   getProfile,
   searchProfiles,

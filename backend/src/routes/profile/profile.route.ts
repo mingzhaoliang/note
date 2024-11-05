@@ -2,6 +2,8 @@ import {
   deleteAvatarController,
   editProfileController,
   followProfileController,
+  getFollowersController,
+  getFollowingController,
   getProfileCommentsController,
   getProfileController,
   getProfilePostsController,
@@ -23,6 +25,10 @@ router.get("/:username/overview", getProfileController);
 router.get("/:username/posts", getProfilePostsController);
 
 router.get("/:username/comments", getProfileCommentsController);
+
+router.get("/:username/followers", getFollowersController);
+
+router.get("/:username/following", getFollowingController);
 
 router.put("/:id/follow", validateData(actionSchema), followProfileController);
 

@@ -6,6 +6,8 @@ import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js"
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
   followProfile,
+  getFollowers,
+  getFollowing,
   getProfile,
   searchProfiles,
   unfollowProfile,
@@ -217,10 +219,59 @@ const updatePrivacyController = async (req: Request, res: Response) => {
   }
 };
 
+const getFollowersController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { last, status = "CONFIRMED" } = req.query as {
+      last: string | undefined;
+      status: "CONFIRMED" | "PENDING" | undefined;
+    };
+    const profile = await getProfile({ username });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+
+    const { followers, remaining } = await getFollowers({
+      id: profile.id,
+      last,
+      status,
+    });
+    res.status(200).json({ relationships: followers, remaining });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const getFollowingController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { last, userId } = req.query as { last: string | undefined; userId: string | undefined };
+    const profile = await getProfile({ username });
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found." });
+      return;
+    }
+
+    const { following, remaining } = await getFollowing({
+      id: profile.id,
+      last,
+      status: "CONFIRMED",
+    });
+    res.status(200).json({ relationships: following, remaining });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 export {
   deleteAvatarController,
   editProfileController,
   followProfileController,
+  getFollowersController,
+  getFollowingController,
   getProfileCommentsController,
   getProfileController,
   getProfilePostsController,
