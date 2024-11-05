@@ -12,7 +12,7 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
   ({ isOwner = false, isLatest = false, text, sender, seen, seenAt, createdAt }, ref) => {
     return (
       <div ref={ref} className={cn("flex gap-x-3", isOwner && "flex-row-reverse")}>
-        <CldAvatar profile={sender} width={120} height={120} />
+        <CldAvatar avatar={sender.avatar} name={sender.name} width={120} height={120} />
         <div className={cn("flex flex-col gap-y-2", isOwner ? "items-end" : "items-start")}>
           <p
             className={cn(

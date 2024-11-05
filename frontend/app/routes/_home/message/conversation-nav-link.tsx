@@ -50,7 +50,8 @@ const ConversationNavLink = ({ conversation, user }: ConversationProps) => {
       {({ isActive }) => (
         <>
           <CldAvatar
-            profile={profile}
+            avatar={profile.avatar}
+            name={profile.name}
             className={cn("w-12 h-12 md:w-16 md:h-16", isActive && "border-2 border-primary")}
           />
           <div className="flex-1 flex flex-col justify-between gap-y-2 overflow-hidden">

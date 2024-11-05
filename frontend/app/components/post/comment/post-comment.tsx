@@ -19,7 +19,7 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
   return (
     <div className="flex gap-x-3">
       <div className="flex items-center flex-col pb-1">
-        <CldAvatar className="w-8 h-8" profile={profile} />
+        <CldAvatar className="w-8 h-8" avatar={profile.avatar} name={profile.name} />
       </div>
       <div className="flex flex-col">
         <div className="mb-2 text-sm flex items-center gap-3">

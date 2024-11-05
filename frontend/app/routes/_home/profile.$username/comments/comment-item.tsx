@@ -56,7 +56,7 @@ const CommentItem = ({
   return (
     <Link to={`/profile/${profile.username}/post/${id}`}>
       <div className="flex gap-x-3">
-        <CldAvatar profile={profile} />
+        <CldAvatar avatar={profile.avatar} name={profile.name} />
         <div className="w-full flex flex-col space-y-2">
           <div className="py-1 flex-between gap-3">
             <div className="text-sm flex-center gap-3">

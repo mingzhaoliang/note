@@ -48,7 +48,7 @@ const CommentOnItem = ({
     <Link to={`/profile/${profile.username}/post/${id}`}>
       <div className="w-full flex space-x-3">
         <div className="flex-center flex-col">
-          <CldAvatar profile={profile} />
+          <CldAvatar avatar={profile.avatar} name={profile.name} />
           <div className="flex-1 border-l-2 my-2 border-muted" />
         </div>
         <div className="w-full flex flex-col space-y-2">

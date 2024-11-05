@@ -86,7 +86,11 @@ export default function Index() {
         >
           <ArrowLeftIcon className="w-6 h-6" />
         </Button>
-        <CldAvatar profile={recipientProfile} className="w-12 h-12" />
+        <CldAvatar
+          avatar={recipientProfile.avatar}
+          name={recipientProfile.name}
+          className="w-12 h-12"
+        />
         <Link
           to={`/profile/${recipientProfile.username}`}
           className="font-semibold hover:underline"

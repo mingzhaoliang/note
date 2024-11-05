@@ -46,7 +46,11 @@ export default function ProfileInfo({ profile, user }: ProfileInfoProps) {
           </div>
         )}
       </div>
-      <CldAvatar className="w-20 h-20 md:w-24 md:h-24" profile={profile} />
+      <CldAvatar
+        className="w-20 h-20 md:w-24 md:h-24"
+        avatar={profile.avatar}
+        name={profile.name}
+      />
     </div>
   );
 }

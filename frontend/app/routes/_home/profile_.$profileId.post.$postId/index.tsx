@@ -64,7 +64,7 @@ export default function PostDetail() {
   return (
     <div className="mx-auto w-full max-w-2xl flex-col space-y-3 p-6">
       <div className="flex-between gap-3">
-        <CldAvatar profile={profile} />
+        <CldAvatar avatar={profile.avatar} name={profile.name} />
         <div className="flex-1 text-sm flex items-center gap-3">
           <UsernameButton username={profile.username} />
           <p className="text-muted-foreground">{postDateFormat(createdAt)}</p>

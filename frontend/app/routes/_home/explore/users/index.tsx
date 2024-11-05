@@ -65,7 +65,13 @@ export default function Index() {
                 prefetch="intent"
                 className="w-full flex-between gap-x-4"
               >
-                <CldAvatar profile={profile} className="w-12 h-12" width={120} height={120} />
+                <CldAvatar
+                  avatar={profile.avatar}
+                  name={profile.name}
+                  className="w-12 h-12"
+                  width={120}
+                  height={120}
+                />
                 <div className="flex-1 text-sm flex justify-between flex-col gap-y-1">
                   <p className="text-primary">{profile.username}</p>
                   <p className="text-inactive">{profile.name}</p>
