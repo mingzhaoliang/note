@@ -45,7 +45,10 @@ const validateSession = async (req: Request, res: Response) => {
     ...user,
     name: profile.name,
     avatar: profile.avatar,
+    bio: profile.bio,
     private: profile.private,
+    follower: profile.follower.map(({ fromId: id, status }) => ({ id, status })),
+    following: profile.following.map(({ toId: id, status }) => ({ id, status })),
   };
 
   res.status(200).json({ user: userDto, newSessionId });
