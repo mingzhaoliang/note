@@ -21,13 +21,19 @@ type CloudinaryAsset = {
   api_key: string;
 };
 
-type User = {
+type BaseRelationship = {
   id: string;
+  status?: "PENDING" | "CONFIRMED";
+};
+
+type Relationship = BaseRelationship & {
+  profile: BaseProfile;
+};
+
+type User = BaseProfile & {
   email: string;
-  username: string;
-  name: string;
-  avatar: string;
-  private: boolean;
+  follower: BaseRelationship[];
+  following: BaseRelationship[];
 };
 
 type BaseProfile = {
@@ -40,8 +46,8 @@ type BaseProfile = {
 };
 
 type Profile = BaseProfile & {
-  follower: string[];
-  following: string[];
+  followerCount: number;
+  followingCount: number;
   postCount: number;
 };
 
@@ -115,6 +121,7 @@ type Message = {
 export type {
   BaseConversation,
   BaseProfile,
+  BaseRelationship,
   CloudinaryAsset,
   Comment,
   Conversation,
@@ -123,5 +130,6 @@ export type {
   PostOverview,
   Profile,
   ProfileComment,
+  Relationship,
   User,
 };
