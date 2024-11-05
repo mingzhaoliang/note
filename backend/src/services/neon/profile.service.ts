@@ -2,29 +2,7 @@ import { prisma } from "@/lib/db/prisma.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { Prisma } from "@prisma/client";
 
-type FindProfileArgs = {
-  id?: string;
-  username?: string;
-};
-
-const findProfile = async ({ id, username }: FindProfileArgs) => {
-  try {
-    if (!id && !username) {
-      throw new Error("Either 'id' or 'username' must be provided.");
-    }
-
-    const profile = await prisma.profile.findUnique({
-      where: { id: id ?? Prisma.skip, username: username ?? Prisma.skip },
-    });
-
-    return profile;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to get the profile.");
-  }
-};
-
-const getProfile = async ({ id, username }: FindProfileArgs) => {
+const getProfile = async ({ id, username }: { id?: string; username?: string }) => {
   try {
     if (!id && !username) {
       throw new Error("Either 'id' or 'username' must be provided.");
@@ -222,7 +200,6 @@ const searchProfiles = async ({
 };
 
 export {
-  findProfile,
   followProfile,
   getLikedPost,
   getProfile,

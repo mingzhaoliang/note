@@ -5,7 +5,6 @@ import { ProfilePrivacySchema } from "@/schemas/profile/profile-privacy.schema.j
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
-  findProfile,
   followProfile,
   getProfile,
   searchProfiles,
@@ -46,7 +45,7 @@ const editProfileController = async (req: Request, res: Response) => {
     if (req.files) {
       const avatarImage = req.files.avatar as any;
 
-      let profile = await findProfile({ id: profileId });
+      profile = await getProfile({ id: profileId });
       if (!profile) {
         res.status(404).json({ error: "Profile not found." });
         return;
@@ -99,7 +98,7 @@ const editProfileController = async (req: Request, res: Response) => {
 const deleteAvatarController = async (req: Request, res: Response) => {
   try {
     const { profileId } = req.params;
-    const profile = await findProfile({ id: profileId });
+    const profile = await getProfile({ id: profileId });
     if (!profile) {
       res.status(404).json({ error: "Profile not found." });
       return;
