@@ -3,7 +3,9 @@ import {
   login,
   logout,
   resetPassword,
+  updatePasswordAvailabilityCheck,
   signup,
+  updatePasswordController,
   validateSession,
   verifyPasswordResetToken,
 } from "@/controllers/auth/auth.controller.js";
@@ -14,6 +16,7 @@ import {
   resetPasswordSchema,
 } from "@/schemas/auth/password-reset.schema.js";
 import { signupSchema } from "@/schemas/auth/signup.schema.js";
+import { updatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
 import express from "express";
 
 const router = express.Router();
@@ -27,7 +30,11 @@ router.post("/logout", logout);
 router.get("/login/google", googleLogin);
 router.get("/login/google/callback", googleLoginCallback);
 
+router.get("/:id/update-password", updatePasswordAvailabilityCheck);
+
 router.post("/reset-password", validateData(resetPasswordRequestSchema), resetPassword);
 router.post("/reset-password/:token", validateData(resetPasswordSchema), verifyPasswordResetToken);
+
+router.put("/:id/update-password", validateData(updatePasswordSchema), updatePasswordController);
 
 export default router;

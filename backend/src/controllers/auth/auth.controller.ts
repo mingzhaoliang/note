@@ -2,12 +2,14 @@ import { createAuthSession, lucia } from "@/lib/lucia/auth.js";
 import { hashPassword, verifyPassword } from "@/lib/utils/password.util.js";
 import { LoginSchema } from "@/schemas/auth/login.schema.js";
 import { SignupSchema } from "@/schemas/auth/signup.schema.js";
+import { UpdatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
 import {
   createPasswordResetToken,
   createUser,
   deletePasswordResetToken,
   findPasswordResetToken,
   getUserByEmailOrUsername,
+  getUserById,
   updatePassword,
 } from "@/services/neon/auth.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
@@ -154,4 +156,54 @@ const verifyPasswordResetToken = async (req: Request, res: Response) => {
   }
 };
 
-export { login, logout, resetPassword, signup, validateSession, verifyPasswordResetToken };
+const updatePasswordController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body as UpdatePasswordSchema;
+
+    const user = await getUserById(id);
+
+    if (!user || !user.passwordHash) {
+      res.status(400).json({ error: "Unable to update password." });
+      return;
+    }
+
+    const validPassword = await verifyPassword(user.passwordHash, currentPassword);
+
+    if (!validPassword) {
+      res.status(400).json({ error: "Incorrect password." });
+      return;
+    }
+
+    await updatePassword(id, newPassword);
+
+    res.status(200).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
+const updatePasswordAvailabilityCheck = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await getUserById(id);
+    // User has an account but has no password
+    const available = !!(user && user.passwordHash);
+    res.status(200).json({ available });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
+export {
+  login,
+  logout,
+  resetPassword,
+  updatePasswordAvailabilityCheck,
+  signup,
+  updatePasswordController,
+  validateSession,
+  verifyPasswordResetToken,
+};
