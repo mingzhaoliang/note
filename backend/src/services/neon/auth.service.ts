@@ -21,7 +21,9 @@ interface CreateUserArgs {
 
 const createUser = async ({ user, account }: CreateUserArgs): Promise<string> => {
   try {
-    const existingUser = await findUser(user);
+    const existingUser = await prisma.user.findFirst({
+      where: { OR: [{ email: user.email }, { username: user.username }] },
+    });
 
     // Hash the password
     const passwordHash = user.password ? await hashPassword(user.password) : undefined;
@@ -53,16 +55,23 @@ const createUser = async ({ user, account }: CreateUserArgs): Promise<string> =>
   }
 };
 
-type FindUserArgs = {
-  id?: string;
-  username?: string;
-  email?: string;
+const getUserById = async (id: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get the user.");
+  }
 };
 
-const findUser = async ({ id, username, email }: FindUserArgs) => {
+const getUserByEmailOrUsername = async (identifier: string) => {
   try {
     const user = await prisma.user.findFirst({
-      where: { OR: [{ id: id ?? Prisma.skip }, { email }, { username }] },
+      where: { OR: [{ email: identifier }, { username: identifier }] },
     });
 
     return user;
@@ -146,6 +155,7 @@ export {
   deletePasswordResetToken,
   findAccount,
   findPasswordResetToken,
-  findUser,
+  getUserByEmailOrUsername,
+  getUserById,
   updatePassword,
 };

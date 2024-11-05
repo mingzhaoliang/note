@@ -7,7 +7,7 @@ import {
   createUser,
   deletePasswordResetToken,
   findPasswordResetToken,
-  findUser,
+  getUserByEmailOrUsername,
   updatePassword,
 } from "@/services/neon/auth.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
@@ -76,7 +76,7 @@ const login = async (req: Request, res: Response) => {
   const { identifier, password } = req.body as LoginSchema;
 
   try {
-    const existingUser = await findUser({ email: identifier, username: identifier });
+    const existingUser = await getUserByEmailOrUsername(identifier);
 
     const validPassword = existingUser?.passwordHash
       ? await verifyPassword(existingUser.passwordHash, password)
@@ -111,7 +111,7 @@ const logout = async (req: Request, res: Response) => {
 const resetPassword = async (req: Request, res: Response) => {
   try {
     const { identifier } = req.body;
-    const user = await findUser({ email: identifier, username: identifier });
+    const user = await getUserByEmailOrUsername(identifier);
 
     if (!user) {
       res.status(400).end();
