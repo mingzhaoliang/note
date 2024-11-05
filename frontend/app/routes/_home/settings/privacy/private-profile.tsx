@@ -39,7 +39,7 @@ const PrivateProfile = ({ isPrivate }: { isPrivate: boolean }) => {
 
   return (
     <div className="flex-between my-2">
-      <div className="flex-center gap-x-2">
+      <div className="flex-center gap-x-3">
         <LockIcon className="w-5 h-5" />
         <p>Private profile</p>
       </div>
