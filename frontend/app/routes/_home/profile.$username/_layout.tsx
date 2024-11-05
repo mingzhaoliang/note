@@ -35,7 +35,7 @@ export default function ProfileLayout() {
 
   return (
     <div className="flex-1 flex flex-col w-full max-w-screen-lg p-6 md:pb-16 md:p-12 mx-auto gap-8">
-      <ProfileInfo profile={profile} user={user} />
+      <ProfileInfo profile={profile} />
       <div className="space-y-4 md:space-y-6">
         <ProfileNavbar username={profile.username} />
         {allowed && <Outlet />}
@@ -55,6 +55,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   const { username } = params;
 
+  let response;
   switch (_action) {
     case "follow":
       const toId = formData.get("toId") as string;
@@ -62,7 +63,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
         const actionState = { message: "Unauthorised." };
         return json({ actionState }, { status: 400, headers });
       }
-      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
+      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileId: toId }),
@@ -76,6 +77,58 @@ export async function action({ params, request }: ActionFunctionArgs) {
       }
 
       return json({ actionState: { _action: "follow", message: null } }, { headers });
+
+    case "confirmRequest":
+      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/confirm`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        return json(
+          {
+            actionState: { _action: "confirmRequest", message: (await response.json()).error },
+            data: null,
+          },
+          { status: 400, headers }
+        );
+      }
+
+      const confirmRequestRelationship = (await response.json()).relationship;
+
+      return json(
+        {
+          actionState: { _action: "confirmRequest", message: null },
+          data: confirmRequestRelationship,
+        },
+        { headers }
+      );
+
+    case "declineRequest":
+      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/decline`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        return json(
+          {
+            actionState: { _action: "declineRequest", message: (await response.json()).error },
+            data: null,
+          },
+          { status: 400, headers }
+        );
+      }
+
+      const declineRequestRelationship = (await response.json()).relationship;
+
+      return json(
+        {
+          actionState: { _action: "declineRequest", message: null },
+          data: declineRequestRelationship,
+        },
+        { headers }
+      );
 
     default:
       if (username !== user.username) {

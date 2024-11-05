@@ -1,18 +1,16 @@
+import LoginModal from "@/components/auth/login-modal";
 import FollowButton from "@/components/profile/follow-button";
 import MessageButton from "@/components/profile/message-button";
 import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
-import { Profile, User } from "@/types";
+import { Profile } from "@/types";
+import RelationshipDialog from "./relationship-dialog";
 
-type ProfileInfoProps = {
-  profile: Profile;
-  user: User | null;
-};
-
-export default function ProfileInfo({ profile, user }: ProfileInfoProps) {
+export default function ProfileInfo({ profile }: { profile: Profile }) {
+  const { user } = useSession();
   const isOwner = user?.id === profile.id;
-  const isFollowing = profile.follower.some((followerId) => followerId === user?.id);
+  const followerCount = profile.followerCount;
 
   return (
     <div className="flex justify-between gap-6">
@@ -24,22 +22,16 @@ export default function ProfileInfo({ profile, user }: ProfileInfoProps) {
           </div>
           <p className="text-muted-foreground">{"@" + profile.username}</p>
         </div>
-        <div className="md:text-lg flex gap-3 md:gap-6 font-medium">
-          <div className="flex flex-wrap gap-1.5">
-            <p>{profile.postCount}</p>
-            <p>Posts</p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <p>{profile.follower.length}</p>
-            <p>Followers</p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <p>{profile.following.length}</p>
-            <p>Following</p>
-          </div>
-        </div>
+        {!user && (
+          <LoginModal>
+            <p className="text-start text-sm text-muted-foreground">
+              {followerCount} {followerCount <= 1 ? "Follower" : "Followers"}
+            </p>
+          </LoginModal>
+        )}
+        {user && <RelationshipDialog followerCount={followerCount} />}
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
-        {!isOwner && (
+        {!isOwner && user && (
           <div className="flex gap-x-2">
             <FollowButton profile={{ id: profile.id, private: profile.private }} />
             <MessageButton profileId={profile.id} />
