@@ -1,4 +1,6 @@
 import {
+  confirmRequestController,
+  declineRequestController,
   deleteAvatarController,
   editProfileController,
   followProfileController,
@@ -31,6 +33,10 @@ router.get("/:username/followers", getFollowersController);
 router.get("/:username/following", getFollowingController);
 
 router.put("/:id/follow", validateData(actionSchema), followProfileController);
+
+router.put("/:id/follow/confirm", validateData(actionSchema), confirmRequestController);
+
+router.put("/:id/follow/decline", validateData(actionSchema), declineRequestController);
 
 router.put("/:profileId", validateData(profileEditSchema), editProfileController);
 

@@ -132,6 +132,8 @@ const followProfileController = async (req: Request, res: Response) => {
     let relationship;
     if (isFollowing) {
       relationship = await unfollowProfile({ fromId: id, toId: profileToFollow.id });
+    } else if (profileToFollow.private) {
+      relationship = await followProfile({ fromId: id, toId: profileToFollow.id });
     } else {
       relationship = await followProfile({
         fromId: id,
@@ -140,6 +142,30 @@ const followProfileController = async (req: Request, res: Response) => {
       });
     }
 
+    res.status(200).json({ relationship });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const confirmRequestController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { profileId } = req.body as ActionSchema;
+    const relationship = await followProfile({ fromId: profileId, toId: id, status: "CONFIRMED" });
+    res.status(200).json({ relationship });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+const declineRequestController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { profileId } = req.body as ActionSchema;
+    const relationship = await unfollowProfile({ fromId: profileId, toId: id });
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
@@ -267,6 +293,8 @@ const getFollowingController = async (req: Request, res: Response) => {
 };
 
 export {
+  confirmRequestController,
+  declineRequestController,
   deleteAvatarController,
   editProfileController,
   followProfileController,
