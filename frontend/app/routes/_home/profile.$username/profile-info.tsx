@@ -41,11 +41,7 @@ export default function ProfileInfo({ profile, user }: ProfileInfoProps) {
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
         {!isOwner && (
           <div className="flex gap-x-2">
-            <FollowButton
-              isFollowing={isFollowing}
-              usernameToFollow={profile.username}
-              username={user!.username}
-            />
+            <FollowButton profile={{ id: profile.id, private: profile.private }} />
             <MessageButton profileId={profile.id} />
           </div>
         )}

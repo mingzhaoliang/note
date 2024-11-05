@@ -28,7 +28,9 @@ export default function ProfileLayout() {
   const { profile, user } = useLoaderData<typeof loader>();
   const allowed =
     !profile.private ||
-    profile.follower.some((followerId) => followerId === user?.id) ||
+    user?.following.some(
+      (following) => following.id === profile.id && following.status === "CONFIRMED"
+    ) ||
     user?.id === profile.id;
 
   return (
@@ -55,15 +57,15 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   switch (_action) {
     case "follow":
-      const usernameToFollow = formData.get("usernameToFollow") as string;
-      if (usernameToFollow === user.username) {
+      const toId = formData.get("toId") as string;
+      if (toId === user.id) {
         const actionState = { message: "Unauthorised." };
         return json({ actionState }, { status: 400, headers });
       }
       const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: usernameToFollow }),
+        body: JSON.stringify({ profileId: toId }),
       });
 
       if (!response.ok) {
@@ -73,7 +75,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
         );
       }
 
-      return json(null, { headers });
+      return json({ actionState: { _action: "follow", message: null } }, { headers });
 
     default:
       if (username !== user.username) {
