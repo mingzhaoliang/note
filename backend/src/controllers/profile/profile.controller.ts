@@ -1,7 +1,7 @@
 import { createProfileCommentDto, createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
-import { ProfileFollowSchema } from "@/schemas/profile/profile-follow.schema.js";
 import { ProfilePrivacySchema } from "@/schemas/profile/profile-privacy.schema.js";
+import { ActionSchema } from "@/schemas/shared/action.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
@@ -118,9 +118,9 @@ const deleteAvatarController = async (req: Request, res: Response) => {
 const followProfileController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { username } = req.body as ProfileFollowSchema;
+    const { profileId } = req.body as ActionSchema;
 
-    const profileToFollow = await getProfile({ username });
+    const profileToFollow = await getProfile({ id: profileId });
     if (!profileToFollow) {
       res.status(404).json({ error: "Profile not found." });
       return;
