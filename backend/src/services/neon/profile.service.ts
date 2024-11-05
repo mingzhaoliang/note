@@ -39,10 +39,12 @@ const getProfile = async ({ id, username }: FindProfileArgs) => {
         avatar: true,
         bio: true,
         private: true,
-        follower: { select: { followerId: true } },
-        following: { select: { followingId: true } },
+        follower: { select: { fromId: true, status: true } },
+        following: { select: { toId: true, status: true } },
         _count: {
           select: {
+            follower: { where: { status: "CONFIRMED" } },
+            following: { where: { status: "CONFIRMED" } },
             posts: true,
           },
         },
@@ -121,36 +123,45 @@ const updatePrivacy = async ({
 };
 
 const followProfile = async ({
-  followingId,
-  followerId,
+  fromId,
+  toId,
+  status = "PENDING",
 }: {
-  followingId: string;
-  followerId: string;
+  fromId: string;
+  toId: string;
+  status?: "CONFIRMED" | "PENDING";
 }) => {
   try {
-    await prisma.follows.create({
-      data: {
-        followingId,
-        followerId,
+    const relationship = await prisma.relationship.upsert({
+      where: { fromId_toId: { fromId, toId } },
+      update: { status },
+      create: { fromId, toId, status },
+      select: {
+        from: true,
+        to: true,
+        status: true,
       },
     });
+
+    return relationship;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to follow profile.");
   }
 };
 
-const unfollowProfile = async ({
-  followingId,
-  followerId,
-}: {
-  followingId: string;
-  followerId: string;
-}) => {
+const unfollowProfile = async ({ fromId, toId }: { fromId: string; toId: string }) => {
   try {
-    await prisma.follows.delete({
-      where: { followerId_followingId: { followingId, followerId } },
+    const relationship = await prisma.relationship.delete({
+      where: { fromId_toId: { fromId, toId } },
+      select: {
+        from: true,
+        to: true,
+        status: true,
+      },
     });
+
+    return relationship;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to unfollow profile.");
@@ -183,8 +194,8 @@ const searchProfiles = async ({
         name: true,
         avatar: true,
         bio: true,
-        follower: { select: { followerId: true } },
-        following: { select: { followingId: true } },
+        follower: { where: { status: "CONFIRMED" }, select: { fromId: true } },
+        following: { where: { status: "CONFIRMED" }, select: { toId: true } },
       },
     });
 

@@ -59,8 +59,8 @@ const createProfileDto = (profile: Awaited<ReturnType<typeof getProfile>>) => {
     avatar: profile.avatar,
     bio: profile.bio,
     private: profile.private,
-    follower: profile.follower.map(({ followerId }) => followerId),
-    following: profile.following.map(({ followingId }) => followingId),
+    followerCount: profile._count.follower,
+    followingCount: profile._count.following,
     postCount: profile._count.posts,
   };
 };

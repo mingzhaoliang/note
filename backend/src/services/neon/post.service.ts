@@ -98,7 +98,7 @@ const getFeedPosts = async ({
         profile: {
           OR: [
             { private: false },
-            { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+            { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
           ],
         },
       },
@@ -114,7 +114,7 @@ const getFeedPosts = async ({
           profile: {
             OR: [
               { private: false },
-              { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+              { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
             ],
           },
         },
@@ -391,7 +391,7 @@ const searchPosts = async ({
         profile: {
           OR: [
             { private: false },
-            { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+            { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
           ],
         },
       },
@@ -409,7 +409,7 @@ const searchPosts = async ({
           profile: {
             OR: [
               { private: false },
-              { private: true, follower: { some: { followerId: userId ?? Prisma.skip } } },
+              { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
             ],
           },
         },

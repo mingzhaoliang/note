@@ -127,14 +127,19 @@ const followProfileController = async (req: Request, res: Response) => {
       return;
     }
 
-    const isFollowing = profileToFollow.follower.some(({ followerId }) => followerId === id);
+    const isFollowing = profileToFollow.follower.some(({ fromId }) => fromId === id);
+    let relationship;
     if (isFollowing) {
-      await unfollowProfile({ followingId: profileToFollow.id, followerId: id });
+      relationship = await unfollowProfile({ fromId: id, toId: profileToFollow.id });
     } else {
-      await followProfile({ followingId: profileToFollow.id, followerId: id });
+      relationship = await followProfile({
+        fromId: id,
+        toId: profileToFollow.id,
+        status: "CONFIRMED",
+      });
     }
 
-    res.status(200).end();
+    res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });

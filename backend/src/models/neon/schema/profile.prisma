@@ -6,8 +6,8 @@ model Profile {
   avatar        String?
   bio           String?
   private       Boolean                   @default(false)
-  follower      Follows[]                 @relation("follower")
-  following     Follows[]                 @relation("following")
+  follower      Relationship[]            @relation("follower")
+  following     Relationship[]            @relation("following")
   likes         PostLike[]
   posts         Post[]
   conversations ConversationParticipant[]
@@ -18,13 +18,19 @@ model Profile {
   @@unique([id, username])
 }
 
-model Follows {
-  followerId  String
-  follower    Profile  @relation("following", references: [id], fields: [followerId], onDelete: Cascade)
-  followingId String
-  following   Profile  @relation("follower", references: [id], fields: [followingId], onDelete: Cascade)
-  updatedAt   DateTime @updatedAt
-  createdAt   DateTime @default(now())
+model Relationship {
+  fromId    String
+  from      Profile  @relation("following", references: [id], fields: [fromId], onDelete: Cascade)
+  toId      String
+  to        Profile  @relation("follower", references: [id], fields: [toId], onDelete: Cascade)
+  status    Status   @default(PENDING)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 
-  @@id([followerId, followingId])
+  @@id([fromId, toId])
+}
+
+enum Status {
+  PENDING
+  CONFIRMED
 }
