@@ -6,6 +6,9 @@ model Profile {
   avatar        String?
   bio           String?
   private       Boolean                   @default(false)
+  deactivated   Boolean                   @default(false)
+  deactivatedAt DateTime?
+  toBeDeletedAt DateTime?
   follower      Relationship[]            @relation("follower")
   following     Relationship[]            @relation("following")
   likes         PostLike[]

@@ -1,8 +1,11 @@
 model User {
-  id           String  @id
-  email        String  @unique
-  username     String  @unique
-  passwordHash String?
+  id            String    @id
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String?
+  deactivated   Boolean   @default(false)
+  deactivatedAt DateTime?
+  toBeDeletedAt DateTime?
 
   authSession   Session[]
   profile       Profile?
