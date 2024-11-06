@@ -191,6 +191,17 @@ const reactivateUser = async (id: string) => {
   }
 };
 
+const removeDeletedUsers = async () => {
+  try {
+    await prisma.user.deleteMany({
+      where: { toBeDeletedAt: { lt: new Date() } },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete the user.");
+  }
+};
+
 export {
   createPasswordResetToken,
   createUser,
@@ -201,5 +212,6 @@ export {
   getUserByEmailOrUsername,
   getUserById,
   reactivateUser,
+  removeDeletedUsers,
   updatePassword,
 };

@@ -4,6 +4,7 @@ import express from "express";
 import fileUpload from "express-fileupload";
 import helmet from "helmet";
 import envConfig from "./config/env.config.js";
+import { startCron } from "./cron/cron.js";
 import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth/auth.route.js";
 import conversationRoute from "./routes/conversation/conversation.route.js";
@@ -14,6 +15,8 @@ import { app, httpServer } from "./socket/socket.js";
 const { PORT } = envConfig;
 
 connectDB();
+
+startCron();
 
 app.use(cookieParser());
 
