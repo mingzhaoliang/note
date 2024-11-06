@@ -43,6 +43,9 @@ type BaseProfile = {
   avatar: string | null;
   bio: string | null;
   private: boolean;
+  deactivated: boolean;
+  deactivatedAt: string | null;
+  toBeDeletedAt: string | null;
 };
 
 type Profile = BaseProfile & {
@@ -55,7 +58,7 @@ type PostOverview = {
   id: string;
   text: string;
   images: string[];
-  profile: Profile;
+  profile: BaseProfile;
 };
 
 type Post = PostOverview & {
@@ -67,7 +70,7 @@ type Post = PostOverview & {
 
 type Comment = {
   id: string;
-  profile: Profile;
+  profile: BaseProfile;
   text: string;
   likes: string[];
   commentOnId: string | null;
@@ -79,7 +82,7 @@ type Comment = {
 type ProfileComment = {
   id: string;
   text: string;
-  profile: Profile;
+  profile: BaseProfile;
   likes: string[];
   commentOnId: string | null;
   createdAt: string;
@@ -87,7 +90,7 @@ type ProfileComment = {
   commentOn: {
     id: string;
     text: string;
-    profile: Profile;
+    profile: BaseProfile;
     commentOnId: string | null;
     createdAt: string;
     commentCount: number;

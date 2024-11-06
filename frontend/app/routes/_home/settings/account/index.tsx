@@ -2,6 +2,8 @@ import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import DeactivateAccountDialog from "./deactivate-account-dialog";
+import ReactiveAccountDialog from "./reactivate-account-dialog";
 import UpdatePasswordDialog from "./update-password-dialog";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -13,14 +15,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const updatePasswordAvailable: boolean = (await response.json()).available;
+  const { available: updatePasswordAvailable } = (await response.json()) as {
+    available: boolean;
+  };
 
   return json({ user, updatePasswordAvailable }, { headers });
 }
 
 export default function Index() {
-  const { updatePasswordAvailable } = useLoaderData<typeof loader>();
-  return <div className="flex flex-col">{updatePasswordAvailable && <UpdatePasswordDialog />}</div>;
+  const { user, updatePasswordAvailable } = useLoaderData<typeof loader>();
+
+  return (
+    <div className="flex flex-col gap-y-4">
+      {updatePasswordAvailable && <UpdatePasswordDialog />}
+      {!user.deactivated && <DeactivateAccountDialog />}
+      {user.deactivated && (
+        <ReactiveAccountDialog
+          toBeDeletedAt={user.toBeDeletedAt ? new Date(user.toBeDeletedAt) : undefined}
+        />
+      )}
+    </div>
+  );
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -40,7 +55,46 @@ export async function action({ request }: ActionFunctionArgs) {
 
       if (!response.ok) {
         const { error } = await response.json();
-        return json({ actionState: { _action, message: error } }, { status: 400, headers });
+        return json({ actionState: { _action, message: error } }, { headers });
+      }
+
+      return json({ actionState: { _action, message: null } }, { headers });
+    }
+
+    case "deactivateAccount": {
+      const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/deactivate`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        return json({ actionState: { _action, message: error } }, { headers });
+      }
+
+      return json({ actionState: { _action, message: null } }, { headers });
+    }
+
+    case "deleteAccount": {
+      const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/delete`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        return json({ actionState: { _action, message: error } }, { headers });
+      }
+
+      return json({ actionState: { _action, message: null } }, { headers });
+    }
+
+    case "reactivateAccount": {
+      const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/reactivate`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        return json({ actionState: { _action, message: error } }, { headers });
       }
 
       return json({ actionState: { _action, message: null } }, { headers });
