@@ -11,8 +11,8 @@ const basicPostSelect = {
   profile: true,
   images: { select: { publicId: true } },
   tags: { select: { tag: { select: { name: true } } } },
-  likes: { select: { profileId: true } },
-  _count: { select: { comments: true } },
+  likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
+  _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
 };
 
 const createPost = async ({
@@ -96,6 +96,7 @@ const getFeedPosts = async ({
       where: {
         commentOnId: null,
         profile: {
+          deactivated: false,
           OR: [
             { private: false },
             { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
@@ -112,6 +113,7 @@ const getFeedPosts = async ({
         where: {
           commentOnId: null,
           profile: {
+            deactivated: false,
             OR: [
               { private: false },
               { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
@@ -192,9 +194,10 @@ const getProfileComments = async ({
         id: true,
         text: true,
         profile: true,
-        likes: { select: { profileId: true } },
+        likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
         commentOnId: true,
         commentOn: {
+          where: { profile: { deactivated: false } },
           select: {
             id: true,
             text: true,
@@ -203,13 +206,13 @@ const getProfileComments = async ({
             commentOn: { select: { profile: { select: { username: true } } } },
             images: { select: { publicId: true } },
             tags: { select: { tag: { select: { name: true } } } },
-            likes: { select: { profileId: true } },
+            likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
             createdAt: true,
-            _count: { select: { comments: true } },
+            _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
           },
         },
         createdAt: true,
-        _count: { select: { comments: true } },
+        _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
       },
       orderBy: {
         createdAt: "desc",
@@ -289,7 +292,7 @@ const deletePost = async ({ postId, profileId }: { postId: string; profileId: st
 const findPost = async (postId: string) => {
   try {
     const post = await prisma.post.findUnique({
-      where: { id: postId },
+      where: { id: postId, profile: { deactivated: false } },
       select: basicPostSelect,
     });
 
@@ -303,15 +306,15 @@ const findPost = async (postId: string) => {
 const getComment = async (commentId: string) => {
   try {
     const comment = await prisma.post.findUnique({
-      where: { id: commentId },
+      where: { id: commentId, profile: { deactivated: false } },
       select: {
         id: true,
         profile: true,
         text: true,
-        likes: { select: { profileId: true } },
+        likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
         commentOnId: true,
         createdAt: true,
-        _count: { select: { comments: true } },
+        _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
       },
     });
 
@@ -335,26 +338,27 @@ const getComments = async ({
     const comments = await prisma.post.findMany({
       take,
       ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
-      where: { commentOnId },
+      where: { commentOnId, profile: { deactivated: false } },
       select: {
         id: true,
         profile: true,
         text: true,
-        likes: { select: { profileId: true } },
+        likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
         commentOnId: true,
         comments: {
+          where: { profile: { deactivated: false } },
           select: {
             id: true,
             profile: true,
             text: true,
-            likes: { select: { profileId: true } },
+            likes: { where: { profile: { deactivated: false } }, select: { profileId: true } },
             commentOnId: true,
             createdAt: true,
-            _count: { select: { comments: true } },
+            _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
           },
         },
         createdAt: true,
-        _count: { select: { comments: true } },
+        _count: { select: { comments: { where: { profile: { deactivated: false } } } } },
       },
       orderBy: {
         createdAt: "desc",
@@ -389,6 +393,7 @@ const searchPosts = async ({
           { tags: { some: { tag: { name: { contains: q, mode: "insensitive" } } } } },
         ],
         profile: {
+          deactivated: false,
           OR: [
             { private: false },
             { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
@@ -407,6 +412,7 @@ const searchPosts = async ({
             { tags: { some: { tag: { name: { contains: q, mode: "insensitive" } } } } },
           ],
           profile: {
+            deactivated: false,
             OR: [
               { private: false },
               { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
