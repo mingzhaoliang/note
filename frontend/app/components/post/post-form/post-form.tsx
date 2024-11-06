@@ -83,12 +83,7 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
         ...data,
         id: tempPostId,
         createdAt: new Date().toISOString(),
-        profile: {
-          id: user.id,
-          username: user.username,
-          name: user.name,
-          avatar: user.avatar,
-        },
+        profile: user,
         commentCount: 0,
         likes: [],
         images: data.images.map((image) => URL.createObjectURL(image)),
