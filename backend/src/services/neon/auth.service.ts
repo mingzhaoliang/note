@@ -149,13 +149,57 @@ const updatePassword = async (userId: string, password: string): Promise<void> =
   }
 };
 
+const deactivateUser = async (id: string, isDelete?: boolean) => {
+  try {
+    const deactivatedAt = new Date();
+    // Set the user to be deleted in 30 days if delete is true
+    const toBeDeletedAt = isDelete ? createDate(new TimeSpan(30, "d")) : Prisma.skip;
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        deactivated: true,
+        deactivatedAt,
+        toBeDeletedAt,
+        profile: { update: { deactivated: true, deactivatedAt, toBeDeletedAt } },
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete the user.");
+  }
+};
+
+const reactivateUser = async (id: string) => {
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        deactivated: false,
+        deactivatedAt: null,
+        toBeDeletedAt: null,
+        profile: { update: { deactivated: false, deactivatedAt: null, toBeDeletedAt: null } },
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to delete the user.");
+  }
+};
+
 export {
   createPasswordResetToken,
   createUser,
+  deactivateUser,
   deletePasswordResetToken,
   findAccount,
   findPasswordResetToken,
   getUserByEmailOrUsername,
   getUserById,
+  reactivateUser,
   updatePassword,
 };

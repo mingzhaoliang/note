@@ -1,6 +1,6 @@
 import envConfig from "@/config/env.config.js";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { Prisma } from "@prisma/client";
+import { type User as DatabaseUser } from "@prisma/client";
 import { Lucia } from "lucia";
 import { prisma } from "../db/prisma.js";
 
@@ -15,6 +15,9 @@ const lucia = new Lucia(adapter, {
   getUserAttributes: (attributes) => ({
     username: attributes.username,
     email: attributes.email,
+    deactivated: attributes.deactivated,
+    deactivatedAt: attributes.deactivatedAt,
+    toBeDeletedAt: attributes.toBeDeletedAt,
   }),
 });
 
@@ -27,7 +30,7 @@ const createAuthSession = async (userId: string) => {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Prisma.UserSelect;
+    DatabaseUserAttributes: DatabaseUser;
   }
 }
 

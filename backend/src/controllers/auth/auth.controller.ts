@@ -6,10 +6,12 @@ import { UpdatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
 import {
   createPasswordResetToken,
   createUser,
+  deactivateUser,
   deletePasswordResetToken,
   findPasswordResetToken,
   getUserByEmailOrUsername,
   getUserById,
+  reactivateUser,
   updatePassword,
 } from "@/services/neon/auth.service.js";
 import { getProfile } from "@/services/neon/profile.service.js";
@@ -23,7 +25,7 @@ const validateSession = async (req: Request, res: Response) => {
 
   const { session, user } = await lucia.validateSession(sessionId);
 
-  if (!session) {
+  if (!session || (user.toBeDeletedAt && user.toBeDeletedAt.getTime() <= Date.now())) {
     res.status(401).end();
     return;
   }
@@ -197,12 +199,48 @@ const updatePasswordAvailabilityCheck = async (req: Request, res: Response) => {
   }
 };
 
+const deactivateUserController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await deactivateUser(id);
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
+const deleteUserController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await deactivateUser(id, true);
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
+const reactivateUserController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await reactivateUser(id);
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
 export {
+  deactivateUserController,
+  deleteUserController,
   login,
   logout,
+  reactivateUserController,
   resetPassword,
-  updatePasswordAvailabilityCheck,
   signup,
+  updatePasswordAvailabilityCheck,
   updatePasswordController,
   validateSession,
   verifyPasswordResetToken,

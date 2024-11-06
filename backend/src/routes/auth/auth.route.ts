@@ -1,10 +1,13 @@
 import { googleLogin, googleLoginCallback } from "@/controllers/auth/auth-google.controller.js";
 import {
+  reactivateUserController,
+  deactivateUserController,
+  deleteUserController,
   login,
   logout,
   resetPassword,
-  updatePasswordAvailabilityCheck,
   signup,
+  updatePasswordAvailabilityCheck,
   updatePasswordController,
   validateSession,
   verifyPasswordResetToken,
@@ -24,17 +27,27 @@ const router = express.Router();
 router.get("/validate-session", validateSession);
 
 router.post("/signup", validateData(signupSchema), signup);
+
 router.post("/login", validateData(loginSchema), login);
+
 router.post("/logout", logout);
 
 router.get("/login/google", googleLogin);
+
 router.get("/login/google/callback", googleLoginCallback);
 
 router.get("/:id/update-password", updatePasswordAvailabilityCheck);
 
 router.post("/reset-password", validateData(resetPasswordRequestSchema), resetPassword);
+
 router.post("/reset-password/:token", validateData(resetPasswordSchema), verifyPasswordResetToken);
 
 router.put("/:id/update-password", validateData(updatePasswordSchema), updatePasswordController);
+
+router.put("/:id/deactivate", deactivateUserController);
+
+router.put("/:id/delete", deleteUserController);
+
+router.put("/:id/reactivate", reactivateUserController);
 
 export default router;
