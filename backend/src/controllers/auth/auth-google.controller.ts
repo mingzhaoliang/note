@@ -1,9 +1,10 @@
-import { createAuthSession } from "@/lib/lucia/auth.js";
-import { google } from "@/lib/lucia/providers/google.js";
-import { createUser, findAccount } from "@/services/neon/auth.service.js";
+import { google } from "@/lib/auth/oauth.js";
+import { createSession, generateSessionToken } from "@/services/neon/session.service.js";
+import { createUser, getAccount } from "@/services/neon/user.service.js";
+import type { RandomReader } from "@oslojs/crypto/random";
+import { generateRandomString } from "@oslojs/crypto/random";
 import { generateCodeVerifier, generateState, OAuth2RequestError } from "arctic";
 import { Request, Response } from "express";
-import { alphabet, generateRandomString } from "oslo/crypto";
 
 const googleLogin = async (req: Request, res: Response) => {
   const state = generateState();
@@ -30,10 +31,11 @@ const googleLoginCallback = async (req: Request, res: Response) => {
     const user = await getGoogleUser(accessToken);
 
     const userId = await getUserId(user);
-    const sessionId = await createAuthSession(userId);
+    const sessionToken = generateSessionToken();
+    const session = await createSession(sessionToken, userId);
 
-    // Pass the session cookie
-    res.status(200).json({ sessionId });
+    // Pass the session token to the frontend
+    res.status(200).json({ sessionToken, expiresAt: session.expiresAt });
   } catch (error) {
     console.error(error);
 
@@ -57,8 +59,15 @@ const getGoogleUser = async (accessToken: string) => {
   return await response.json();
 };
 
+const random: RandomReader = {
+  read(bytes) {
+    crypto.getRandomValues(bytes);
+  },
+};
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
 const getUserId = async (user: any) => {
-  const existingAccount = await findAccount({
+  const existingAccount = await getAccount({
     providerId: "google",
     providerUserId: user.sub,
   });
@@ -66,14 +75,14 @@ const getUserId = async (user: any) => {
   let userId;
 
   if (!existingAccount) {
-    const fullName = generateRandomString(10, alphabet("A-Z", "a-z", "0-9"));
+    const username = generateRandomString(random, alphabet, 16);
     userId = await createUser({
-      user: {
-        fullName,
-        username: user.name,
+      userData: {
+        fullName: user.name,
+        username,
         email: user.email,
       },
-      account: {
+      accountData: {
         providerId: "google",
         providerUserId: user.sub,
       },

@@ -35,8 +35,6 @@ const FollowerRequestList = () => {
     dispatch(setFollowerRequests(fetcher.data.relationships));
   }, [fetcher.data?.relationships, fetcher.state, dispatch, setFollowerRequests]);
 
-  console.log("fetcher.data", fetcher.data);
-
   return (
     <div className="flex flex-col gap-y-6">
       {followerRequests.length === 0 && fetcher.state === "loading" && <ProfileListItemSkeleton />}

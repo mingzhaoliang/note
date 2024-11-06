@@ -8,6 +8,7 @@ import Sidebar from "./sidebar";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { authHeader, user } = await requireUser(request);
+
   return json({ user }, { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
 }
 

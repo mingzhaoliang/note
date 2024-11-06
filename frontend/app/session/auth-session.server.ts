@@ -1,17 +1,20 @@
 import envConfig from "@/config/env.config.server";
-import { createCookieSessionStorage } from "@remix-run/node";
+import { CookieSerializeOptions, createCookieSessionStorage } from "@remix-run/node";
 
 const isProduction = envConfig.NODE_ENV === "production";
+
+const cookieOptions: CookieSerializeOptions = {
+  path: "/",
+  httpOnly: true,
+  sameSite: "lax",
+  ...(isProduction ? { domain: envConfig.DOMAIN, secure: true } : {}),
+};
 
 const { getSession, commitSession, destroySession } = createCookieSessionStorage({
   cookie: {
     name: "auth",
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30, // default session expiration time of lucia auth
     secrets: [...envConfig.COOKIE_SECRETS],
-    ...(isProduction ? { domain: envConfig.DOMAIN, secure: true } : {}),
+    ...cookieOptions,
   },
 });
 
@@ -22,12 +25,27 @@ const getAuthSession = async (request: Request) => {
   return authSessionId;
 };
 
-const setAuthSession = async (sessionId: string) => {
+const setAuthSession = async (token: string, expires: Date) => {
   const session = await getSession();
-  session.set("authSession", sessionId);
+  session.set("authSession", token);
 
-  const header = await commitSession(session);
+  const header = await commitSession(session, { ...cookieOptions, expires });
   return header;
+};
+
+const getPasswordResetSessionToken = async (request: Request) => {
+  const session = await getSession(request.headers.get("Cookie"));
+
+  const token = session.get("passwordResetSession") ?? null;
+  return token;
+};
+
+const setPasswordResetSession = async (token: string, expires: Date) => {
+  const session = await getSession();
+  session.set("passwordResetSession", token);
+
+  const cookie = await commitSession(session, { ...cookieOptions, expires });
+  return cookie;
 };
 
 const destroyAuthSession = async (request: Request) => {
@@ -37,4 +55,10 @@ const destroyAuthSession = async (request: Request) => {
   return header;
 };
 
-export { getAuthSession, setAuthSession, destroyAuthSession };
+export {
+  destroyAuthSession,
+  getAuthSession,
+  getPasswordResetSessionToken,
+  setAuthSession,
+  setPasswordResetSession,
+};

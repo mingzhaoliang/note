@@ -4,6 +4,12 @@ const resetPasswordRequestSchema = z.object({
   identifier: z.string(),
 });
 
+const verifyEmailSchema = z.object({
+  code: z
+    .string({ required_error: "Invalid or missing fields." })
+    .min(1, { message: "Enter your code." }),
+});
+
 const resetPasswordSchema = z
   .object({
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
@@ -14,4 +20,15 @@ const resetPasswordSchema = z
     path: ["passwordConfirmation"],
   });
 
-export { resetPasswordRequestSchema, resetPasswordSchema };
+type ResetPasswordRequestSchema = z.infer<typeof resetPasswordRequestSchema>;
+type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
+type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
+
+export {
+  resetPasswordRequestSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+  type ResetPasswordRequestSchema,
+  type ResetPasswordSchema,
+  type VerifyEmailSchema,
+};

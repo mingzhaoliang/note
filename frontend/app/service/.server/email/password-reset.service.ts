@@ -1,21 +1,22 @@
 import envConfig from "@/config/env.config.server";
 import { sendEmail } from "./send-email.service";
 
-const sendPasswordResetToken = async (email: string, verificationLink: string) => {
+const sendPasswordResetEmail = async (email: string, verificationCode: string) => {
   if (envConfig.NODE_ENV !== "production") {
-    console.log(verificationLink);
+    console.log(verificationCode);
     return;
   }
 
-  await sendEmail(email, "Password Reset", template(verificationLink));
+  await sendEmail(email, "Password Reset", template(verificationCode));
 };
 
-const template = (verificationLink: string) => {
+const template = (verificationCode: string) => {
   return `
     <h1>Password Reset</h1>
-    <p>Click the link below to reset your password.</p>
-    <a href="${verificationLink}">Reset Password</a>
+    <p>Please use the following code to reset your password:</p>
+    <p>${verificationCode}</p>
+    <p>Thank you!</p>
   `;
 };
 
-export { sendPasswordResetToken };
+export { sendPasswordResetEmail };

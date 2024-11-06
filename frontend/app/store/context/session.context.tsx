@@ -6,7 +6,7 @@ type SessionContext = {
 };
 
 const sessionContext = createContext<SessionContext>({
-  user: { id: "", email: "", username: "", name: "", avatar: "" },
+  user: null,
 });
 
 const useSession = () => {

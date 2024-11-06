@@ -5,9 +5,8 @@ import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { resetPasswordSchema, ResetPasswordSchema } from "@/schemas/auth/password-reset.schema";
-import { setAuthSession } from "@/session/auth-session.server";
-import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
-import { redirectIfAuthenticated } from "@/session/guard.server";
+import { getPasswordResetSessionToken, setAuthSession } from "@/session/auth-session.server";
+import { validatePasswordResetSession } from "@/session/guard.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ActionFunctionArgs,
@@ -16,12 +15,31 @@ import {
   LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 
-export default function ResetPassword() {
-  const loaderData = useLoaderData<typeof loader>();
+export const headers: HeadersFunction = () => ({
+  "Referrer-Policy": "strict-origin",
+});
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { session } = await validatePasswordResetSession(request);
+
+  if (!session) {
+    return redirect("/forgot-password");
+  }
+
+  if (!session.emailVerified) {
+    return redirect("/reset-password/verify-email");
+  }
+
+  return null;
+}
+
+export default function Index() {
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
   const { toast } = useToast();
 
   const form = useForm<ResetPasswordSchema>({
@@ -34,14 +52,14 @@ export default function ResetPassword() {
   const { isValid } = form.formState;
 
   const submit = useSubmit();
-  const onSubmit: SubmitHandler<ResetPasswordSchema> = (data) => submit(data, { method: "post" });
+  const onSubmit: SubmitHandler<ResetPasswordSchema> = (data) => submit(data, { method: "PUT" });
   const onError: SubmitErrorHandler<ResetPasswordSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
   useEffect(() => {
-    if (!loaderData.message) return;
-    toast({ variant: "primary", title: loaderData.message });
-  }, [loaderData, toast]);
+    if (!actionData?.message || navigation.state !== "idle") return;
+    toast({ variant: "primary", title: actionData.message });
+  }, [actionData, navigation.state, toast]);
 
   return (
     <FormProvider {...form}>
@@ -86,41 +104,31 @@ export default function ResetPassword() {
   );
 }
 
-export const headers: HeadersFunction = () => ({
-  "Referrer-Policy": "strict-origin",
-});
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  await redirectIfAuthenticated(request);
-
-  const session = await getBaseSession(request.headers.get("Cookie"));
-  const message: string | null = session.get("message") || null;
-
-  return json({ message }, { headers: { "Set-Cookie": await commitBaseSession(session) } });
-}
-
 export async function action({ request, params }: ActionFunctionArgs) {
+  const token = await getPasswordResetSessionToken(request);
+
   const formData = await request.formData();
-  const payload = Object.fromEntries(formData);
-  const { token } = params;
 
   // Make a POST request to the server to reset the password
-  const response = await fetch(envConfig.API_URL + "/auth/reset-password/" + token, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+  const response = await fetch(`${envConfig.API_URL}/auth/reset-password/${token}`, {
+    method: "PUT",
+    body: formData,
   });
 
   // If the server responded with an error, show an error and return a 400 status
   if (!response.ok) {
-    const session = await getBaseSession(request.headers.get("Cookie"));
-    session.flash("message", "Unable to reset password. Please try again later.");
+    let message;
 
-    return json({}, { status: 400, headers: { "Set-Cookie": await commitBaseSession(session) } });
+    if (response.status === 400) {
+      message = (await response.json()).message || response.statusText;
+    } else {
+      message = response.statusText;
+    }
+    return json({ message }, { status: response.status });
   }
 
-  const { sessionId } = await response.json();
-  const authHeader = await setAuthSession(sessionId);
+  const { sessionToken, expiresAt } = await response.json();
+  const authHeader = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", {
     headers: { "Set-Cookie": authHeader, "Referrer-Policy": "strict-origin" },

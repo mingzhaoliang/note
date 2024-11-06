@@ -9,25 +9,22 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { loginSchema, LoginSchema } from "@/schemas/auth/login.schema";
 import { setAuthSession } from "@/session/auth-session.server";
-import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfAuthenticated } from "@/session/guard.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, Link, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await redirectIfAuthenticated(request);
-
-  const session = await getBaseSession(request.headers.get("Cookie"));
-  const message: string | null = session.get("message") || null;
-  return json({ message }, { headers: { "Set-Cookie": await commitBaseSession(session) } });
+  return null;
 }
 
-export default function LoginForm() {
+export default function Index() {
   const { toast } = useToast();
-  const loaderData = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -45,9 +42,9 @@ export default function LoginForm() {
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
   useEffect(() => {
-    if (!loaderData.message) return;
-    toast({ variant: "primary", title: loaderData.message });
-  }, [loaderData, toast]);
+    if (!actionData?.message || navigation.state !== "idle") return;
+    toast({ variant: "primary", title: actionData.message });
+  }, [actionData, navigation.state, toast]);
 
   return (
     <FormProvider {...form}>
@@ -95,7 +92,10 @@ export default function LoginForm() {
             <span className={cn(!isValid && "opacity-50")}>Log in</span>
           </Button>
         </div>
-        <Link to="/reset-password" className="self-center text-sm text-muted-foreground font-light">
+        <Link
+          to="/forgot-password"
+          className="self-center text-sm text-muted-foreground font-light"
+        >
           Forgot password?
         </Link>
         <SeparatorWithText text="or" />
@@ -123,16 +123,19 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const { error } = await response.json();
+    let message;
 
-    const session = await getBaseSession(request.headers.get("Cookie"));
-    session.flash("message", error);
-
-    return json({}, { status: 400, headers: { "Set-Cookie": await commitBaseSession(session) } });
+    if (response.status === 400) {
+      const data = await response.json();
+      message = data.message || response.statusText;
+    } else {
+      message = response.statusText;
+    }
+    return json({ message }, { status: 400 });
   }
 
-  const { sessionId } = await response.json();
-  const authHeader = await setAuthSession(sessionId);
+  const { sessionToken, expiresAt } = await response.json();
+  const authHeader = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", { headers: { "Set-Cookie": authHeader } });
 }

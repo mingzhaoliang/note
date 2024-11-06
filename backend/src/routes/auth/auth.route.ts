@@ -1,22 +1,27 @@
 import { googleLogin, googleLoginCallback } from "@/controllers/auth/auth-google.controller.js";
 import {
-  reactivateUserController,
   deactivateUserController,
   deleteUserController,
   login,
   logout,
-  resetPassword,
+  reactivateUserController,
   signup,
   updatePasswordAvailabilityCheck,
   updatePasswordController,
   validateSession,
-  verifyPasswordResetToken,
 } from "@/controllers/auth/auth.controller.js";
+import {
+  createPasswordResetSessionController,
+  resetPasswordController,
+  validatePasswordResetSessionTokenController,
+  verifyPasswordResetSessionEmailController,
+} from "@/controllers/auth/password-reset.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { loginSchema } from "@/schemas/auth/login.schema.js";
 import {
   resetPasswordRequestSchema,
   resetPasswordSchema,
+  verifyEmailSchema,
 } from "@/schemas/auth/password-reset.schema.js";
 import { signupSchema } from "@/schemas/auth/signup.schema.js";
 import { updatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
@@ -38,9 +43,21 @@ router.get("/login/google/callback", googleLoginCallback);
 
 router.get("/:id/update-password", updatePasswordAvailabilityCheck);
 
-router.post("/reset-password", validateData(resetPasswordRequestSchema), resetPassword);
+router.post(
+  "/forgot-password",
+  validateData(resetPasswordRequestSchema),
+  createPasswordResetSessionController
+);
 
-router.post("/reset-password/:token", validateData(resetPasswordSchema), verifyPasswordResetToken);
+router.get("/reset-password/validate-session", validatePasswordResetSessionTokenController);
+
+router.put(
+  "/reset-password/:token/verify-email",
+  validateData(verifyEmailSchema),
+  verifyPasswordResetSessionEmailController
+);
+
+router.put("/reset-password/:token", validateData(resetPasswordSchema), resetPasswordController);
 
 router.put("/:id/update-password", validateData(updatePasswordSchema), updatePasswordController);
 

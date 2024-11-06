@@ -1,77 +1,74 @@
-import { createAuthSession, lucia } from "@/lib/lucia/auth.js";
-import { hashPassword, verifyPassword } from "@/lib/utils/password.util.js";
+import { hashPassword, verifyPassword } from "@/lib/auth/utils.js";
 import { LoginSchema } from "@/schemas/auth/login.schema.js";
 import { SignupSchema } from "@/schemas/auth/signup.schema.js";
 import { UpdatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
+import { getProfile } from "@/services/neon/profile.service.js";
 import {
-  createPasswordResetToken,
+  createSession,
+  generateSessionToken,
+  invalidateSession,
+  validateSessionToken,
+} from "@/services/neon/session.service.js";
+import {
   createUser,
   deactivateUser,
-  deletePasswordResetToken,
-  findPasswordResetToken,
   getUserByEmailOrUsername,
   getUserById,
   reactivateUser,
   updatePassword,
-} from "@/services/neon/auth.service.js";
-import { getProfile } from "@/services/neon/profile.service.js";
+} from "@/services/neon/user.service.js";
 import { Request, Response } from "express";
-import { isWithinExpirationDate } from "oslo";
-import { sha256 } from "oslo/crypto";
-import { encodeHex } from "oslo/encoding";
 
 const validateSession = async (req: Request, res: Response) => {
-  let sessionId = req.query.sessionId as string;
+  try {
+    let sessionToken = req.query.sessionToken as string;
 
-  const { session, user } = await lucia.validateSession(sessionId);
+    const { session, user } = await validateSessionToken(sessionToken);
 
-  if (!session || (user.toBeDeletedAt && user.toBeDeletedAt.getTime() <= Date.now())) {
-    res.status(401).end();
-    return;
+    if (!session) {
+      res.status(401).end();
+      return;
+    }
+
+    const profile = await getProfile({ id: user.id });
+
+    if (!profile) {
+      res.status(401).end();
+      return;
+    }
+
+    const userDto = {
+      ...user,
+      name: profile.name,
+      avatar: profile.avatar,
+      bio: profile.bio,
+      private: profile.private,
+      follower: profile.follower.map(({ fromId: id, status }) => ({ id, status })),
+      following: profile.following.map(({ toId: id, status }) => ({ id, status })),
+    };
+
+    res.status(200).json({ user: userDto, sessionToken, expiresAt: session.expiresAt });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
   }
-
-  let newSessionId = null;
-  if (session.fresh) {
-    await lucia.invalidateSession(sessionId);
-    const newSessionCookie = lucia.createSessionCookie(session.id);
-
-    newSessionId = newSessionCookie.value;
-  }
-
-  const profile = await getProfile({ id: user.id });
-
-  if (!profile) {
-    res.status(401).end();
-    return;
-  }
-
-  const userDto = {
-    ...user,
-    name: profile.name,
-    avatar: profile.avatar,
-    bio: profile.bio,
-    private: profile.private,
-    follower: profile.follower.map(({ fromId: id, status }) => ({ id, status })),
-    following: profile.following.map(({ toId: id, status }) => ({ id, status })),
-  };
-
-  res.status(200).json({ user: userDto, newSessionId });
 };
 
 const signup = async (req: Request, res: Response) => {
   try {
     const { fullName, username, email, password } = req.body as SignupSchema;
 
-    const userId = await createUser({ user: { fullName, username, email, password } });
+    const userId = await createUser({ userData: { fullName, username, email, password } });
 
-    const sessionId = await createAuthSession(userId);
+    const sessionToken = generateSessionToken();
+    const session = await createSession(sessionToken, userId);
 
-    res.status(200).json({ sessionId });
+    res.status(200).json({ sessionToken, expiresAt: session.expiresAt });
   } catch (error: any) {
     if (error.name === "MongoServerError" && error.code === 11000) {
       res.status(409).json({ error: "Username or email already in use." });
     } else {
-      res.status(500).json({ error: "Internal server error." });
+      res.status(500).end();
     }
   }
 };
@@ -92,66 +89,26 @@ const login = async (req: Request, res: Response) => {
     if (!existingUser || !validPassword) {
       res.status(400).json({ error: "Incorrect password." });
     } else {
-      const sessionId = await createAuthSession(existingUser.id);
+      const sessionToken = generateSessionToken();
+      const session = await createSession(sessionToken, existingUser.id);
 
-      res.status(200).json({ sessionId });
+      res.status(200).json({ sessionToken, expiresAt: session.expiresAt });
     }
   } catch (error) {
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
 const logout = async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.body;
-    await lucia.invalidateSession(sessionId);
+    const { sessionToken } = req.body;
+    const { session } = await validateSessionToken(sessionToken);
+    if (!session) {
+      res.status(401).end();
+      return;
+    }
+    invalidateSession(session.id);
     res.status(200).end();
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-};
-
-const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const { identifier } = req.body;
-    const user = await getUserByEmailOrUsername(identifier);
-
-    if (!user) {
-      res.status(400).end();
-      return;
-    }
-
-    const verificationToken = await createPasswordResetToken(user.id);
-
-    res.status(200).json({ email: user.email, verificationToken });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-};
-
-const verifyPasswordResetToken = async (req: Request, res: Response) => {
-  try {
-    const { password } = req.body;
-    const { token } = req.params;
-
-    const tokenHash = encodeHex(await sha256(new TextEncoder().encode(token)));
-    const storedToken = await findPasswordResetToken(tokenHash);
-
-    if (!storedToken || !isWithinExpirationDate(storedToken.expiresAt)) {
-      res.status(400).end();
-      return;
-    }
-
-    await deletePasswordResetToken(tokenHash);
-
-    const { userId } = storedToken;
-    await updatePassword(userId, password);
-
-    const sessionId = await createAuthSession(userId);
-
-    res.status(200).json({ sessionId });
   } catch (error) {
     console.error(error);
     res.status(500).end();
@@ -238,10 +195,8 @@ export {
   login,
   logout,
   reactivateUserController,
-  resetPassword,
   signup,
   updatePasswordAvailabilityCheck,
   updatePasswordController,
   validateSession,
-  verifyPasswordResetToken,
 };

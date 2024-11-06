@@ -3,9 +3,9 @@ import { destroyAuthSession, getAuthSession } from "@/session/auth-session.serve
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 
 export async function action({ request }: ActionFunctionArgs) {
-  const sessionId = await getAuthSession(request);
+  const sessionToken = await getAuthSession(request);
 
-  if (!sessionId) {
+  if (!sessionToken) {
     return redirect("/", { status: 401 });
   }
 
@@ -14,7 +14,7 @@ export async function action({ request }: ActionFunctionArgs) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ sessionId }),
+    body: JSON.stringify({ sessionToken }),
   });
 
   if (!response.ok) {

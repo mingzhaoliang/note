@@ -9,17 +9,23 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { signupSchema, SignupSchema } from "@/schemas/auth/signup.schema";
 import { setAuthSession } from "@/session/auth-session.server";
-import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
+import { getBaseSession } from "@/session/base-session.server";
 import { redirectIfAuthenticated } from "@/session/guard.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, Link, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 
-export default function SignupForm() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  await redirectIfAuthenticated(request);
+  return null;
+}
+
+export default function Index() {
   const { toast } = useToast();
-  const loaderData = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
 
   const form = useForm<SignupSchema>({
     resolver: zodResolver(signupSchema),
@@ -38,9 +44,9 @@ export default function SignupForm() {
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
   useEffect(() => {
-    if (!loaderData.message) return;
-    toast({ variant: "primary", title: loaderData.message });
-  }, [loaderData, toast]);
+    if (!actionData?.message || navigation.state !== "idle") return;
+    toast({ variant: "primary", title: actionData.message });
+  }, [actionData, navigation.state, toast]);
 
   return (
     <FormProvider {...form}>
@@ -141,14 +147,6 @@ export default function SignupForm() {
   );
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  await redirectIfAuthenticated(request);
-
-  const session = await getBaseSession(request.headers.get("Cookie"));
-  const message: string | null = session.get("message") || null;
-  return json({ message }, { headers: { "Set-Cookie": await commitBaseSession(session) } });
-}
-
 export async function action({ request }: ActionFunctionArgs) {
   const session = await getBaseSession(request.headers.get("Cookie"));
   const formData = await request.formData();
@@ -163,13 +161,19 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const { error } = await response.json();
-    session.flash("message", error);
-    return json({}, { status: 400, headers: { "Set-Cookie": await commitBaseSession(session) } });
+    let message;
+
+    if (response.status === 400) {
+      const data = await response.json();
+      message = data.message || response.statusText;
+    } else {
+      message = response.statusText;
+    }
+    return json({ message }, { status: 400 });
   }
 
-  const { sessionId } = await response.json();
-  const authHeader = await setAuthSession(sessionId);
+  const { sessionToken, expiresAt } = await response.json();
+  const authHeader = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", { headers: { "Set-Cookie": authHeader } });
 }
