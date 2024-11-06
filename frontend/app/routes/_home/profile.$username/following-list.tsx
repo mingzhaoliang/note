@@ -29,7 +29,7 @@ const FollowingList = () => {
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state !== "idle") return;
-    dispatch(setFollowing(fetcher.data.relationships));
+    dispatch(setFollowing(fetcher.data.relationships as Relationship[]));
   }, [fetcher.data?.relationships, fetcher.state, dispatch]);
 
   return (
