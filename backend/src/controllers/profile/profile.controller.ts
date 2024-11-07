@@ -40,7 +40,7 @@ const getProfileController = async (req: Request, res: Response) => {
 const editProfileController = async (req: Request, res: Response) => {
   try {
     const { profileId } = req.params;
-    const { name, username, bio } = req.body as ProfileEditSchema;
+    const { name, bio } = req.body as ProfileEditSchema;
 
     let profile;
 
@@ -72,7 +72,6 @@ const editProfileController = async (req: Request, res: Response) => {
         profile = await updateProfile({
           profileId,
           name,
-          username,
           bio,
           avatar: currentAvatar,
         });
@@ -85,7 +84,6 @@ const editProfileController = async (req: Request, res: Response) => {
       profile = await updateProfile({
         profileId,
         name,
-        username,
         bio,
       });
     }

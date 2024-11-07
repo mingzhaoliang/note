@@ -52,18 +52,10 @@ const getLikedPost = async (profileId: string, postId: string) => {
 const updateProfile = async ({
   profileId,
   name,
-  username,
   bio,
   avatar,
 }: Partial<ProfileEditSchema> & { profileId: string; avatar?: string | null }) => {
   try {
-    if (username) {
-      await prisma.user.update({
-        where: { id: profileId },
-        data: { username },
-      });
-    }
-
     const profile = await prisma.profile.update({
       where: { id: profileId },
       data: {

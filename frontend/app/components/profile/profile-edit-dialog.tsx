@@ -1,9 +1,15 @@
+import CldImage from "@/components/shared/cld-image";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { ACCEPTED_IMAGE_TYPES } from "@/config/shared.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
@@ -12,26 +18,26 @@ import { profileEditSchema, ProfileEditSchema } from "@/schemas/profile/profile-
 import { BaseProfile } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { useFetcher } from "@remix-run/react";
+import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { EditIcon, ImagePlusIcon } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
-import CldImage from "../shared/cld-image";
-import { Button } from "../ui/button";
-import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
-import { Input } from "../ui/input";
-import { ResponsiveDialog } from "../ui/responsive-dialog";
-import { Textarea } from "../ui/textarea";
 
-export default function ProfileEditDialog({ username, name, bio, avatar }: BaseProfile) {
+export default function ProfileEditDialog({
+  name,
+  bio,
+  avatar,
+}: Pick<BaseProfile, "name" | "bio" | "avatar">) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const fetcher = useFetcher<typeof action>({ key: "edit-profile" });
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const submit = useSubmit();
+
   const form = useForm<ProfileEditSchema>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
       name,
-      username,
       bio: bio ?? "",
       avatar: undefined,
     },
@@ -57,16 +63,33 @@ export default function ProfileEditDialog({ username, name, bio, avatar }: BaseP
   };
 
   const onSubmit: SubmitHandler<ProfileEditSchema> = (data, event) => {
-    fetcher.submit(event?.target, {
+    submit({ ...data, _action: "update-profile" } as any, {
       method: "PUT",
-      action: `/profile/${username}`,
+      action: "/settings/account",
       encType: data.avatar ? "multipart/form-data" : undefined,
     });
-
-    setOpen(false);
   };
   const onError: SubmitErrorHandler<ProfileEditSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
+
+  useEffect(() => {
+    if (navigation.state !== "idle" || !actionData || actionData._action !== "update-profile") {
+      return;
+    }
+
+    if (actionData.message) {
+      toast({
+        variant: "primary",
+        title: actionData.message,
+      });
+    } else {
+      toast({
+        variant: "primary",
+        title: "Profile updated",
+      });
+      setOpen(false);
+    }
+  }, [navigation.state, actionData, toast]);
 
   return (
     <ResponsiveDialog query="(min-width: 768px)" modal open={open} onOpenChange={setOpen}>
@@ -89,7 +112,7 @@ export default function ProfileEditDialog({ username, name, bio, avatar }: BaseP
               <Description />
             </Header>
             <FormProvider {...form}>
-              <fetcher.Form
+              <Form
                 className="max-md:pb-4 flex flex-col gap-4 max-md:flex-1 max-md:px-4"
                 onSubmit={form.handleSubmit(onSubmit, onError)}
               >
@@ -162,26 +185,6 @@ export default function ProfileEditDialog({ username, name, bio, avatar }: BaseP
                 </div>
                 <FormField
                   control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem className="border-b">
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="masked-input"
-                          placeholder="Enter your username"
-                          autoCapitalize="off"
-                          autoComplete="off"
-                          autoCorrect="off"
-                          autoFocus={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="bio"
                   render={({ field: { ref, ...rest } }) => (
                     <FormItem className="border-b">
@@ -208,7 +211,7 @@ export default function ProfileEditDialog({ username, name, bio, avatar }: BaseP
                 >
                   Save
                 </Button>
-              </fetcher.Form>
+              </Form>
             </FormProvider>
           </Content>
           <DropdownMenuContent className="w-60 p-2 font-medium">

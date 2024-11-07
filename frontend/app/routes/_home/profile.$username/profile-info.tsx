@@ -1,11 +1,11 @@
 import LoginModal from "@/components/auth/login-modal";
 import FollowButton from "@/components/profile/follow-button";
 import MessageButton from "@/components/profile/message-button";
-import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
 import { Profile } from "@/types";
 import RelationshipDialog from "./relationship-dialog";
+import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 
 export default function ProfileInfo({ profile }: { profile: Profile }) {
   const { user } = useSession();
@@ -18,7 +18,9 @@ export default function ProfileInfo({ profile }: { profile: Profile }) {
         <div className="flex flex-col space-y-1">
           <div className="flex items-center gap-3">
             <p className="text-2xl md:text-3xl font-semibold">{profile.name}</p>
-            {isOwner && <ProfileEditDialog {...profile} />}
+            {isOwner && (
+              <ProfileEditDialog name={profile.name} bio={profile.bio} avatar={profile.avatar} />
+            )}
           </div>
           <p className="text-muted-foreground">{"@" + profile.username}</p>
         </div>

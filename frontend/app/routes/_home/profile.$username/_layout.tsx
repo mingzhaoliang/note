@@ -1,9 +1,8 @@
 import envConfig from "@/config/env.config.server";
-import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
-import { ActionState, BaseProfile, Profile } from "@/types";
+import { ActionState, Profile } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Outlet, replace, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import ProfileInfo from "./profile-info";
 import ProfileNavbar from "./profile-navbar";
 
@@ -58,6 +57,30 @@ export async function action({ params, request }: ActionFunctionArgs) {
   let actionState: ActionState<ActionType> = { _action, message: null, data: null };
 
   switch (_action) {
+    case "update-profile": {
+      if (username !== user.username) {
+        actionState.message = "Unauthorised";
+        return json(actionState, { status: 401, headers });
+      }
+      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { status: 400, headers });
+      }
+
+      const avatar = formData.get("avatar") as File | null;
+      if (avatar && avatar.size === 0) {
+        fetch(`${envConfig.API_URL}/profile/${user.id}/avatar`, { method: "DELETE" });
+      }
+
+      return json(actionState, { headers });
+    }
+
     case "follow": {
       const toId = formData.get("toId") as string;
       if (toId === user.id) {
@@ -112,43 +135,9 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
       return json(actionState, { headers });
     }
-
-    default: {
-      if (username !== user.username) {
-        actionState.message = "Unauthorised.";
-        return json(actionState, { status: 400, headers });
-      }
-
-      const baseSession = await getBaseSession(request.headers.get("Cookie"));
-      baseSession.flash("_action", "edit");
-      headers.append("Set-Cookie", await commitBaseSession(baseSession));
-
-      const updateResponse = await fetch(`${envConfig.API_URL}/profile/${user.id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      let deleteResponse = null;
-      const avatar = formData.get("avatar") as File | null;
-      if (avatar && avatar.size === 0) {
-        deleteResponse = await fetch(`${envConfig.API_URL}/profile/${user.id}/avatar`, {
-          method: "DELETE",
-        });
-      }
-
-      let error, updatedProfile: BaseProfile;
-      if (!updateResponse.ok) {
-        actionState.message =
-          updateResponse.status === 400
-            ? (await updateResponse.json()).error
-            : updateResponse.statusText;
-        return json(actionState, { status: 400, headers });
-      } else {
-        updatedProfile = (await updateResponse.json()).profile;
-        return replace(`/profile/${updatedProfile.username}`, { headers });
-      }
-    }
   }
+
+  return json(actionState, { headers });
 }
 
-type ActionType = "follow" | "confirm-request" | "decline-request" | null;
+type ActionType = "update-profile" | "follow" | "confirm-request" | "decline-request" | null;
