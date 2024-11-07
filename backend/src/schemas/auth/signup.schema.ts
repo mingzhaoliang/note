@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { username } from "./update-username.schema.js";
 
 const signupSchema = z.object({
   fullName: z.string().trim().min(1, { message: "Enter your full name." }),
-  username: z.string().trim().min(1, { message: "Enter your username." }),
+  username,
   email: z
     .string()
     .trim()

@@ -4,6 +4,7 @@ import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PasswordInput from "@/components/ui/password-input";
 import { SeparatorWithText } from "@/components/ui/separator-with-text";
+import UniqueInput from "@/components/ui/unique-input";
 import envConfig from "@/config/env.config.server";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
@@ -14,7 +15,7 @@ import { redirectIfAuthenticated } from "@/session/guard.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useNavigation, useSubmit } from "@remix-run/react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -26,8 +27,10 @@ export default function Index() {
   const { toast } = useToast();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const [isIdentifierValid, setIsIdentifierValid] = useState(false);
 
   const form = useForm<SignupSchema>({
+    mode: "onBlur",
     resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
@@ -37,6 +40,18 @@ export default function Index() {
     },
   });
   const { isValid } = form.formState;
+
+  const checkUsername = useCallback(async (username: string) => {
+    const response = await fetch(`/check-identifier?type=username&identifier=${username}`);
+    const data = await response.json();
+    return data.isValid;
+  }, []);
+
+  const checkEmail = useCallback(async (email: string) => {
+    const response = await fetch(`/check-identifier?type=email&identifier=${email}`);
+    const data = await response.json();
+    return data.isValid;
+  }, []);
 
   const submit = useSubmit();
   const onSubmit: SubmitHandler<SignupSchema> = (data) => submit(data, { method: "POST" });
@@ -62,14 +77,16 @@ export default function Index() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    placeholder="Username"
-                    className="h-14"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck="false"
+                  <UniqueInput
+                    placeholder="Enter your username"
                     aria-label="Username"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    spellCheck="false"
+                    className="h-14"
+                    checkFn={checkUsername}
+                    checkFnCallback={setIsIdentifierValid}
                     {...field}
                   />
                 </FormControl>
@@ -130,7 +147,10 @@ export default function Index() {
           />
           <Button
             type="submit"
-            className={cn("h-14", !isValid && "cursor-not-allowed hover:bg-primary")}
+            className={cn(
+              "h-14",
+              (!isValid || !isIdentifierValid) && "cursor-not-allowed hover:bg-primary"
+            )}
           >
             <span className={cn(!isValid && "opacity-50")}>Sign up</span>
           </Button>
