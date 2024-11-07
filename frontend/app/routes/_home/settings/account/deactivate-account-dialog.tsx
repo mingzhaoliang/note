@@ -10,15 +10,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
@@ -65,11 +58,9 @@ const DeactivateAccountDialog = () => {
     handleType("delete");
   };
 
-  const handleDeactivateAccount = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleDeactivateAccount = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    formData.set("_action", "deactivate-account");
-    submit(formData, { method: "PUT" });
+    submit({ _action: "deactivate-account" }, { method: "PUT" });
   };
 
   const handleDeleteAccount = (event: React.FormEvent<HTMLFormElement>) => {
@@ -110,87 +101,94 @@ const DeactivateAccountDialog = () => {
   }, [actionData, navigation.state, toast]);
 
   return (
-    <AlertDialog>
-      <Dialog open={dialogOpen["state"]} onOpenChange={handleOpen}>
-        <DialogTrigger className="flex-between my-2" onClick={() => handleType("menu")}>
-          <p>Deactivate or delete account</p>
-          <ChevronRightIcon />
-        </DialogTrigger>
-        {dialogOpen["type"] === "menu" && (
-          <DialogContent className="!rounded-xl">
-            <DialogHeader className="mb-2">
-              <DialogTitle>Deactivate or delete</DialogTitle>
-              <VisuallyHidden>
-                <DialogDescription />
-              </VisuallyHidden>
-            </DialogHeader>
-            <div className="mb-4 space-y-4">
-              <div>
-                <p className="font-medium mb-2">Deactivating your account is temporary.</p>
-                <p className="text-sm text-inactive">{deactivateWarning}</p>
+    <ResponsiveDialog
+      query="(min-width: 768px)"
+      open={dialogOpen["state"]}
+      onOpenChange={handleOpen}
+    >
+      {({ Header, Title, Content, Description, Trigger }) => (
+        <AlertDialog>
+          <Trigger className="flex-between my-2" onClick={() => handleType("menu")}>
+            <p>Deactivate or delete account</p>
+            <ChevronRightIcon />
+          </Trigger>
+          {dialogOpen["type"] === "menu" && (
+            <Content className="responsive-dialog-content">
+              <Header className="mb-2">
+                <Title>Deactivate or delete</Title>
+                <VisuallyHidden>
+                  <Description />
+                </VisuallyHidden>
+              </Header>
+              <div className="mb-4 space-y-4">
+                <div>
+                  <p className="font-medium mb-2">Deactivating your account is temporary.</p>
+                  <p className="text-sm text-inactive">{deactivateWarning}</p>
+                </div>
+                <div>
+                  <p className="font-medium mb-2">Deleting your account is permanent.</p>
+                  <p className="text-sm text-inactive">{deleteWarning} </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium mb-2">Deleting your account is permanent.</p>
-                <p className="text-sm text-inactive">{deleteWarning} </p>
-              </div>
-            </div>
-            <AlertDialogTrigger onClick={alertDeactivate} asChild>
-              <Button className="h-14">Deactivate account</Button>
-            </AlertDialogTrigger>
-            <AlertDialogTrigger onClick={alertDelete} asChild>
-              <Button variant="outline" className="h-14 text-destructive">
-                Delete account
-              </Button>
-            </AlertDialogTrigger>
-          </DialogContent>
-        )}
-        {dialogOpen["type"] === "delete" && (
-          <DialogContent className="!rounded-xl">
-            <DialogHeader>
-              <DialogTitle>Delete account</DialogTitle>
-              <DialogDescription>
-                Type <span className="text-destructive font-medium">Delete my account</span> below
-                to confirm that you want to delete your account.
-              </DialogDescription>
-            </DialogHeader>
-            <Form method="PUT" onSubmit={handleDeleteAccount}>
-              <Input name="confirm" placeholder="Delete my account" className="h-14" />
-              <Button
-                type="submit"
-                className="w-full mt-4 h-14"
-                disabled={navigation.state !== "idle"}
-              >
-                {navigation.state === "submitting" ? "Deleting..." : "Delete"}
-              </Button>
-            </Form>
-          </DialogContent>
-        )}
-        <AlertDialogContent className="rounded-xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure to {isDelete ? "delete" : "deactivate"} your account?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {isDelete ? deleteWarning : deactivateWarning}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            {isDelete ? (
-              <AlertDialogAction asChild>
-                <DialogTrigger onClick={() => handleType("delete")}>Continue</DialogTrigger>
-              </AlertDialogAction>
-            ) : (
-              <Form method="PUT" onSubmit={handleDeactivateAccount}>
-                <AlertDialogAction type="submit" disabled={navigation.state !== "idle"}>
+              <AlertDialogTrigger onClick={alertDeactivate} asChild>
+                <Button className="h-14">Deactivate account</Button>
+              </AlertDialogTrigger>
+              <AlertDialogTrigger onClick={alertDelete} asChild>
+                <Button variant="outline" className="h-14 text-destructive">
+                  Delete account
+                </Button>
+              </AlertDialogTrigger>
+            </Content>
+          )}
+          {dialogOpen["type"] === "delete" && (
+            <Content className="responsive-dialog-content">
+              <Header>
+                <Title>Delete account</Title>
+                <Description>
+                  Type <span className="text-destructive font-medium">Delete my account</span> below
+                  to confirm that you want to delete your account.
+                </Description>
+              </Header>
+              <Form method="PUT" onSubmit={handleDeleteAccount}>
+                <Input name="confirm" placeholder="Delete my account" className="h-14" />
+                <Button
+                  type="submit"
+                  className="w-full mt-4 h-14"
+                  disabled={navigation.state !== "idle"}
+                >
+                  {navigation.state === "submitting" ? "Deleting..." : "Delete"}
+                </Button>
+              </Form>
+            </Content>
+          )}
+          <AlertDialogContent className="rounded-xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you sure to {isDelete ? "delete" : "deactivate"} your account?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {isDelete ? deleteWarning : deactivateWarning}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              {isDelete ? (
+                <Trigger onClick={() => handleType("delete")} asChild>
+                  <AlertDialogAction>Continue</AlertDialogAction>
+                </Trigger>
+              ) : (
+                <AlertDialogAction
+                  disabled={navigation.state !== "idle"}
+                  onClick={handleDeactivateAccount}
+                >
                   {navigation.state === "submitting" ? "Deactivating..." : "Deactivate"}
                 </AlertDialogAction>
-              </Form>
-            )}
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </Dialog>
-    </AlertDialog>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </ResponsiveDialog>
   );
 };
 

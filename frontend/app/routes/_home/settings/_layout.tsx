@@ -8,14 +8,14 @@ export default function SettingsLayout() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full max-w-screen-sm h-screen flex flex-col mx-auto p-6">
-      <div className="flex items-center gap-x-2 mb-8">
+    <div className="w-full max-w-screen-sm h-screen flex flex-col mx-auto py-6 md:p-6">
+      <div className="flex items-center gap-x-2 max-md:px-6 md:mb-8">
         <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(-1)}>
           <ArrowLeftIcon />
         </Button>
         <h1 className="max-md:text-center text-xl font-semibold">Settings</h1>
       </div>
-      <Card className="flex-1 w-full rounded-xl bg-primary-foreground">
+      <Card className="flex-1 w-full rounded-xl max-md:border-0 md:bg-primary-foreground">
         <CardHeader>
           <NavTab>
             <NavTabItem to="privacy" replace className="md:text-base">

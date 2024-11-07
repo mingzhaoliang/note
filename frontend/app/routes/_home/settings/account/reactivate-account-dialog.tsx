@@ -1,12 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { ChevronRightIcon } from "lucide-react";
@@ -45,31 +38,39 @@ const ReactiveAccountDialog = ({ toBeDeletedAt }: { toBeDeletedAt?: Date }) => {
   }, [actionData, navigation.state, toast]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex-between my-2">
-        <p>Reactivate account</p>
-        <ChevronRightIcon />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Reactivate account</DialogTitle>
-          <DialogDescription>
-            Your profile, posts, comments, likes, and followers will be displayed again after
-            reactivating your account.
-          </DialogDescription>
-        </DialogHeader>
-        {daysTillDeletion && (
-          <div className="text-sm text-destructive">{`Your account will be deleted in ${
-            daysTillDeletion > 1 ? daysTillDeletion + " days" : "today"
-          }.`}</div>
-        )}
-        <Form method="PUT" onSubmit={handleReactivate}>
-          <Button type="submit" className="w-full mt-4 h-14" disabled={navigation.state !== "idle"}>
-            {navigation.state === "submitting" ? "Reactivating..." : "Reactivate"}
-          </Button>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <ResponsiveDialog query="(min-width: 768px)" open={open} onOpenChange={setOpen}>
+      {({ Header, Title, Content, Description, Trigger }) => (
+        <>
+          <Trigger className="flex-between my-2">
+            <p>Reactivate account</p>
+            <ChevronRightIcon />
+          </Trigger>
+          <Content className="responsive-dialog-content">
+            <Header>
+              <Title className="mb-2">Reactivate account</Title>
+              <Description>
+                Your profile, posts, comments, likes, and followers will be displayed again after
+                reactivating your account.
+              </Description>
+            </Header>
+            {daysTillDeletion && (
+              <div className="text-sm text-destructive">{`Your account will be deleted in ${
+                daysTillDeletion > 1 ? daysTillDeletion + " days" : "today"
+              }.`}</div>
+            )}
+            <Form method="PUT" onSubmit={handleReactivate}>
+              <Button
+                type="submit"
+                className="w-full mt-4 h-14"
+                disabled={navigation.state !== "idle"}
+              >
+                {navigation.state === "submitting" ? "Reactivating..." : "Reactivate"}
+              </Button>
+            </Form>
+          </Content>
+        </>
+      )}
+    </ResponsiveDialog>
   );
 };
 
