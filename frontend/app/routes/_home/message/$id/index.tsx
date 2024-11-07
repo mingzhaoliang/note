@@ -145,8 +145,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const error = (await response.json()).error;
-    return json({ newMessage: null, actionState: { message: error } }, { headers });
+    const message = response.status === 400 ? (await response.json()).message : response.statusText;
+    return json({ newMessage: null, actionState: { message } }, { headers });
   }
 
   const newMessage = (await response.json()).message;

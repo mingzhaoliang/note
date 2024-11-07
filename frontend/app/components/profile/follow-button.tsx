@@ -74,13 +74,10 @@ const FollowButton = ({ profile }: FollowButtonProps) => {
   };
 
   useEffect(() => {
-    if (!fetcher.data?.actionState.message) return;
+    if (!fetcher.data?.message) return;
 
-    toast({
-      variant: "primary",
-      title: fetcher.data.actionState.message,
-    });
-  }, [fetcher.data?.actionState, toast]);
+    fetcher.data._action === "follow" && toast({ variant: "primary", title: fetcher.data.message });
+  }, [fetcher.data, toast]);
 
   return (
     <Button

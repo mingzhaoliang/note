@@ -7,6 +7,7 @@ import {
 import { ACCEPTED_IMAGE_TYPES } from "@/config/shared.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
+import { action } from "@/routes/_home/profile.$username/_layout";
 import { profileEditSchema, ProfileEditSchema } from "@/schemas/profile/profile-edit.schema";
 import { BaseProfile } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +26,7 @@ import { Textarea } from "../ui/textarea";
 export default function ProfileEditDialog({ username, name, bio, avatar }: BaseProfile) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const fetcher = useFetcher({ key: "edit-profile" });
+  const fetcher = useFetcher<typeof action>({ key: "edit-profile" });
   const form = useForm<ProfileEditSchema>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {

@@ -22,7 +22,7 @@ const getMessagesController = async (req: Request, res: Response) => {
     res.status(200).json({ messages, remaining: remainingMessages });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -44,7 +44,7 @@ const sendMessageController = async (req: Request, res: Response) => {
     res.status(201).json({ message });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -58,7 +58,7 @@ const getConversationController = async (req: Request, res: Response) => {
     res.status(200).json({ conversation: conversationDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -67,7 +67,7 @@ const getConversationsController = async (req: Request, res: Response) => {
     const { profileId } = req.query as { profileId: string | undefined };
 
     if (!profileId) {
-      res.status(400).json({ error: "Missing profileId." });
+      res.status(400).json({ message: "Missing profileId." });
       return;
     }
 
@@ -80,7 +80,7 @@ const getConversationsController = async (req: Request, res: Response) => {
     res.status(200).json({ conversations: conversationsDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -92,7 +92,7 @@ const createConversationController = async (req: Request, res: Response) => {
     res.status(200).json({ conversationId: conversation.id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 

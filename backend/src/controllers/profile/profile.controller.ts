@@ -24,7 +24,7 @@ const getProfileController = async (req: Request, res: Response) => {
     const profile = await getProfile({ username });
 
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
 
@@ -33,7 +33,7 @@ const getProfileController = async (req: Request, res: Response) => {
     res.status(200).json({ profile: profileDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -49,7 +49,7 @@ const editProfileController = async (req: Request, res: Response) => {
 
       profile = await getProfile({ id: profileId });
       if (!profile) {
-        res.status(404).json({ error: "Profile not found." });
+        res.status(404).end();
         return;
       }
 
@@ -60,7 +60,7 @@ const editProfileController = async (req: Request, res: Response) => {
         if (
           !["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(avatarImage.mimetype)
         ) {
-          res.status(400).json({ error: "Invalid file type." });
+          res.status(400).json({ message: "Invalid file type." });
           return;
         }
 
@@ -93,7 +93,7 @@ const editProfileController = async (req: Request, res: Response) => {
     res.status(200).json({ profile });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -102,7 +102,7 @@ const deleteAvatarController = async (req: Request, res: Response) => {
     const { profileId } = req.params;
     const profile = await getProfile({ id: profileId });
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
 
@@ -113,7 +113,7 @@ const deleteAvatarController = async (req: Request, res: Response) => {
     res.status(200).json({ profile: updatedProfile });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -124,7 +124,7 @@ const followProfileController = async (req: Request, res: Response) => {
 
     const profileToFollow = await getProfile({ id: profileId });
     if (!profileToFollow) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
 
@@ -145,7 +145,7 @@ const followProfileController = async (req: Request, res: Response) => {
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -157,7 +157,7 @@ const confirmRequestController = async (req: Request, res: Response) => {
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -169,7 +169,7 @@ const declineRequestController = async (req: Request, res: Response) => {
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -180,7 +180,7 @@ const getProfilePostsController = async (req: Request, res: Response) => {
 
     const profile = await getProfile({ username });
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
     const { posts, remainingPosts } = await getProfilePosts({
@@ -195,7 +195,7 @@ const getProfilePostsController = async (req: Request, res: Response) => {
     res.status(200).json({ posts: postsDto, remaining: remainingPosts });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -205,7 +205,7 @@ const getProfileCommentsController = async (req: Request, res: Response) => {
     const { lastCommentId } = req.query as { lastCommentId: string | undefined };
     const profile = await getProfile({ username });
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
     const { comments, remainingComments } = await getProfileComments({
@@ -218,7 +218,7 @@ const getProfileCommentsController = async (req: Request, res: Response) => {
     res.status(200).json({ comments: profileCommentsDto, remaining: remainingComments });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -229,7 +229,7 @@ const searchProfilesController = async (req: Request, res: Response) => {
     res.status(200).json({ profiles, remaining });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -241,7 +241,7 @@ const updatePrivacyController = async (req: Request, res: Response) => {
     res.status(200).json({ profile: updatedProfile });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -254,7 +254,7 @@ const getFollowersController = async (req: Request, res: Response) => {
     };
     const profile = await getProfile({ username });
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
 
@@ -266,7 +266,7 @@ const getFollowersController = async (req: Request, res: Response) => {
     res.status(200).json({ relationships: followers, remaining });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -276,7 +276,7 @@ const getFollowingController = async (req: Request, res: Response) => {
     const { last, userId } = req.query as { last: string | undefined; userId: string | undefined };
     const profile = await getProfile({ username });
     if (!profile) {
-      res.status(404).json({ error: "Profile not found." });
+      res.status(404).end();
       return;
     }
 
@@ -288,7 +288,7 @@ const getFollowingController = async (req: Request, res: Response) => {
     res.status(200).json({ relationships: following, remaining });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 

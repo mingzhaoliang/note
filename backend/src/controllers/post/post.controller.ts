@@ -54,7 +54,7 @@ const createPostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -68,7 +68,7 @@ const getFeedPostsController = async (req: Request, res: Response) => {
     res.status(200).json({ posts: postsDto, remaining });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Internal server error.");
+    res.status(500).end();
   }
 };
 
@@ -80,7 +80,7 @@ const deletePostController = async (req: Request, res: Response) => {
     res.status(200).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -104,7 +104,7 @@ const likeUnlikePostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ error: "Oops! Something went wrong." });
+    res.status(500).end();
   }
 };
 
@@ -122,7 +122,7 @@ const findPostController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ error: "Oops! Something went wrong." });
+    res.status(500).end();
   }
 };
 
@@ -137,7 +137,7 @@ const getCommentsController = async (req: Request, res: Response) => {
     res.status(200).json({ comments: commentsDto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -153,7 +153,7 @@ const createCommentController = async (req: Request, res: Response) => {
     res.status(200).json({ post: postDto, comment });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 
@@ -171,7 +171,7 @@ const searchPostsController = async (req: Request, res: Response) => {
     res.status(200).json({ posts: postsDto, remaining });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).end();
   }
 };
 

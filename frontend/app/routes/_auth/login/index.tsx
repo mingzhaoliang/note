@@ -127,6 +127,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     if (response.status === 400) {
       const data = await response.json();
+      console.log("data", data);
       message = data.message || response.statusText;
     } else {
       message = response.statusText;

@@ -1,7 +1,7 @@
 import envConfig from "@/config/env.config.server";
 import { commitBaseSession, getBaseSession } from "@/session/base-session.server";
 import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
-import { BaseProfile, Profile } from "@/types";
+import { ActionState, BaseProfile, Profile } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Outlet, replace, useLoaderData } from "@remix-run/react";
 import ProfileInfo from "./profile-info";
@@ -51,89 +51,72 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
   const formData = await request.formData();
-  const _action = formData.get("_action");
+  const _action = formData.get("_action") as ActionType;
 
   const { username } = params;
 
-  let response;
+  let actionState: ActionState<ActionType> = { _action, message: null, data: null };
+
   switch (_action) {
-    case "follow":
+    case "follow": {
       const toId = formData.get("toId") as string;
       if (toId === user.id) {
-        const actionState = { message: "Unauthorised." };
-        return json({ actionState }, { status: 400, headers });
+        actionState.message = "Cannot follow yourself";
+        return json(actionState, { status: 401, headers });
       }
-      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
+      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileId: toId }),
       });
 
       if (!response.ok) {
-        return json(
-          { actionState: { message: (await response.json()).error } },
-          { status: 400, headers }
-        );
+        actionState.message =
+          response.status === 400 ? (await response.json()).error : response.statusText;
+        return json(actionState, { status: 400, headers });
       }
 
-      return json({ actionState: { _action: "follow", message: null } }, { headers });
+      return json(actionState, { headers });
+    }
 
-    case "confirmRequest":
-      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/confirm`, {
+    case "confirm-request": {
+      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/confirm`, {
         method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
-        return json(
-          {
-            actionState: { _action: "confirmRequest", message: (await response.json()).error },
-            data: null,
-          },
-          { status: 400, headers }
-        );
+        actionState.message =
+          response.status === 400 ? (await response.json()).error : response.statusText;
+        return json(actionState, { status: 400, headers });
       }
 
-      const confirmRequestRelationship = (await response.json()).relationship;
+      actionState.data = (await response.json()).relationship;
 
-      return json(
-        {
-          actionState: { _action: "confirmRequest", message: null },
-          data: confirmRequestRelationship,
-        },
-        { headers }
-      );
+      return json(actionState, { headers });
+    }
 
-    case "declineRequest":
-      response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/decline`, {
+    case "decline-request": {
+      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow/decline`, {
         method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
-        return json(
-          {
-            actionState: { _action: "declineRequest", message: (await response.json()).error },
-            data: null,
-          },
-          { status: 400, headers }
-        );
+        actionState.message =
+          response.status === 400 ? (await response.json()).error : response.statusText;
+        return json(actionState, { status: 400, headers });
       }
 
-      const declineRequestRelationship = (await response.json()).relationship;
+      actionState.data = (await response.json()).relationship;
 
-      return json(
-        {
-          actionState: { _action: "declineRequest", message: null },
-          data: declineRequestRelationship,
-        },
-        { headers }
-      );
+      return json(actionState, { headers });
+    }
 
-    default:
+    default: {
       if (username !== user.username) {
-        const actionState = { message: "Unauthorised." };
-        return json({ actionState }, { status: 400, headers });
+        actionState.message = "Unauthorised.";
+        return json(actionState, { status: 400, headers });
       }
 
       const baseSession = await getBaseSession(request.headers.get("Cookie"));
@@ -154,13 +137,18 @@ export async function action({ params, request }: ActionFunctionArgs) {
       }
 
       let error, updatedProfile: BaseProfile;
-      if (!updateResponse.ok || (deleteResponse && !deleteResponse.ok)) {
-        error = (await updateResponse.json()).error;
-        const actionState = { message: error };
-        return json({ actionState }, { status: 400, headers });
+      if (!updateResponse.ok) {
+        actionState.message =
+          updateResponse.status === 400
+            ? (await updateResponse.json()).error
+            : updateResponse.statusText;
+        return json(actionState, { status: 400, headers });
       } else {
         updatedProfile = (await updateResponse.json()).profile;
         return replace(`/profile/${updatedProfile.username}`, { headers });
       }
+    }
   }
 }
+
+type ActionType = "follow" | "confirm-request" | "decline-request" | null;

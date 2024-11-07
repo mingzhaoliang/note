@@ -67,8 +67,8 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const error = (await response.json()).error;
-    return json({ error }, { headers });
+    const message = response.status === 400 ? (await response.json()).message : response.statusText;
+    return json({ message }, { headers });
   }
 
   const conversationId = (await response.json()).conversationId;

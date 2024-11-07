@@ -13,21 +13,20 @@ const PrivateProfile = ({ isPrivate }: { isPrivate: boolean }) => {
   const handleChange = async (checked: boolean) => {
     setChecked(checked);
     fetcher.submit(
-      { _action: "private", isPrivate: checked },
+      { _action: "private-profile", isPrivate: checked },
       { method: "PUT", action: `/settings/privacy` }
     );
   };
 
   useEffect(() => {
-    if (fetcher.state !== "idle" || !fetcher.data?.actionState) return;
+    if (fetcher.state !== "idle" || !fetcher.data) return;
 
-    const { actionState } = fetcher.data;
-    if (actionState._action !== "private") return;
-    if (actionState.message) {
+    if (fetcher.data._action !== "private-profile") return;
+    if (fetcher.data.message) {
       setChecked((prev) => !prev);
       toast({
         variant: "primary",
-        title: actionState.message,
+        title: fetcher.data.message,
       });
     } else {
       toast({

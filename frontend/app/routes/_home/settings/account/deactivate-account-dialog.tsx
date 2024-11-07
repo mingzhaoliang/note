@@ -68,7 +68,7 @@ const DeactivateAccountDialog = () => {
   const handleDeactivateAccount = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    formData.set("_action", "deactivateAccount");
+    formData.set("_action", "deactivate-account");
     submit(formData, { method: "PUT" });
   };
 
@@ -84,19 +84,21 @@ const DeactivateAccountDialog = () => {
       return;
     }
 
-    formData.set("_action", "deleteAccount");
+    formData.set("_action", "delete-account");
     submit(formData, { method: "PUT" });
   };
 
   useEffect(() => {
-    if (navigation.state !== "idle" || !actionData) return;
+    if (
+      navigation.state !== "idle" ||
+      !actionData ||
+      !["delete-account", "deactivate-account"].some((action) => actionData._action === action)
+    ) {
+      return;
+    }
 
-    const { actionState } = actionData;
-
-    if (actionState._action !== "deleteAccount") return;
-
-    if (actionState.message) {
-      toast({ variant: "primary", title: actionState.message });
+    if (actionData.message) {
+      toast({ variant: "primary", title: actionData.message });
     } else {
       toast({
         variant: "primary",

@@ -13,9 +13,9 @@ const validateData = (schema: z.ZodObject<any, any> | z.ZodEffects<z.ZodObject<a
         const errorMessages = error.errors.map((issue: any) => ({
           message: issue.message,
         }));
-        res.status(400).json({ error: "Invalid data", details: errorMessages });
+        res.status(400).json({ message: errorMessages[0].message, details: errorMessages });
       } else {
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).end();
       }
     }
   };

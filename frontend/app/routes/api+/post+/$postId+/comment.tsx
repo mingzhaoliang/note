@@ -18,8 +18,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   let message, post;
   if (!response.ok) {
-    const error = (await response.json()).error;
-    message = response ? error : "Oops! Something went wrong!";
+    message = response.status === 400 ? (await response.json()).message : response.statusText;
   } else {
     post = (await response.json()).post;
   }

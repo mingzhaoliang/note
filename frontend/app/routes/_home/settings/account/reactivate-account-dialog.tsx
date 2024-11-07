@@ -27,19 +27,17 @@ const ReactiveAccountDialog = ({ toBeDeletedAt }: { toBeDeletedAt?: Date }) => {
   const handleReactivate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    formData.set("_action", "reactivateAccount");
+    formData.set("_action", "reactivate-account");
     submit(formData, { method: "PUT" });
   };
 
   useEffect(() => {
-    if (navigation.state !== "idle" || !actionData) return;
+    if (navigation.state !== "idle" || !actionData || actionData._action !== "reactivate-account") {
+      return;
+    }
 
-    const { actionState } = actionData;
-
-    if (actionState._action !== "reactivateAccount") return;
-
-    if (actionState.message) {
-      toast({ variant: "primary", title: actionState.message });
+    if (actionData.message) {
+      toast({ variant: "primary", title: actionData.message });
     } else {
       toast({ variant: "primary", title: "You account is activated now." });
       setOpen(false);

@@ -1,5 +1,6 @@
 import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
+import { ActionState } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import DeactivateAccountDialog from "./deactivate-account-dialog";
@@ -44,62 +45,74 @@ export async function action({ request }: ActionFunctionArgs) {
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
   const formData = await request.formData();
-  const _action = formData.get("_action");
+  const _action = formData.get("_action") as ActionType;
 
+  let actionState: ActionState<ActionType> = { _action, message: null, data: null };
   switch (_action) {
-    case "updatePassword": {
+    case "update-password": {
       const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/update-password`, {
         method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        return json({ actionState: { _action, message: error } }, { headers });
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { headers });
       }
 
-      return json({ actionState: { _action, message: null } }, { headers });
+      return json(actionState, { headers });
     }
 
-    case "deactivateAccount": {
+    case "deactivate-account": {
       const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/deactivate`, {
         method: "PUT",
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        return json({ actionState: { _action, message: error } }, { headers });
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { headers });
       }
 
-      return json({ actionState: { _action, message: null } }, { headers });
+      return json(actionState, { headers });
     }
 
-    case "deleteAccount": {
+    case "delete-account": {
       const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/delete`, {
         method: "PUT",
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        return json({ actionState: { _action, message: error } }, { headers });
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { headers });
       }
 
-      return json({ actionState: { _action, message: null } }, { headers });
+      return json(actionState, { headers });
     }
 
-    case "reactivateAccount": {
+    case "reactivate-account": {
       const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/reactivate`, {
         method: "PUT",
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        return json({ actionState: { _action, message: error } }, { headers });
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { headers });
       }
 
-      return json({ actionState: { _action, message: null } }, { headers });
+      return json(actionState, { headers });
     }
   }
 
-  return json(null, { headers });
+  return json(actionState, { headers });
 }
+
+type ActionType =
+  | "update-password"
+  | "deactivate-account"
+  | "delete-account"
+  | "reactivate-account"
+  | null;

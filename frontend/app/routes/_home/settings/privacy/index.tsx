@@ -1,8 +1,9 @@
 import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated } from "@/session/guard.server";
+import { ActionState } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
-import PrivateProfile from "./private-profile";
 import { useLoaderData } from "@remix-run/react";
+import PrivateProfile from "./private-profile";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { authHeader, user } = await redirectIfUnauthenticated(request);
@@ -27,26 +28,28 @@ export async function action({ request }: ActionFunctionArgs) {
   if (authHeader) headers.append("Set-Cookie", authHeader);
 
   const formData = await request.formData();
-  const _action = formData.get("_action");
+  const _action = formData.get("_action") as ActionType;
+
+  let actionState: ActionState<ActionType> = { _action, message: null, data: null };
 
   switch (_action) {
-    case "private": {
+    case "private-profile": {
       const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/privacy`, {
         method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        return json(
-          { actionState: { _action: "private", message: error } },
-          { status: 400, headers }
-        );
+        actionState.message =
+          response.status === 400 ? (await response.json()).message : response.statusText;
+        return json(actionState, { status: 400, headers });
       }
 
-      return json({ actionState: { _action: "private", message: null } }, { headers });
+      return json(actionState, { headers });
     }
   }
 
-  return json(null, { headers });
+  return json(actionState, { headers });
 }
+
+type ActionType = "private-profile" | null;

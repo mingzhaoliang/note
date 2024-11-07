@@ -121,7 +121,10 @@ type Message = {
   createdAt: string;
 };
 
+type ActionState<T> = { _action: T; message: string | null; data: any };
+
 export type {
+  ActionState,
   BaseConversation,
   BaseProfile,
   BaseRelationship,

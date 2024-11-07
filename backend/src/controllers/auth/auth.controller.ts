@@ -66,7 +66,7 @@ const signup = async (req: Request, res: Response) => {
     res.status(200).json({ sessionToken, expiresAt: session.expiresAt });
   } catch (error: any) {
     if (error.name === "MongoServerError" && error.code === 11000) {
-      res.status(409).json({ error: "Username or email already in use." });
+      res.status(400).json({ message: "Username or email already in use." });
     } else {
       res.status(500).end();
     }
@@ -87,7 +87,7 @@ const login = async (req: Request, res: Response) => {
         })();
 
     if (!existingUser || !validPassword) {
-      res.status(400).json({ error: "Incorrect password." });
+      res.status(400).json({ message: "Incorrect password." });
     } else {
       const sessionToken = generateSessionToken();
       const session = await createSession(sessionToken, existingUser.id);
@@ -123,14 +123,14 @@ const updatePasswordController = async (req: Request, res: Response) => {
     const user = await getUserById(id);
 
     if (!user || !user.passwordHash) {
-      res.status(400).json({ error: "Unable to update password." });
+      res.status(400).json({ message: "Unable to update password." });
       return;
     }
 
     const validPassword = await verifyPassword(user.passwordHash, currentPassword);
 
     if (!validPassword) {
-      res.status(400).json({ error: "Incorrect password." });
+      res.status(400).json({ message: "Incorrect password." });
       return;
     }
 

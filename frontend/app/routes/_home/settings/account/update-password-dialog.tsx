@@ -29,19 +29,17 @@ const UpdatePasswordDialog = () => {
   });
   const { isValid } = form.formState;
   const onSubmit: SubmitHandler<UpdatePasswordSchema> = (data) =>
-    submit({ ...data, _action: "updatePassword" }, { method: "PUT" });
+    submit({ ...data, _action: "update-password" }, { method: "PUT" });
   const onError: SubmitErrorHandler<UpdatePasswordSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
   useEffect(() => {
     if (navigation.state !== "idle" || !actionData) return;
 
-    const { actionState } = actionData;
+    if (actionData._action !== "update-password") return;
 
-    if (actionState._action !== "updatePassword") return;
-
-    if (actionState.message) {
-      toast({ variant: "primary", title: actionState.message });
+    if (actionData.message) {
+      toast({ variant: "primary", title: actionData.message });
     } else {
       form.reset();
       setOpen(false);

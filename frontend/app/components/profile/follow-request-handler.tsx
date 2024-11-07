@@ -1,5 +1,6 @@
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
+import { action } from "@/routes/_home/profile.$username/_layout";
 import { useSession } from "@/store/context/session.context";
 import { removeFollowerRequest, setFollowers } from "@/store/redux/features/relationship-slice";
 import { useAppDispatch } from "@/store/redux/hooks";
@@ -15,19 +16,19 @@ const FollowRequestHandler = ({ requestingProfileId }: RequestHandlerProps) => {
   const { user } = useSession();
   const username = user?.username;
   const { toast } = useToast();
-  const fetcher = useFetcher<any>();
+  const fetcher = useFetcher<typeof action>();
   const dispatch = useAppDispatch();
 
   const handleDecline = useCallback(() => {
     fetcher.submit(
-      { _action: "declineRequest", profileId: requestingProfileId },
+      { _action: "decline-request", profileId: requestingProfileId },
       { method: "PUT", action: `/profile/${username}` }
     );
   }, [fetcher.submit, requestingProfileId, username]);
 
   const handleConfirm = useCallback(() => {
     fetcher.submit(
-      { _action: "confirmRequest", profileId: requestingProfileId },
+      { _action: "confirm-request", profileId: requestingProfileId },
       { method: "PUT", action: `/profile/${username}` }
     );
   }, [fetcher.submit, requestingProfileId, username]);
@@ -35,12 +36,12 @@ const FollowRequestHandler = ({ requestingProfileId }: RequestHandlerProps) => {
   useEffect(() => {
     if (!fetcher.data || fetcher.state !== "idle") return;
 
-    const { actionState, data } = fetcher.data;
+    const { _action, message, data } = fetcher.data;
 
-    if (actionState.message) {
-      toast({ variant: "primary", title: actionState.message });
+    if (message) {
+      toast({ variant: "primary", title: message });
     } else {
-      if (actionState._action === "confirmRequest") {
+      if (_action === "confirm-request") {
         dispatch(
           setFollowers([
             {
