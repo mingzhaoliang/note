@@ -2,6 +2,7 @@ import { hashPassword, verifyPassword } from "@/lib/auth/utils.js";
 import { LoginSchema } from "@/schemas/auth/login.schema.js";
 import { SignupSchema } from "@/schemas/auth/signup.schema.js";
 import { UpdatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
+import { UpdateUsernameSchema } from "@/schemas/auth/update-username.schema.js";
 import { getProfile } from "@/services/neon/profile.service.js";
 import {
   createSession,
@@ -12,10 +13,13 @@ import {
 import {
   createUser,
   deactivateUser,
+  getUserByEmail,
   getUserByEmailOrUsername,
   getUserById,
+  getUserByUsername,
   reactivateUser,
   updatePassword,
+  updateUsername,
 } from "@/services/neon/user.service.js";
 import { Request, Response } from "express";
 
@@ -189,7 +193,43 @@ const reactivateUserController = async (req: Request, res: Response) => {
   }
 };
 
+const checkIdentifierController = async (req: Request, res: Response) => {
+  try {
+    const { identifier, type } = req.query as { identifier: string; type: string };
+
+    if (type === "username") {
+      const isValid = !(await getUserByUsername(identifier));
+      res.status(200).json({ isValid });
+      return;
+    }
+
+    if (type === "email") {
+      const isValid = !(await getUserByEmail(identifier));
+      res.status(200).json({ isValid });
+      return;
+    }
+
+    res.status(400).json({ message: "Invalid identifier type." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
+const updateUsernameController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { username } = req.body as UpdateUsernameSchema;
+    const user = await updateUsername(id, username);
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).end();
+  }
+};
+
 export {
+  checkIdentifierController,
   deactivateUserController,
   deleteUserController,
   login,
@@ -198,5 +238,6 @@ export {
   signup,
   updatePasswordAvailabilityCheck,
   updatePasswordController,
+  updateUsernameController,
   validateSession,
 };

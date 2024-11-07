@@ -1,5 +1,6 @@
 import { googleLogin, googleLoginCallback } from "@/controllers/auth/auth-google.controller.js";
 import {
+  checkIdentifierController,
   deactivateUserController,
   deleteUserController,
   login,
@@ -8,6 +9,7 @@ import {
   signup,
   updatePasswordAvailabilityCheck,
   updatePasswordController,
+  updateUsernameController,
   validateSession,
 } from "@/controllers/auth/auth.controller.js";
 import {
@@ -25,6 +27,7 @@ import {
 } from "@/schemas/auth/password-reset.schema.js";
 import { signupSchema } from "@/schemas/auth/signup.schema.js";
 import { updatePasswordSchema } from "@/schemas/auth/update-password.schema.js";
+import { updateUsernameSchema } from "@/schemas/auth/update-username.schema.js";
 import express from "express";
 
 const router = express.Router();
@@ -40,6 +43,8 @@ router.post("/logout", logout);
 router.get("/login/google", googleLogin);
 
 router.get("/login/google/callback", googleLoginCallback);
+
+router.get("/check-identifier", checkIdentifierController);
 
 router.get("/:id/update-password", updatePasswordAvailabilityCheck);
 
@@ -58,6 +63,8 @@ router.put(
 );
 
 router.put("/reset-password/:token", validateData(resetPasswordSchema), resetPasswordController);
+
+router.put("/:id/update-username", validateData(updateUsernameSchema), updateUsernameController);
 
 router.put("/:id/update-password", validateData(updatePasswordSchema), updatePasswordController);
 

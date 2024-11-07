@@ -44,6 +44,13 @@ export async function createUser({
   return user.id;
 }
 
+export async function updateUsername(userId: string, username: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { username },
+  });
+}
+
 export async function updatePassword(userId: string, password: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
@@ -54,6 +61,22 @@ export async function updatePassword(userId: string, password: string): Promise<
 export async function getUserById(id: string) {
   const user = await prisma.user.findUnique({
     where: { id },
+  });
+
+  return user;
+}
+
+export async function getUserByUsername(username: string) {
+  const user = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  return user;
+}
+
+export async function getUserByEmail(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
   });
 
   return user;
