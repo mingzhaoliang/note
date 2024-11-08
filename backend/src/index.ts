@@ -8,6 +8,7 @@ import { startCron } from "./cron/cron.js";
 import { connectDB } from "./lib/db/prisma.js";
 import authRoute from "./routes/auth.route.js";
 import conversationRoute from "./routes/conversation.route.js";
+import notificationRoute from "./routes/notification.route.js";
 import postRoute from "./routes/post.route.js";
 import profileRouter from "./routes/profile.route.js";
 import { app, httpServer } from "./socket/socket.js";
@@ -42,6 +43,8 @@ app.use("/api/profile", profileRouter);
 app.use("/api/post", postRoute);
 
 app.use("/api/conversation", conversationRoute);
+
+app.use("/api/notification", notificationRoute);
 
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
