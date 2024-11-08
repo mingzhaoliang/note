@@ -98,6 +98,7 @@ const getFeedPosts = async ({
         profile: {
           deactivated: false,
           OR: [
+            { id: userId ?? Prisma.skip },
             { private: false },
             { private: true, follower: { some: { fromId: userId ?? Prisma.skip } } },
           ],
