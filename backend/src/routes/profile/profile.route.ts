@@ -1,17 +1,19 @@
 import {
-  confirmRequestController,
-  declineRequestController,
   deleteAvatarController,
   editProfileController,
-  followProfileController,
-  getFollowersController,
-  getFollowingController,
   getProfileCommentsController,
   getProfileController,
   getProfilePostsController,
   searchProfilesController,
   updatePrivacyController,
 } from "@/controllers/profile/profile.controller.js";
+import {
+  confirmRequestController,
+  declineRequestController,
+  followProfileController,
+  getFollowersController,
+  getFollowingController,
+} from "@/controllers/profile/relationship.controller.js";
 import { validateData } from "@/middleware/validation.middleware.js";
 import { profileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { profilePrivacySchema } from "@/schemas/profile/profile-privacy.schema.js";

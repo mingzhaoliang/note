@@ -1,16 +1,11 @@
 import { createProfileCommentDto, createProfileDto } from "@/lib/utils/createDto.js";
 import { ProfileEditSchema } from "@/schemas/profile/profile-edit.schema.js";
 import { ProfilePrivacySchema } from "@/schemas/profile/profile-privacy.schema.js";
-import { ActionSchema } from "@/schemas/shared/action.schema.js";
 import { deleteImage, uploadImage } from "@/services/apis/cloudinary.service.js";
 import { getProfileComments, getProfilePosts } from "@/services/neon/post.service.js";
 import {
-  followProfile,
-  getFollowers,
-  getFollowing,
   getProfile,
   searchProfiles,
-  unfollowProfile,
   updatePrivacy,
   updateProfile,
 } from "@/services/neon/profile.service.js";
@@ -115,62 +110,6 @@ export async function deleteAvatarController(req: Request, res: Response) {
   }
 }
 
-export async function followProfileController(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const { profileId } = req.body as ActionSchema;
-
-    const profileToFollow = await getProfile({ id: profileId });
-    if (!profileToFollow) {
-      res.status(404).end();
-      return;
-    }
-
-    const isFollowing = profileToFollow.follower.some(({ fromId }) => fromId === id);
-    let relationship;
-    if (isFollowing) {
-      relationship = await unfollowProfile({ fromId: id, toId: profileToFollow.id });
-    } else if (profileToFollow.private) {
-      relationship = await followProfile({ fromId: id, toId: profileToFollow.id });
-    } else {
-      relationship = await followProfile({
-        fromId: id,
-        toId: profileToFollow.id,
-        status: "CONFIRMED",
-      });
-    }
-
-    res.status(200).json({ relationship });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-}
-
-export async function confirmRequestController(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const { profileId } = req.body as ActionSchema;
-    const relationship = await followProfile({ fromId: profileId, toId: id, status: "CONFIRMED" });
-    res.status(200).json({ relationship });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-}
-
-export async function declineRequestController(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const { profileId } = req.body as ActionSchema;
-    const relationship = await unfollowProfile({ fromId: profileId, toId: id });
-    res.status(200).json({ relationship });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-}
-
 export async function getProfilePostsController(req: Request, res: Response) {
   try {
     const { username } = req.params;
@@ -234,53 +173,6 @@ export async function updatePrivacyController(req: Request, res: Response) {
     const { isPrivate } = req.body as ProfilePrivacySchema;
     const updatedProfile = await updatePrivacy({ profileId, isPrivate });
     res.status(200).json({ profile: updatedProfile });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-}
-
-export async function getFollowersController(req: Request, res: Response) {
-  try {
-    const { username } = req.params;
-    const { last, status = "CONFIRMED" } = req.query as {
-      last: string | undefined;
-      status: "CONFIRMED" | "PENDING" | undefined;
-    };
-    const profile = await getProfile({ username });
-    if (!profile) {
-      res.status(404).end();
-      return;
-    }
-
-    const { followers, remaining } = await getFollowers({
-      id: profile.id,
-      last,
-      status,
-    });
-    res.status(200).json({ relationships: followers, remaining });
-  } catch (error) {
-    console.error(error);
-    res.status(500).end();
-  }
-}
-
-export async function getFollowingController(req: Request, res: Response) {
-  try {
-    const { username } = req.params;
-    const { last, userId } = req.query as { last: string | undefined; userId: string | undefined };
-    const profile = await getProfile({ username });
-    if (!profile) {
-      res.status(404).end();
-      return;
-    }
-
-    const { following, remaining } = await getFollowing({
-      id: profile.id,
-      last,
-      status: "CONFIRMED",
-    });
-    res.status(200).json({ relationships: following, remaining });
   } catch (error) {
     console.error(error);
     res.status(500).end();
