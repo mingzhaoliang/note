@@ -49,6 +49,7 @@
     "typescript": "^5.6.3"
   },
   "prisma": {
-    "schema": "src/models/neon/schema"
+    "schema": "src/models/neon/schema",
+    "seed": "node dist/lib/db/seed.js"
   }
 }

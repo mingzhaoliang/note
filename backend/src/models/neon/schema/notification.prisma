@@ -1,0 +1,23 @@
+model NotificationType {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
+  description  String?
+  template     String
+  notification Notification[]
+}
+
+model Notification {
+  id                 String           @id @default(cuid())
+  notificationTypeId Int
+  type               NotificationType @relation(fields: [notificationTypeId], references: [id])
+  senderId           String?
+  sender             Profile?         @relation("sender", fields: [senderId], references: [id])
+  recipientId        String
+  recipient          Profile          @relation("recipient", fields: [recipientId], references: [id])
+  relatedId          String?
+  seen               Boolean          @default(false)
+  seenAt             DateTime?
+  createdAt          DateTime         @default(now())
+
+  @@index([notificationTypeId, senderId, recipientId])
+}
