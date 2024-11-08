@@ -1,6 +1,6 @@
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
-import { action } from "@/routes/_home/profile.$username/_layout";
+import { action } from "@/routes/_home/profile/$username/_layout";
 import { useSession } from "@/store/context/session.context";
 import { removeFollowerRequest, setFollowers } from "@/store/redux/features/relationship-slice";
 import { useAppDispatch } from "@/store/redux/hooks";

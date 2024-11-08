@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { action } from "@/routes/_home/profile.$username/_layout";
+import { action } from "@/routes/_home/profile/$username/_layout";
 import { useSession } from "@/store/context/session.context";
 import { BaseRelationship, Profile } from "@/types";
 import { Slot } from "@radix-ui/react-slot";
