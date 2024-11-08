@@ -50,6 +50,7 @@ export async function confirmRequestController(req: Request, res: Response) {
     const { id } = req.params;
     const { profileId } = req.body as ActionSchema;
     const relationship = await followProfile({ fromId: profileId, toId: id, status: "CONFIRMED" });
+    await deleteNotifications(3, profileId, id);
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
@@ -62,6 +63,7 @@ export async function declineRequestController(req: Request, res: Response) {
     const { id } = req.params;
     const { profileId } = req.body as ActionSchema;
     const relationship = await unfollowProfile({ fromId: profileId, toId: id });
+    await deleteNotifications(3, profileId, id);
     res.status(200).json({ relationship });
   } catch (error) {
     console.error(error);
