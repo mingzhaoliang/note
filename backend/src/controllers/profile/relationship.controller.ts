@@ -1,4 +1,5 @@
 import { ActionSchema } from "@/schemas/shared/action.schema.js";
+import { deleteNotifications, sendNotification } from "@/services/neon/notification.service.js";
 import {
   followProfile,
   getFollowers,
@@ -23,8 +24,12 @@ export async function followProfileController(req: Request, res: Response) {
     let relationship;
     if (isFollowing) {
       relationship = await unfollowProfile({ fromId: id, toId: profileToFollow.id });
+      if (relationship.status === "PENDING") {
+        deleteNotifications(3, id, profileToFollow.id);
+      }
     } else if (profileToFollow.private) {
       relationship = await followProfile({ fromId: id, toId: profileToFollow.id });
+      sendNotification(3, id, profileToFollow.id);
     } else {
       relationship = await followProfile({
         fromId: id,
