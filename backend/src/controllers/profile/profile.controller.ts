@@ -18,7 +18,7 @@ import { CloudinaryAsset } from "@/types/index.js";
 import { Request, Response } from "express";
 import fs from "fs";
 
-const getProfileController = async (req: Request, res: Response) => {
+export async function getProfileController(req: Request, res: Response) {
   try {
     const { username } = req.params;
     const profile = await getProfile({ username });
@@ -35,9 +35,9 @@ const getProfileController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const editProfileController = async (req: Request, res: Response) => {
+export async function editProfileController(req: Request, res: Response) {
   try {
     const { profileId } = req.params;
     const { name, bio } = req.body as ProfileEditSchema;
@@ -93,9 +93,9 @@ const editProfileController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const deleteAvatarController = async (req: Request, res: Response) => {
+export async function deleteAvatarController(req: Request, res: Response) {
   try {
     const { profileId } = req.params;
     const profile = await getProfile({ id: profileId });
@@ -113,9 +113,9 @@ const deleteAvatarController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const followProfileController = async (req: Request, res: Response) => {
+export async function followProfileController(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const { profileId } = req.body as ActionSchema;
@@ -145,9 +145,9 @@ const followProfileController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const confirmRequestController = async (req: Request, res: Response) => {
+export async function confirmRequestController(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const { profileId } = req.body as ActionSchema;
@@ -157,9 +157,9 @@ const confirmRequestController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const declineRequestController = async (req: Request, res: Response) => {
+export async function declineRequestController(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const { profileId } = req.body as ActionSchema;
@@ -169,9 +169,9 @@ const declineRequestController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const getProfilePostsController = async (req: Request, res: Response) => {
+export async function getProfilePostsController(req: Request, res: Response) {
   try {
     const { username } = req.params;
     const { last } = req.query as { last: string | undefined };
@@ -192,9 +192,9 @@ const getProfilePostsController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const getProfileCommentsController = async (req: Request, res: Response) => {
+export async function getProfileCommentsController(req: Request, res: Response) {
   try {
     const { username } = req.params;
     const { lastCommentId } = req.query as { lastCommentId: string | undefined };
@@ -215,9 +215,9 @@ const getProfileCommentsController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const searchProfilesController = async (req: Request, res: Response) => {
+export async function searchProfilesController(req: Request, res: Response) {
   try {
     const { q, last } = req.query as { q: string; last: string };
     const { profiles, remaining } = await searchProfiles({ q, last });
@@ -226,9 +226,9 @@ const searchProfilesController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const updatePrivacyController = async (req: Request, res: Response) => {
+export async function updatePrivacyController(req: Request, res: Response) {
   try {
     const { profileId } = req.params;
     const { isPrivate } = req.body as ProfilePrivacySchema;
@@ -238,9 +238,9 @@ const updatePrivacyController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const getFollowersController = async (req: Request, res: Response) => {
+export async function getFollowersController(req: Request, res: Response) {
   try {
     const { username } = req.params;
     const { last, status = "CONFIRMED" } = req.query as {
@@ -263,9 +263,9 @@ const getFollowersController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
+}
 
-const getFollowingController = async (req: Request, res: Response) => {
+export async function getFollowingController(req: Request, res: Response) {
   try {
     const { username } = req.params;
     const { last, userId } = req.query as { last: string | undefined; userId: string | undefined };
@@ -285,19 +285,4 @@ const getFollowingController = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).end();
   }
-};
-
-export {
-  confirmRequestController,
-  declineRequestController,
-  deleteAvatarController,
-  editProfileController,
-  followProfileController,
-  getFollowersController,
-  getFollowingController,
-  getProfileCommentsController,
-  getProfileController,
-  getProfilePostsController,
-  searchProfilesController,
-  updatePrivacyController,
-};
+}
