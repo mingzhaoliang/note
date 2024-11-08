@@ -174,23 +174,20 @@ const declineRequestController = async (req: Request, res: Response) => {
 const getProfilePostsController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const { lastPostId } = req.query as { lastPostId: string | undefined };
+    const { last } = req.query as { last: string | undefined };
 
     const profile = await getProfile({ username });
     if (!profile) {
       res.status(404).end();
       return;
     }
-    const { posts, remainingPosts } = await getProfilePosts({
-      profileId: profile.id,
-      lastCursor: lastPostId,
-    });
+    const { posts, remaining } = await getProfilePosts({ profileId: profile.id, last });
 
     const postsDto = posts.map((post) => ({
       ...post,
       images: post.images.map(({ publicId }) => publicId),
     }));
-    res.status(200).json({ posts: postsDto, remaining: remainingPosts });
+    res.status(200).json({ posts: postsDto, remaining });
   } catch (error) {
     console.error(error);
     res.status(500).end();

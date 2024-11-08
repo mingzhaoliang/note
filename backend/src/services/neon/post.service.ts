@@ -134,42 +134,40 @@ const getFeedPosts = async ({
   }
 };
 
-type findProfilePostArgs = {
+const getProfilePosts = async ({
+  profileId,
+  last,
+  take = 20,
+}: {
   profileId: string;
-  lastCursor?: string;
+  last?: string;
   take?: number;
-};
-
-const getProfilePosts = async ({ profileId, lastCursor, take = 12 }: findProfilePostArgs) => {
+}) => {
   try {
     const postsPromise = prisma.post.findMany({
       take,
-      ...(lastCursor && { skip: 1, cursor: { id: lastCursor } }),
-      where: { profileId },
+      ...(last && { skip: 1, cursor: { id: last } }),
+      where: { profileId, commentOnId: null },
       select: {
         id: true,
         text: true,
-        images: {
-          select: {
-            publicId: true,
-          },
-        },
+        images: { select: { publicId: true } },
         profile: true,
       },
       orderBy: { createdAt: "desc" },
     });
 
-    const remainingPostsPromise = prisma.post
+    const remainingPromise = prisma.post
       .findMany({
-        where: { profileId },
-        ...(lastCursor && { skip: take + 1, cursor: { id: lastCursor } }),
+        where: { profileId, commentOnId: null },
+        ...(last && { skip: take + 1, cursor: { id: last } }),
         orderBy: { createdAt: "desc" },
       })
       .then((posts) => posts.length);
 
-    const [posts, remainingPosts] = await Promise.all([postsPromise, remainingPostsPromise]);
+    const [posts, remaining] = await Promise.all([postsPromise, remainingPromise]);
 
-    return { posts, remainingPosts };
+    return { posts, remaining };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get the posts.");

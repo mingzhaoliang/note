@@ -15,12 +15,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const { posts, totalPosts } = (await response.json()) as {
+  const { posts, remaining } = (await response.json()) as {
     posts: PostOverview[];
-    totalPosts: number;
+    remaining: number;
   };
 
-  return json({ posts, totalPosts });
+  return json({ posts, remaining });
 }
 
 export default function ProfilePosts() {
