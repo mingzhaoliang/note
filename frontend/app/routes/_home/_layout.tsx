@@ -7,9 +7,9 @@ import MobileHeader from "./mobile-header";
 import Sidebar from "./sidebar";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await requireUser(request);
+  const { user, headers } = await requireUser(request);
 
-  return json({ user }, { headers: authHeader ? { "Set-Cookie": authHeader } : undefined });
+  return json({ user }, { headers });
 }
 
 export default function HomeLayout() {

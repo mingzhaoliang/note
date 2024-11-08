@@ -15,9 +15,7 @@ import { Await, defer, redirect, useLoaderData, useLocation, useNavigate } from 
 import { Suspense } from "react";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await requireUser(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await requireUser(request);
 
   const { postId } = params;
   if (!postId) {

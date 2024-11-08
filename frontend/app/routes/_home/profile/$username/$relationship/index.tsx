@@ -8,9 +8,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   if (relationship !== "followers" && relationship !== "following") {
     throw new Error("Invalid relationship");
   }
-  const { authHeader, user } = await requireUser(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await requireUser(request);
 
   const searchParams = new URL(request.url).searchParams;
 

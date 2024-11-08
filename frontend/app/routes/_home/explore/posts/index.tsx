@@ -14,9 +14,7 @@ import { json, redirect, useFetcher, useLoaderData, useSearchParams } from "@rem
 import { useCallback, useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user, authHeader } = await requireUser(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await requireUser(request);
 
   const searchParams = new URL(request.url).searchParams;
 

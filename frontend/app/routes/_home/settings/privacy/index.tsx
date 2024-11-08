@@ -6,9 +6,8 @@ import { useLoaderData } from "@remix-run/react";
 import PrivateProfile from "./private-profile";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
+
   return json({ user }, { headers });
 }
 
@@ -23,9 +22,7 @@ export default function Index() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as ActionType;

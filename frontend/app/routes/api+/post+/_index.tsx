@@ -3,9 +3,7 @@ import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const formData = await request.formData();
   formData.append("profileId", user.id);

@@ -7,9 +7,7 @@ import ProfileInfo from "./profile-info";
 import ProfileNavbar from "./profile-navbar";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { authHeader, user } = await requireUser(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await requireUser(request);
 
   const { username } = params;
   const response = await fetch(`${envConfig.API_URL}/profile/${username}/overview`);
@@ -45,9 +43,7 @@ export default function ProfileLayout() {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as ActionType;

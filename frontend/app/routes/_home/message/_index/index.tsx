@@ -8,9 +8,7 @@ import { useMediaQuery } from "usehooks-ts";
 import ConversationNavLink from "../conversation-nav-link";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const response = await fetch(`${envConfig.API_URL}/conversation?profileId=${user.id}`);
 
@@ -50,9 +48,7 @@ export default function Index() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const formData = await request.formData();
   const recipientId = formData.get("recipientId");

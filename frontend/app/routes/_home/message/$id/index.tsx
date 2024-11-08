@@ -20,9 +20,7 @@ import { useEffect, useRef } from "react";
 import MessageContainer, { MessageContainerRef } from "./message-container";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const { id: conversationId } = params;
 
@@ -126,9 +124,7 @@ export default function Index() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const { id: conversationId } = params;
 

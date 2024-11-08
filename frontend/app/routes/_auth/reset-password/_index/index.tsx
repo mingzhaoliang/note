@@ -128,9 +128,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   const { sessionToken, expiresAt } = await response.json();
-  const authHeader = await setAuthSession(sessionToken, new Date(expiresAt));
+  const authCookie = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", {
-    headers: { "Set-Cookie": authHeader, "Referrer-Policy": "strict-origin" },
+    headers: { "Set-Cookie": authCookie, "Referrer-Policy": "strict-origin" },
   });
 }

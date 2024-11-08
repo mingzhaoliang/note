@@ -9,9 +9,7 @@ import { useCallback } from "react";
 import { useImmer } from "use-immer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { user, authHeader } = await requireUser(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await requireUser(request);
 
   const searchParams = new URL(request.url).searchParams;
   const q = searchParams.get("q");

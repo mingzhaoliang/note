@@ -9,9 +9,7 @@ import UpdatePasswordDialog from "./update-password-dialog";
 import UpdateUsernameDialog from "./update-username-dialog";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/update-password`);
 
@@ -47,9 +45,7 @@ export default function Index() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { authHeader, user } = await redirectIfUnauthenticated(request);
-  const headers = new Headers();
-  if (authHeader) headers.append("Set-Cookie", authHeader);
+  const { user, headers } = await redirectIfUnauthenticated(request);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as ActionType;
