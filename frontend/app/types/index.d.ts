@@ -123,6 +123,16 @@ type Message = {
 
 type ActionState<T> = { _action: T; message: string | null; data: any };
 
+type Notification = {
+  id: string;
+  notificationTypeId: number;
+  message: string;
+  sender: Profile | null;
+  relatedId: string | null;
+  seen: boolean;
+  createdAt: string;
+};
+
 export type {
   ActionState,
   BaseConversation,
@@ -132,6 +142,7 @@ export type {
   Comment,
   Conversation,
   Message,
+  Notification,
   Post,
   PostOverview,
   Profile,

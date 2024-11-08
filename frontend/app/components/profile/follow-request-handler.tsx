@@ -54,14 +54,14 @@ const FollowRequestHandler = ({ requestingProfileId }: RequestHandlerProps) => {
       }
       dispatch(removeFollowerRequest(requestingProfileId));
     }
-  }, [fetcher.data, fetcher.state, dispatch]);
+  }, [fetcher.data, fetcher.state, requestingProfileId, dispatch, toast]);
 
   return (
     <div className={cn("flex items-center gap-x-2", fetcher.state !== "idle" && "hidden")}>
-      <Button variant="outline" size="sm" className="space-x-2 rounded-xl" onClick={handleDecline}>
+      <Button variant="outline" size="sm" onClick={handleDecline}>
         Decline
       </Button>
-      <Button size="sm" className="space-x-2 rounded-xl" onClick={handleConfirm}>
+      <Button size="sm" onClick={handleConfirm}>
         Confirm
       </Button>
     </div>
