@@ -1,16 +1,16 @@
 model Post {
-  id          String      @id @default(cuid())
-  profileId   String
-  profile     Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  text        String
-  images      PostImage[]
-  tags        PostTag[]
-  likes       PostLike[]
-  commentOnId String?
-  commentOn   Post?       @relation("comment", fields: [commentOnId], references: [id], onDelete: Cascade)
-  comments    Post[]      @relation("comment")
-  updatedAt   DateTime    @updatedAt
-  createdAt   DateTime    @default(now())
+  id        String      @id @default(cuid())
+  profileId String
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  text      String
+  images    PostImage[]
+  tags      PostTag[]
+  likes     PostLike[]
+  parentId  String?
+  parent    Post?       @relation("comment", fields: [parentId], references: [id], onDelete: Cascade)
+  comments  Post[]      @relation("comment")
+  updatedAt DateTime    @updatedAt
+  createdAt DateTime    @default(now())
 
   @@index([profileId])
 }

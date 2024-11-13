@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "./client.js";
 
 const notificationTypeSeed = [
   {
@@ -29,12 +28,8 @@ async function main() {
   });
 }
 
-main()
-  .then(() => {
-    prisma.$disconnect();
-  })
-  .catch((e) => {
-    console.error(e);
-    prisma.$disconnect();
-    process.exit(1);
-  });
+main().catch((e) => {
+  console.error(e);
+  prisma.$disconnect();
+  process.exit(1);
+});

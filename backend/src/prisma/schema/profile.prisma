@@ -1,29 +1,22 @@
 model Profile {
   id                    String                    @id
+  user                  User                      @relation(references: [id], fields: [id], onDelete: Cascade)
   username              String                    @unique
-  user                  User                      @relation(references: [id, username], fields: [id, username], onDelete: Cascade)
   name                  String
   avatar                String?
   bio                   String?
   private               Boolean                   @default(false)
-  deactivated           Boolean                   @default(false)
-  deactivatedAt         DateTime?
-  toBeDeletedAt         DateTime?
-  follower              Relationship[]            @relation("follower")
-  following             Relationship[]            @relation("following")
+  follower              ProfileRelationship[]     @relation("follower")
+  following             ProfileRelationship[]     @relation("following")
   likes                 PostLike[]
   posts                 Post[]
   conversations         ConversationParticipant[]
   messages              Message[]
   sentNotifications     Notification[]            @relation("sender")
   receivedNotifications Notification[]            @relation("recipient")
-  updatedAt             DateTime                  @updatedAt
-  createdAt             DateTime                  @default(now())
-
-  @@unique([id, username])
 }
 
-model Relationship {
+model ProfileRelationship {
   fromId    String
   from      Profile  @relation("following", references: [id], fields: [fromId], onDelete: Cascade)
   toId      String

@@ -1,19 +1,18 @@
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  username      String    @unique
+  id            String                 @id @default(cuid())
+  email         String                 @unique
+  username      String                 @unique
   passwordHash  String?
-  deactivated   Boolean   @default(false)
+  deactivated   Boolean                @default(false)
   deactivatedAt DateTime?
   toBeDeletedAt DateTime?
-  emailVerified Boolean   @default(false)
-
+  emailVerified Boolean                @default(false)
+  updatedAt     DateTime               @updatedAt
+  createdAt     DateTime               @default(now())
   authSession   Session[]
   profile       Profile?
   account       Account?
   passwordReset PasswordResetSession[]
-
-  @@unique([id, username])
 }
 
 model Account {
