@@ -1,4 +1,4 @@
-import { removeDeletedUsers } from "@/services/neon/user.service.js";
+import { removeDeletedUsers } from "@/features/auth/services/auth.service.js";
 import { CronJob } from "cron";
 
 const deleteUsers = new CronJob("0 0 */24 * * *", () => {
