@@ -7,10 +7,10 @@ cloudinary.config({
   api_secret: envConfig.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = async (
+export async function uploadImage(
   data: string | File,
   options: { folder: string; backup?: boolean; publicId?: string }
-) => {
+): Promise<CloudinaryAsset> {
   const uploadOptions = {
     upload_preset: envConfig.UPLOAD_PRESET,
     folder: options?.publicId ? undefined : options?.folder,
@@ -37,19 +37,40 @@ const uploadImage = async (
     });
   }
 
-  return uploadResult;
-};
+  return uploadResult as CloudinaryAsset;
+}
 
-const deleteImage = async (publicId: string) => {
+export async function deleteImage(publicId: string) {
   await cloudinary.uploader.destroy(publicId, { invalidate: true });
-};
+}
 
-const bulkDeleteImages = async (publicIds: string[]) => {
+export async function bulkDeleteImages(publicIds: string[]) {
   await cloudinary.api.delete_resources(publicIds, { invalidate: true });
-};
+}
 
-const restoreImages = async (publicIds: string[]) => {
+export async function restoreImages(publicIds: string[]) {
   await cloudinary.api.restore(publicIds);
-};
+}
 
-export { bulkDeleteImages, cloudinary, deleteImage, restoreImages, uploadImage };
+export type CloudinaryAsset = {
+  asset_id: string;
+  public_id: string;
+  version: number;
+  version_id: string;
+  signature: string;
+  width: number;
+  height: number;
+  format: string;
+  resource_type: "image" | "raw" | "video" | "auto";
+  created_at: string;
+  tags: string[];
+  bytes: number;
+  type: "upload" | "authenticated" | "private";
+  etag: string;
+  placeholder: boolean;
+  url: string;
+  secure_url: string;
+  folder: string;
+  original_filename: string;
+  api_key: string;
+};
