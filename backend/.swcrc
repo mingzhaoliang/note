@@ -13,6 +13,7 @@
     }
   },
   "module": {
-    "type": "nodenext"
+    "type": "nodenext",
+    "resolveFully": true
   }
 }
