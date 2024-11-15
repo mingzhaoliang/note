@@ -1,4 +1,4 @@
-import { markAsSeen } from "@/services/neon/conversation.service.js";
+import { markAsSeen } from "@/features/conversation/services/conversation.service.js";
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
