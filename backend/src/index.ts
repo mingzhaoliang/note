@@ -1,30 +1,26 @@
+import compression from "compression";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express from "express";
 import fileUpload from "express-fileupload";
 import helmet from "helmet";
+import PrettyError from "pretty-error";
 import envConfig from "./config/env.config.js";
 import { startCron } from "./cron/cron.js";
-import { connectDB } from "./lib/db/prisma.js";
-import authRoute from "./routes/auth.route.js";
-import conversationRoute from "./routes/conversation.route.js";
-import notificationRoute from "./routes/notification.route.js";
-import postRoute from "./routes/post.route.js";
-import profileRouter from "./routes/profile.route.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { prisma } from "./prisma/client.js";
+import route from "./routes/index.js";
 import { app, httpServer } from "./socket/socket.js";
 
 const { PORT } = envConfig;
 
-connectDB();
-
-startCron();
-
-app.use(cookieParser());
-
+// * Security, Compression & Parser
+const pe = new PrettyError();
+pe.start();
 app.use(helmet());
-
+app.use(compression());
+app.use(cookieParser());
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -36,19 +32,29 @@ app.use(
   })
 );
 
-app.use("/api/auth", authRoute);
-
-app.use("/api/profile", profileRouter);
-
-app.use("/api/post", postRoute);
-
-app.use("/api/conversation", conversationRoute);
-
-app.use("/api/notification", notificationRoute);
-
-app.get("/health", (req, res) => {
+// * Route
+app.use(route);
+app.get("/health", (_, res) => {
   res.status(200).send("OK");
 });
+
+// * Custom Error Handler
+app.use(errorHandler);
+
+// * DB
+const connectDB = async () => {
+  try {
+    await prisma.$connect();
+    console.log("Database connected");
+  } catch (error: any) {
+    console.log(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
+connectDB();
+
+// * Cron Job
+startCron();
 
 httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
