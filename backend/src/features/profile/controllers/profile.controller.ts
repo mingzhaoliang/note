@@ -1,3 +1,4 @@
+import * as postService from "@/features/post/services/post.service.js";
 import { ErrorResponse } from "@/middleware/errorHandler.js";
 import asyncHandler from "express-async-handler";
 import fileUpload from "express-fileupload";

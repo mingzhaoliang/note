@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const createPostSchema = z.object({
+export const createPostSchema = z.object({
   profileId: z.string({ required_error: "Profile ID is required." }),
   text: z
     .string()
@@ -16,6 +16,11 @@ const createPostSchema = z.object({
     }),
 });
 
-type CreatePostSchema = z.infer<typeof createPostSchema>;
-
-export { createPostSchema, type CreatePostSchema };
+export const createCommentSchema = z.object({
+  profileId: z.string({ required_error: "Profile ID is required." }),
+  parentId: z.string({ required_error: "Parent ID is required." }),
+  text: z
+    .string({ required_error: "Enter your comment." })
+    .min(1, { message: "Enter your comment." })
+    .max(500, { message: "Comment is too long." }),
+});
