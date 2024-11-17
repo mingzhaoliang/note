@@ -58,6 +58,7 @@ type PostOverview = {
   id: string;
   text: string;
   images: string[];
+  profileId: string;
   profile: BaseProfile;
 };
 
@@ -65,7 +66,10 @@ type Post = PostOverview & {
   createdAt: string;
   tags: string[];
   likes: string[];
-  commentCount: number;
+  _count: {
+    likes: number;
+    comments: number;
+  };
 };
 
 type Comment = {
@@ -73,8 +77,11 @@ type Comment = {
   profile: BaseProfile;
   text: string;
   likes: string[];
-  commentOnId: string | null;
-  commentCount: number;
+  parentId: string | null;
+  _count: {
+    likes: number;
+    comments: number;
+  };
   comments?: Comment[];
   createdAt: string;
 };
@@ -84,17 +91,23 @@ type ProfileComment = {
   text: string;
   profile: BaseProfile;
   likes: string[];
-  commentOnId: string | null;
+  parentId: string | null;
   createdAt: string;
-  commentCount: number;
-  commentOn: {
+  _count: {
+    likes: number;
+    comments: number;
+  };
+  parent: {
     id: string;
     text: string;
     profile: BaseProfile;
-    commentOnId: string | null;
+    parentId: string | null;
     createdAt: string;
-    commentCount: number;
-    commentOnUsername: string | null;
+    _count: {
+      likes: number;
+      comments: number;
+    };
+    parent: { profile: BaseProfile } | null;
     images: string[];
     tags: string[];
     likes: string[];

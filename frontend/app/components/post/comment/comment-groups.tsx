@@ -1,9 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { INITIAL_DISPLAY_COMMENTS } from "@/config/post.config";
 import { Comment, User } from "@/types";
-import { useCallback, useState } from "react";
-import { Button } from "../../ui/button";
-import PostComment from "./post-comment";
 import { Link, useLocation } from "@remix-run/react";
+import { useCallback, useState } from "react";
+import CommentItem from "./comment-item";
 
 type CommentSectionProps = {
   comments: Comment[];
@@ -13,7 +13,7 @@ type CommentSectionProps = {
 const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   const [showMore, setShowMore] = useState(false);
   // Only grandchildren comments will be collapsed
-  const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].commentOnId;
+  const hasMore = comments.length > INITIAL_DISPLAY_COMMENTS && comments[0].parentId;
   const location = useLocation();
 
   const handleShowMore = useCallback(() => {
@@ -27,7 +27,7 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
   return (
     <>
       {comments.map((comment, index) => {
-        if (index + 1 > INITIAL_DISPLAY_COMMENTS && !showMore && comment.commentOnId) {
+        if (index + 1 > INITIAL_DISPLAY_COMMENTS && !showMore && comment.parentId) {
           return null;
         }
         return (
@@ -36,9 +36,9 @@ const CommentGroups = ({ comments, user }: CommentSectionProps) => {
               to={`/profile/${comment.profile.username}/post/${comment.id}`}
               state={{ referrer: location.pathname }}
             >
-              <PostComment profile={comment.profile} comment={comment} user={user} />
+              <CommentItem profile={comment.profile} comment={comment} user={user} />
             </Link>
-            {comment.commentCount > 0 && comment.comments && (
+            {comment._count.comments > 0 && comment.comments && (
               <div className="ml-10 flex flex-col gap-y-3">
                 <CommentGroups comments={comment.comments} user={user} />
               </div>

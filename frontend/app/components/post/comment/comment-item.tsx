@@ -1,11 +1,9 @@
-import { Comment as CommentIcon, Like } from "@/components/icons";
 import CldAvatar from "@/components/shared/cld-avatar";
 import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
 import UsernameButton from "@/components/shared/username-button";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { BaseProfile, Comment, User } from "@/types";
-import PostStats from "../post-card/post-stats";
 
 type CommentDetailsProps = {
   profile: BaseProfile;
@@ -13,7 +11,7 @@ type CommentDetailsProps = {
   user: User | null;
 };
 
-const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
+const CommentItem = ({ profile, comment, user }: CommentDetailsProps) => {
   const hasLiked = user ? comment.likes.includes(user.id) : false;
 
   return (
@@ -28,35 +26,21 @@ const PostComment = ({ profile, comment, user }: CommentDetailsProps) => {
         </div>
         <p className="text-sm">{comment.text}</p>
         <div className="-ml-3 flex items-center gap-x-2">
-          {user && (
-            <>
-              <LikeButton
-                id={comment.id}
-                hasLiked={hasLiked}
-                count={comment.likes.length}
-                onRevalidate={() => {}}
-              />
-              <CommentButton
-                commentOnId={comment.id}
-                count={comment.commentCount}
-                onRevalidate={() => {}}
-              />
-            </>
-          )}
-          {!user && (
-            <>
-              <PostStats count={0}>
-                <Like />
-              </PostStats>
-              <PostStats count={comment.commentCount}>
-                <CommentIcon />
-              </PostStats>
-            </>
-          )}
+          <LikeButton
+            postId={comment.id}
+            postOwnerUsername={profile.username}
+            hasLiked={hasLiked}
+            count={comment._count.likes}
+          />
+          <CommentButton
+            parentId={comment.id}
+            postOwnerUsername={profile.username}
+            count={comment._count.comments}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default PostComment;
+export default CommentItem;
