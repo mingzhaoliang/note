@@ -22,12 +22,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!q) return redirect("/explore", { headers });
 
   if (user) searchParams.append("userId", user.id);
-  const response = await fetch(`${envConfig.API_URL}/post/explore?` + searchParams.toString());
+  const response = await fetch(`${envConfig.API_URL}/post/search?` + searchParams.toString());
 
-  if (!response.ok) {
-    console.log(await response.text());
-    throw new Error("Oops! Something went wrong!");
-  }
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
   const { posts, remaining } = (await response.json()) as { posts: Post[]; remaining: number };
 

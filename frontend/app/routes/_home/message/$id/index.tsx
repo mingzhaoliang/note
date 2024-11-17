@@ -24,27 +24,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { id: conversationId } = params;
 
-  const lastMessageId = new URL(request.url).searchParams.get("lastMessageId");
+  const last = new URL(request.url).searchParams.get("last");
 
-  const conversationResponse = await fetch(`${envConfig.API_URL}/conversation/${conversationId}`);
-
-  if (!conversationResponse.ok) throw new Error("Oops! Something went wrong!");
-
-  const messagesResponse = await fetch(
-    `${envConfig.API_URL}/conversation/${conversationId}/messages` +
-      (lastMessageId ? `?lastMessageId=${lastMessageId}` : "")
+  const response = await fetch(
+    `${envConfig.API_URL}/conversation/${conversationId}` + (last ? `?last=${last}` : "")
   );
 
-  if (!messagesResponse.ok) throw new Error("Oops! Something went wrong!");
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const conversation: BaseConversation = (await conversationResponse.json()).conversation;
+  const data = await response.json();
+  const conversation: BaseConversation = data.data.conversation;
+  const messages: Message[] = data.data.messages;
+  const count = data.count;
 
-  const { messages, remaining } = (await messagesResponse.json()) as {
-    messages: Message[];
-    remaining: number;
-  };
-
-  return json({ conversation, messages, remaining, user }, { headers });
+  return json({ conversation, messages, count, user }, { headers });
 }
 
 export default function Index() {
@@ -141,7 +134,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const message = response.status === 400 ? (await response.json()).message : response.statusText;
+    const data = await response.json();
+    const message = data.message ?? response.statusText;
     return json({ newMessage: null, actionState: { message } }, { headers });
   }
 

@@ -26,7 +26,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect("/login", { headers: { "Set-Cookie": await commitBaseSession(session) } });
   }
 
-  const { sessionToken, expiresAt } = await response.json();
+  const data = await response.json();
+  const { sessionToken, expiresAt } = data.data;
   const authCookie = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", { headers: { "Set-Cookie": authCookie } });

@@ -26,7 +26,8 @@ export async function requireUser(
   }
 
   // If the session is valid, return the user and the session cookie.
-  const { user, expiresAt } = await response.json();
+  const data = await response.json();
+  const { user, expiresAt } = data.data;
   const authCookie = await setAuthSession(sessionToken, new Date(expiresAt));
   headers.append("Set-Cookie", authCookie);
 
@@ -54,9 +55,7 @@ export async function validatePasswordResetSession(request: Request) {
     return { session: null, user: null };
   }
 
-  const res = await fetch(
-    `${envConfig.API_URL}/auth/reset-password/validate-session?token=${token}`
-  );
+  const res = await fetch(`${envConfig.API_URL}/reset-password/validate-session?token=${token}`);
   if (!res.ok) {
     return { session: null, user: null };
   }

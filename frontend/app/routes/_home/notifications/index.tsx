@@ -12,7 +12,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const res = await fetch(`${envConfig.API_URL}/notification/${user.id}`);
   if (!res.ok) throw new Error("Oops! Something went wrong!");
   const data = await res.json();
-  const notifications: Notification[] = data.notifications;
+  const notifications: Notification[] = data.data;
 
   return json({ notifications, user }, { headers });
 }

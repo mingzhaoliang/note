@@ -110,20 +110,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   // Make a POST request to the server to reset the password
-  const response = await fetch(`${envConfig.API_URL}/auth/reset-password/${token}`, {
+  const response = await fetch(`${envConfig.API_URL}/reset-password/${token}`, {
     method: "PUT",
     body: formData,
   });
 
   // If the server responded with an error, show an error and return a 400 status
   if (!response.ok) {
-    let message;
-
-    if (response.status === 400) {
-      message = (await response.json()).message || response.statusText;
-    } else {
-      message = response.statusText;
-    }
+    const data = await response.json();
+    const message = data.message ?? response.statusText;
     return json({ message }, { status: response.status });
   }
 

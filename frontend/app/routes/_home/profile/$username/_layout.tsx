@@ -10,13 +10,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { user, headers } = await requireUser(request);
 
   const { username } = params;
-  const response = await fetch(`${envConfig.API_URL}/profile/${username}/overview`);
+  const response = await fetch(`${envConfig.API_URL}/profile/${username}`);
 
   if (!response.ok) {
     return redirect("/", { headers });
   }
 
-  const profile: Profile = (await response.json()).profile;
+  const data = await response.json();
+  const profile: Profile = data.data;
 
   return json({ profile, user }, { headers });
 }
@@ -64,8 +65,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message ?? response.statusText;
         return json(actionState, { status: 400, headers });
       }
 
@@ -90,8 +91,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).error : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message ?? response.statusText;
         return json(actionState, { status: 400, headers });
       }
 
@@ -104,13 +105,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
         body: formData,
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).error : response.statusText;
+        actionState.message = data.message ?? response.statusText;
         return json(actionState, { status: 400, headers });
       }
 
-      actionState.data = (await response.json()).relationship;
+      actionState.data = data.data;
 
       return json(actionState, { headers });
     }
@@ -121,13 +122,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
         body: formData,
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).error : response.statusText;
+        actionState.message = data.message ?? response.statusText;
         return json(actionState, { status: 400, headers });
       }
 
-      actionState.data = (await response.json()).relationship;
+      actionState.data = data.data;
 
       return json(actionState, { headers });
     }

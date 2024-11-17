@@ -42,13 +42,7 @@ export default function Index() {
   const { isValid } = form.formState;
 
   const checkUsername = useCallback(async (username: string) => {
-    const response = await fetch(`/check-identifier?type=username&identifier=${username}`);
-    const data = await response.json();
-    return data.isValid;
-  }, []);
-
-  const checkEmail = useCallback(async (email: string) => {
-    const response = await fetch(`/check-identifier?type=email&identifier=${email}`);
+    const response = await fetch(`/is-unique-username?username=${username}`);
     const data = await response.json();
     return data.isValid;
   }, []);
@@ -174,25 +168,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const response = await fetch(envConfig.API_URL + "/auth/signup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    let message;
-
-    if (response.status === 400) {
-      const data = await response.json();
-      message = data.message || response.statusText;
-    } else {
-      message = response.statusText;
-    }
+    const data = await response.json();
+    const message = data.message || response.statusText;
     return json({ message }, { status: 400 });
   }
 
-  const { sessionToken, expiresAt } = await response.json();
+  const data = await response.json();
+  const { sessionToken, expiresAt } = data.data;
   const authCookie = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", { headers: { "Set-Cookie": authCookie } });

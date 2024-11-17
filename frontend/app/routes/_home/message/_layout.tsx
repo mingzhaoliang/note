@@ -12,7 +12,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const conversations: TConversation[] = (await response.json()).conversations;
+  const data = await response.json();
+  const conversations: TConversation[] = data.data;
 
   return json({ conversations, user }, { headers });
 }

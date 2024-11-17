@@ -9,7 +9,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getBaseSession(request.headers.get("Cookie"));
 
   const response = await fetch(envConfig.API_URL + "/auth/login/google");
-  const { googleOauthState, googleOauthCodeVerifier, googleOauthUrl } = await response.json();
+  const data = await response.json();
+  const { googleOauthState, googleOauthCodeVerifier, googleOauthUrl } = data.data;
 
   session.flash("googleOauthState", googleOauthState);
   session.flash("googleOauthCodeVerifier", googleOauthCodeVerifier);

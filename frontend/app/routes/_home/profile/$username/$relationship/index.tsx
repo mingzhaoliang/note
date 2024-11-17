@@ -21,10 +21,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     throw new Error("Oops! Something went wrong!");
   }
 
-  const { relationships, remaining } = (await response.json()) as {
-    relationships: Relationship[];
-    remaining: number;
-  };
+  const data = await response.json();
+  const relationships: Relationship[] = data.data;
+  const count: number = data.count;
 
-  return json({ relationships, remaining, user }, { headers });
+  return json({ relationships, count, user }, { headers });
 }

@@ -14,7 +14,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const conversations: TConversation[] = (await response.json()).conversations;
+  const data = await response.json();
+  const conversations: TConversation[] = data.data;
 
   return json({ conversations, user }, { headers });
 }
@@ -63,7 +64,8 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!response.ok) {
-    const message = response.status === 400 ? (await response.json()).message : response.statusText;
+    const data = await response.json();
+    const message = data.message ?? response.statusText;
     return json({ message }, { headers });
   }
 

@@ -65,19 +65,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
 
-  const res = await fetch(`${envConfig.API_URL}/auth/reset-password/${token}/verify-email`, {
+  const res = await fetch(`${envConfig.API_URL}/reset-password/${token}/verify-email`, {
     method: "PUT",
     body: formData,
   });
 
   if (!res.ok) {
-    let message;
-
-    if (res.status === 400) {
-      message = (await res.json()).message || res.statusText;
-    } else {
-      message = res.statusText;
-    }
+    const data = await res.json();
+    const message = data.message ?? res.statusText;
     return json({ message }, { status: res.status });
   }
 

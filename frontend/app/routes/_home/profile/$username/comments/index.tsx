@@ -19,9 +19,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   );
 
   if (!response.ok) {
-    const { error } = await response.json();
-    if (error === "Profile not found." && _action === "edit-profile")
-      return json({ comments: [], totalComments: 0 });
+    if (_action === "edit-profile") return json({ comments: [], totalComments: 0 });
     throw new Error("Oops! Something went wrong!");
   }
 

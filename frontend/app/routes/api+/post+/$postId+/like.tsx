@@ -14,10 +14,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   let message, post;
+  const data = await response.json();
   if (!response.ok) {
-    message = response.status === 400 ? (await response.json()).message : response.statusText;
+    message = data.message ?? response.statusText;
   } else {
-    post = (await response.json()).post;
+    post = data.data;
   }
 
   const actionState = { message, postId };

@@ -14,8 +14,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   let message;
+  const data = await response.json();
   if (!response.ok) {
-    message = response.status === 400 ? (await response.json()).message : response.statusText;
+    message = data.message ?? response.statusText;
   }
 
   const actionState = { message, postId };

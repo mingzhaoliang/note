@@ -37,8 +37,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message ?? response.statusText;
         return json(actionState, { status: 400, headers });
       }
 

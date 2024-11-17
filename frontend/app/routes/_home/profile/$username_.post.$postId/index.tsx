@@ -24,15 +24,15 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   const comments: Promise<Comment[]> = fetch(`${envConfig.API_URL}/post/${postId}/comments`)
     .then((response) => response.json())
-    .then((data) => data.comments);
+    .then((data) => data.data);
 
-  const post = await fetch(`${envConfig.API_URL}/post/${postId}`)
+  const post: Post = await fetch(`${envConfig.API_URL}/post/${postId}`)
     .then((response) => response.json())
-    .then((data) => data.post as Post);
+    .then((data) => data.data);
 
-  const postOwner = await fetch(`${envConfig.API_URL}/profile/${post.profile.username}/overview`)
+  const postOwner: Profile = await fetch(`${envConfig.API_URL}/profile/${post.profile.username}`)
     .then((response) => response.json())
-    .then((data) => data.profile as Profile);
+    .then((data) => data.data);
 
   if (
     postOwner.private &&

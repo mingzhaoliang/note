@@ -15,16 +15,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   if (user) searchParams.append("userId", user.id);
 
-  const response = await fetch(`${envConfig.API_URL}/post/feed?` + searchParams.toString());
+  const response = await fetch(`${envConfig.API_URL}/post?` + searchParams.toString());
 
-  if (!response.ok) {
-    console.error(await response.text());
-    throw new Error("Oops! Something went wrong!");
-  }
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const { posts, remaining } = (await response.json()) as { posts: Post[]; remaining: number };
+  const data = await response.json();
+  const posts: Post[] = data.data;
+  const count: number = data.count;
 
-  return json({ posts, remaining, user }, { headers });
+  return json({ posts, count, user }, { headers });
 }
 
 export default function Index() {

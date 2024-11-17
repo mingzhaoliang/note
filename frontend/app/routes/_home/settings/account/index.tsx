@@ -11,13 +11,12 @@ import UpdateUsernameDialog from "./update-username-dialog";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { user, headers } = await redirectIfUnauthenticated(request);
 
-  const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/update-password`);
+  const response = await fetch(`${envConfig.API_URL}/auth/${user.id}/has-password`);
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const { available: updatePasswordAvailable } = (await response.json()) as {
-    available: boolean;
-  };
+  const data = await response.json();
+  const updatePasswordAvailable = data.data;
 
   return json({ user, updatePasswordAvailable }, { headers });
 }
@@ -62,8 +61,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message || response.statusText;
         return json(actionState, { headers });
       }
 
@@ -76,8 +75,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message || response.statusText;
         return json(actionState, { headers });
       }
 
@@ -90,8 +89,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message || response.statusText;
         return json(actionState, { headers });
       }
 
@@ -104,8 +103,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message || response.statusText;
         return json(actionState, { headers });
       }
 
@@ -118,8 +117,8 @@ export async function action({ request }: ActionFunctionArgs) {
       });
 
       if (!response.ok) {
-        actionState.message =
-          response.status === 400 ? (await response.json()).message : response.statusText;
+        const data = await response.json();
+        actionState.message = data.message || response.statusText;
         return json(actionState, { headers });
       }
 

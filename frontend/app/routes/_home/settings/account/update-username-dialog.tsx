@@ -16,7 +16,7 @@ const UpdateUsernameDialog = ({ username }: { username: string }) => {
   const [isValid, setIsValid] = useState(true);
 
   const checkUsername = useCallback(async (username: string) => {
-    const response = await fetch(`/check-identifier?type=username&identifier=${username}`);
+    const response = await fetch(`/is-unique-username?username=${username}`);
     const data = await response.json();
     return data.isValid;
   }, []);

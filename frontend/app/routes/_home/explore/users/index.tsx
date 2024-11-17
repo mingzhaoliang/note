@@ -24,17 +24,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       new URLSearchParams({ q, ...(lastUserId && { last: lastUserId }) }).toString()
   );
 
-  if (!response.ok) {
-    console.log(await response.text());
-    throw new Error("Oops! Something went wrong!");
-  }
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const { profiles, remaining } = (await response.json()) as {
-    profiles: Profile[];
-    remaining: number;
-  };
+  const data = await response.json();
+  const profiles: Profile[] = data.data;
+  const count: number = data.count;
 
-  return json({ profiles, remaining, user }, { headers });
+  return json({ profiles, count, user }, { headers });
 }
 
 export default function Index() {

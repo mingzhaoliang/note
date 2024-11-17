@@ -70,7 +70,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Make a request to the server to send a password reset email
-  const response = await fetch(envConfig.API_URL + "/auth/forgot-password", {
+  const response = await fetch(envConfig.API_URL + "/reset-password/forgot-password", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ identifier }),
@@ -78,7 +78,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
   // If the server responded with an error, show an error
   if (!response.ok) {
-    return json({ message: "Unable to reset password. Please try again later." }, { status: 400 });
+    const data = await response.json();
+    const message = data.message ?? response.statusText;
+    return json({ message }, { status: 400 });
   }
 
   // If the server responded with a success, send a password reset email

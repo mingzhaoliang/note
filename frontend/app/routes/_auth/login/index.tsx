@@ -116,26 +116,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const response = await fetch(envConfig.API_URL + "/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    let message;
-
-    if (response.status === 400) {
-      const data = await response.json();
-      console.log("data", data);
-      message = data.message || response.statusText;
-    } else {
-      message = response.statusText;
-    }
+    const data = await response.json();
+    const message = data.message || response.statusText;
     return json({ message }, { status: 400 });
   }
 
-  const { sessionToken, expiresAt } = await response.json();
+  const data = await response.json();
+  const { sessionToken, expiresAt } = data.data;
   const authCookie = await setAuthSession(sessionToken, new Date(expiresAt));
 
   return redirect("/", { headers: { "Set-Cookie": authCookie } });

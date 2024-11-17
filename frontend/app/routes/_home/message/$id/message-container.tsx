@@ -148,7 +148,7 @@ const MessageContainer = forwardRef<MessageContainerRef, MessageContainerProps>(
           ))}
           <InfiniteScrollTrigger
             onLoad={handleLoadMessages}
-            loaderRoute={`/message/${conversationId}?lastMessageId=${lastMessageId}`}
+            loaderRoute={`/message/${conversationId}?last=${lastMessageId}`}
             loaderComponent={<LoaderIcon className="animate-spin text-inactive" />}
           />
         </div>

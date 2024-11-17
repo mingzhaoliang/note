@@ -3,20 +3,17 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
+  const username = searchParams.get("username");
 
-  const type = searchParams.get("type");
-  const identifier = searchParams.get("identifier");
-
-  if (!type || !identifier) {
+  if (!username) {
     return json({ isValid: false });
   }
 
-  const response = await fetch(
-    `${envConfig.API_URL}/auth/check-identifier?identifier=${identifier}&type=${type}`
-  );
+  const response = await fetch(`${envConfig.API_URL}/auth/is-unique-username?username=${username}`);
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
-  const { isValid } = (await response.json()) as { isValid: boolean };
+  const data = await response.json();
+  const isValid: boolean = data.data;
 
   return json({ isValid });
 }
