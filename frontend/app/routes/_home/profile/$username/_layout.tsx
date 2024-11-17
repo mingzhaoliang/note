@@ -1,8 +1,11 @@
 import envConfig from "@/config/env.config.server";
 import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
+import { setComments, setPosts, setProfile } from "@/store/redux/features/profile-slice";
+import { useAppStore } from "@/store/redux/hooks";
 import { ActionState, Profile } from "@/types";
-import { ActionFunctionArgs, json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { Outlet, useLoaderData, useMatches } from "@remix-run/react";
+import { useRef } from "react";
 import ProfileInfo from "./profile-info";
 import ProfileNavbar from "./profile-navbar";
 
@@ -12,9 +15,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { username } = params;
   const response = await fetch(`${envConfig.API_URL}/profile/${username}`);
 
-  if (!response.ok) {
-    return redirect("/", { headers });
-  }
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
   const data = await response.json();
   const profile: Profile = data.data;
@@ -24,6 +25,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function ProfileLayout() {
   const { profile, user } = useLoaderData<typeof loader>();
+  const initialised = useRef({ profile: false, posts: false, comments: false });
+  const store = useAppStore();
+  if (!initialised.current.profile) {
+    store.dispatch(setProfile(profile));
+  }
+
+  const matches = useMatches();
+  matches.forEach((match: any) => {
+    if (match.id === "routes/_home/profile/$username/_index/index") {
+      if (!initialised.current.posts) {
+        initialised.current.posts = true;
+        store.dispatch(setPosts(match.data.posts));
+      }
+    }
+    if (match.id === "routes/_home/profile/$username/comments/index") {
+      if (!initialised.current.comments) {
+        initialised.current.comments = true;
+        store.dispatch(setComments(match.data.comments));
+      }
+    }
+  });
+
   const allowed =
     !profile.private ||
     user?.following.some(

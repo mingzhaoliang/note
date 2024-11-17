@@ -1,60 +1,36 @@
-import { Comment, Like } from "@/components/icons";
 import PostDropdown from "@/components/post/post-card/post-dropdown";
-import PostStats from "@/components/post/post-card/post-stats";
 import CldAvatar from "@/components/shared/cld-avatar";
 import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
 import UsernameButton from "@/components/shared/username-button";
-import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { useSession } from "@/store/context/session.context";
+import { updateComment } from "@/store/redux/features/profile-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { ProfileComment } from "@/types";
-import { Link, useFetcher } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { useCallback } from "react";
-import { Updater } from "use-immer";
 
-type CommentItemProps = Omit<ProfileComment, "commentOn"> & {
-  setProfileComments: Updater<ProfileComment[]>;
-};
+type CommentItemProps = Pick<
+  ProfileComment,
+  "id" | "profile" | "text" | "createdAt" | "likes" | "_count"
+>;
 
-const CommentItem = ({
-  profile,
-  id,
-  text,
-  createdAt,
-  likes,
-  commentCount,
-  setProfileComments,
-}: CommentItemProps) => {
+const CommentItem = ({ id: postId, profile, text, createdAt, likes, _count }: CommentItemProps) => {
   const { user } = useSession();
   const isOwner = user?.id === profile.id;
   const hasLiked = user ? likes.includes(user.id) : false;
-  const fetcher = useFetcher({ key: "post" });
+  const dispatch = useAppDispatch();
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedComment, actionState) => {
-    if (!updatedComment) return;
-    setProfileComments((draft) => {
-      const targetComment = draft.find((comment) => comment.id === actionState.postId);
-      if (targetComment) {
-        targetComment.likes = updatedComment.likes;
-        targetComment.commentCount = updatedComment.commentCount;
-      }
-    });
-  }, []);
-
-  const handleDelete: OnRevalidate = useCallback((_, actionState) => {
-    setProfileComments((draft) => {
-      const index = draft.findIndex((comment) => comment.id === actionState.postId);
-      if (index !== -1) {
-        draft.splice(index, 1);
-      }
-    });
-  }, []);
-
-  useRevalidatePost(fetcher, handleDelete);
+  const onReaction = useCallback(
+    (data: any) => {
+      dispatch(updateComment(data.data.post));
+    },
+    [dispatch]
+  );
 
   return (
-    <Link to={`/profile/${profile.username}/post/${id}`}>
+    <Link to={`/profile/${profile.username}/post/${postId}`}>
       <div className="flex gap-x-3">
         <CldAvatar avatar={profile.avatar} name={profile.name} />
         <div className="w-full flex flex-col space-y-2">
@@ -63,37 +39,25 @@ const CommentItem = ({
               <UsernameButton username={profile.username} />
               <p className="text-muted-foreground">{postDateFormat(createdAt)}</p>
             </div>
-            <PostDropdown isOwner={isOwner} postId={id} />
+            <PostDropdown isOwner={isOwner} postId={postId} />
           </div>
           <div className="flex items-center flex-wrap gap-2">
             <p className="text-foreground">{text}</p>
           </div>
           <div className="mt-2 -ml-3 flex items-center">
-            {user && (
-              <>
-                <LikeButton
-                  id={id}
-                  hasLiked={hasLiked}
-                  count={likes.length}
-                  onRevalidate={handleRevalidate}
-                />
-                <CommentButton
-                  commentOnId={id}
-                  count={commentCount}
-                  onRevalidate={handleRevalidate}
-                />
-              </>
-            )}
-            {!user && (
-              <>
-                <PostStats count={likes.length}>
-                  <Like />
-                </PostStats>
-                <PostStats count={commentCount}>
-                  <Comment />
-                </PostStats>
-              </>
-            )}
+            <LikeButton
+              postId={postId}
+              postOwnerUsername={profile.username}
+              hasLiked={hasLiked}
+              count={_count.likes}
+              onAction={onReaction}
+            />
+            <CommentButton
+              parentId={postId}
+              postOwnerUsername={profile.username}
+              count={_count.comments}
+              onAction={onReaction}
+            />
           </div>
         </div>
       </div>

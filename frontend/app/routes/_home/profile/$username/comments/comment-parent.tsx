@@ -1,24 +1,20 @@
-import { Comment, Like } from "@/components/icons";
 import PostImages from "@/components/post/post-card/post-images";
-import PostStats from "@/components/post/post-card/post-stats";
 import CldAvatar from "@/components/shared/cld-avatar";
 import CommentButton from "@/components/shared/comment-button";
 import LikeButton from "@/components/shared/like-button";
 import TagButton from "@/components/shared/tag-button";
 import UsernameButton from "@/components/shared/username-button";
-import { OnRevalidate } from "@/hooks/use-revalidate-post";
 import { postDateFormat } from "@/lib/utils/formatter";
 import { useSession } from "@/store/context/session.context";
+import { updateCommentParent } from "@/store/redux/features/profile-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { ProfileComment } from "@/types";
 import { Link } from "@remix-run/react";
 import { useCallback } from "react";
-import { Updater } from "use-immer";
 
-type CommentOnItemProps = ProfileComment["commentOn"] & {
-  setProfileComments: Updater<ProfileComment[]>;
-};
+type CommentParentProps = ProfileComment["parent"];
 
-const CommentOnItem = ({
+const CommentParent = ({
   id,
   text,
   profile,
@@ -26,23 +22,19 @@ const CommentOnItem = ({
   createdAt,
   tags,
   likes,
-  commentCount,
-  commentOnUsername,
-  setProfileComments,
-}: CommentOnItemProps) => {
+  _count,
+  parent,
+}: CommentParentProps) => {
   const { user } = useSession();
   const hasLiked = user ? likes.includes(user.id) : false;
+  const dispatch = useAppDispatch();
 
-  const handleRevalidate: OnRevalidate = useCallback((updatedComment, actionState) => {
-    if (!updatedComment) return;
-    setProfileComments((draft) => {
-      const targetComment = draft.find((comment) => comment.commentOn.id === actionState.postId);
-      if (targetComment) {
-        targetComment.commentOn.likes = updatedComment.likes;
-        targetComment.commentOn.commentCount = updatedComment.commentCount;
-      }
-    });
-  }, []);
+  const onReaction = useCallback(
+    (data: any) => {
+      dispatch(updateCommentParent(data.data.post));
+    },
+    [dispatch]
+  );
 
   return (
     <Link to={`/profile/${profile.username}/post/${id}`}>
@@ -57,9 +49,9 @@ const CommentOnItem = ({
               <UsernameButton username={profile.username} />
               <p className="text-muted-foreground">{postDateFormat(createdAt)}</p>
             </div>
-            {commentOnUsername && (
+            {parent && (
               <p className="text-sm text-muted-foreground">
-                Replying to <UsernameButton username={commentOnUsername} />
+                Replying to <UsernameButton username={parent.profile.username} />
               </p>
             )}
           </div>
@@ -71,31 +63,19 @@ const CommentOnItem = ({
             ))}
           </div>
           <div className="mt-2 -ml-3 flex items-center">
-            {user && (
-              <>
-                <LikeButton
-                  id={id}
-                  hasLiked={hasLiked}
-                  count={likes.length}
-                  onRevalidate={handleRevalidate}
-                />
-                <CommentButton
-                  commentOnId={id}
-                  count={commentCount}
-                  onRevalidate={handleRevalidate}
-                />
-              </>
-            )}
-            {!user && (
-              <>
-                <PostStats count={likes.length}>
-                  <Like />
-                </PostStats>
-                <PostStats count={commentCount}>
-                  <Comment />
-                </PostStats>
-              </>
-            )}
+            <LikeButton
+              postId={id}
+              postOwnerUsername={profile.username}
+              hasLiked={hasLiked}
+              count={_count.likes}
+              onAction={onReaction}
+            />
+            <CommentButton
+              parentId={id}
+              postOwnerUsername={profile.username}
+              count={_count.comments}
+              onAction={onReaction}
+            />
           </div>
         </div>
       </div>
@@ -103,4 +83,4 @@ const CommentOnItem = ({
   );
 };
 
-export default CommentOnItem;
+export default CommentParent;
