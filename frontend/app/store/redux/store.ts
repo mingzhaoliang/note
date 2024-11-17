@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import postReducer from "./features/post-slice";
+import feedReducer from "./features/feed-slice";
 import relationshipReducer from "./features/relationship-slice";
 
 const store = configureStore({
   reducer: {
-    post: postReducer,
+    feed: feedReducer,
     relationship: relationshipReducer,
   },
 });
