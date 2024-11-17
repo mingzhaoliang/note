@@ -3,9 +3,10 @@ import LexicalComposer from "@/components/shared/lexical-composer";
 import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { MAX_COMMENT_LENGTH, WARNING_THRESHOLD } from "@/config/post.config";
-import { OnRevalidate, useRevalidatePost } from "@/hooks/use-revalidate-post";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
+import { action } from "@/routes/_home/profile/$username_.post/$postId";
+import { useSession } from "@/store/context/session.context";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -14,16 +15,31 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LoginModal from "../auth/login-modal";
 
-type PostCommentProps = {
-  commentOnId: string;
+type CommentButtonProps = {
+  postOwnerUsername: string;
+  parentId: string;
   count: number;
-  onRevalidate: OnRevalidate;
+  onAction?: (data: any) => void;
 };
 
-const CommentButton = ({ commentOnId, count, onRevalidate }: PostCommentProps) => {
-  const fetcher = useFetcher();
+const CommentButton = ({ postOwnerUsername, parentId, count, onAction }: CommentButtonProps) => {
+  const { user } = useSession();
+  if (!user) {
+    return (
+      <div className="flex items-center space-x-2">
+        <LoginModal>
+          <Comment className="text-inactive w-5 h-5">{count}</Comment>
+        </LoginModal>
+        <div className="min-w-3">
+          {count > 0 && <p className="text-inactive text-sm">{count}</p>}
+        </div>
+      </div>
+    );
+  }
+  const fetcher = useFetcher<typeof action>();
   const isSubmitting = fetcher.state !== "idle";
   const optimisticCount = isSubmitting ? count + 1 : count;
 
@@ -33,8 +49,6 @@ const CommentButton = ({ commentOnId, count, onRevalidate }: PostCommentProps) =
   const isValid = commentText.length > 0 && commentText.length <= MAX_COMMENT_LENGTH;
   const remaining = MAX_COMMENT_LENGTH - commentText.length;
   const shouldShowWarning = remaining <= WARNING_THRESHOLD;
-
-  useRevalidatePost(fetcher, onRevalidate);
 
   const handleEditorChange = (editorState: EditorState, editor: LexicalEditor) => {
     const textContent = editor.getRootElement()?.textContent;
@@ -55,13 +69,25 @@ const CommentButton = ({ commentOnId, count, onRevalidate }: PostCommentProps) =
 
     // Submit the comment to the server
     fetcher.submit(
-      { commentOnId, text: commentText },
-      { method: "POST", action: `/api/post/${commentOnId}/comment` }
+      { _action: "comment", parentId, text: commentText },
+      { method: "POST", action: `/profile/${postOwnerUsername}/post/${parentId}` }
     );
 
     setCommentText("");
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (fetcher.state !== "idle" || !fetcher.data || fetcher.data._action !== "comment") {
+      return;
+    }
+
+    if (fetcher.data.message) {
+      toast({ variant: "primary", title: fetcher.data.message });
+    } else {
+      onAction?.(fetcher.data);
+    }
+  }, [fetcher.state, fetcher.data, toast]);
 
   return (
     <ResponsiveDialog query="(min-width: 768px)" modal open={open} onOpenChange={setOpen}>

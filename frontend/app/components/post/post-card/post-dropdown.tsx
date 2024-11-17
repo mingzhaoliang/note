@@ -1,13 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,12 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EllipsisIcon } from "lucide-react";
-import DeletePostForm from "./delete-post-form";
+import DeletePostAlertContent from "./delete-post-alert-content";
 
 type PostDropdownProps = {
   isOwner: boolean;
   postId: string;
-  onDelete?: () => void;
+  onDelete?: (id: string) => void;
 };
 
 export default function PostDropdown({ isOwner, postId, onDelete }: PostDropdownProps) {
@@ -56,19 +47,7 @@ export default function PostDropdown({ isOwner, postId, onDelete }: PostDropdown
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialogContent
-        overlayConfig={{ onClick: (e) => e.stopPropagation() }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure to delete this post?</AlertDialogTitle>
-          <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <DeletePostForm postId={postId} onDelete={onDelete} />
-        </AlertDialogFooter>
-      </AlertDialogContent>
+      <DeletePostAlertContent postId={postId} onDelete={onDelete} />
     </AlertDialog>
   );
 }

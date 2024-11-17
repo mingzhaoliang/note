@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { MAX_NOTE_LENGTH, MAXIMUM_IMAGES, WARNING_THRESHOLD } from "@/config/post.config";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
+import { action } from "@/routes/_home/profile/$username_.post/_index";
 import { postFormSchema, PostFormSchema } from "@/schemas/post/post-form.schema";
 import { useSession } from "@/store/context/session.context";
-import { createPost } from "@/store/redux/features/post-slice";
 import { useAppDispatch } from "@/store/redux/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -29,7 +29,7 @@ type PostFormProps = {
 };
 
 export default function PostForm({ className, setOpen }: PostFormProps) {
-  const fetcher = useFetcher({ key: "post" });
+  const fetcher = useFetcher<typeof action>({ key: "create-post" });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tagInputRef = useRef<PostTagsSectionRef>(null);
   const { toast } = useToast();
@@ -48,7 +48,6 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
 
   const remaining = MAX_NOTE_LENGTH - form.watch("text").length;
   const shouldShowWarning = remaining <= WARNING_THRESHOLD;
-
   const imageCount = form.watch("images").length;
 
   const handleEditorChange = (editorState: EditorState, editor: LexicalEditor) => {
@@ -73,33 +72,16 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
 
     const formData = new FormData(event?.target);
 
-    const tempPostId = "tmp-" + Math.random().toString(36).slice(2);
-    formData.set("text", data.text);
     formData.set("_action", "create");
-    formData.set("postId", tempPostId);
-
-    dispatch(
-      createPost({
-        ...data,
-        id: tempPostId,
-        createdAt: new Date().toISOString(),
-        profile: user,
-        commentCount: 0,
-        likes: [],
-        images: data.images.map((image) => URL.createObjectURL(image)),
-      })
-    );
+    formData.set("text", data.text);
 
     fetcher.submit(formData, {
       method: "POST",
-      action: "/api/post?index",
+      action: `/profile/${user.username}/post?index`,
       encType: "multipart/form-data",
     });
-
-    setOpen(false);
-
-    navigate("/");
   };
+
   const onError: SubmitErrorHandler<PostFormSchema> = (error) =>
     toast({ variant: "primary", title: Object.values(error)[0].message });
 
@@ -149,12 +131,12 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
             {shouldShowWarning && remaining}
           </p>
           <Button
-            disabled={!form.formState.isValid}
+            disabled={!form.formState.isValid || fetcher.state !== "idle"}
             variant="outline"
             type="submit"
             className="rounded-xl bg-primary-foreground"
           >
-            Post
+            {fetcher.state !== "idle" ? "Posting..." : "Post"}
           </Button>
         </div>
       </fetcher.Form>
