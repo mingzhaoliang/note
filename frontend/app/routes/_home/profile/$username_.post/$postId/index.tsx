@@ -1,17 +1,26 @@
 import CommentGroups from "@/components/post/comment/comment-groups";
 import PostDropdown from "@/components/post/post-card/post-dropdown";
-import PostFooter from "@/components/post/post-card/post-footer";
 import PostImages from "@/components/post/post-card/post-images";
 import CldAvatar from "@/components/shared/cld-avatar";
+import CommentButton from "@/components/shared/comment-button";
+import LikeButton from "@/components/shared/like-button";
 import TagButton from "@/components/shared/tag-button";
 import UsernameButton from "@/components/shared/username-button";
 import { Separator } from "@/components/ui/separator";
 import envConfig from "@/config/env.config.server";
 import { postDateFormat } from "@/lib/utils/formatter";
-import { requireUser } from "@/session/guard.server";
-import { Comment, Post, Profile } from "@/types";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { Await, defer, redirect, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { redirectIfUnauthenticated, requireUser } from "@/session/guard.server";
+import { ActionState, Comment, Post, Profile } from "@/types";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  Await,
+  defer,
+  json,
+  redirect,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "@remix-run/react";
 import { Suspense } from "react";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -44,12 +53,13 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   return defer({ user, post, comments }, { headers });
 }
 
-export default function PostDetail() {
+export default function Index() {
   const { user, post, comments } = useLoaderData<typeof loader>();
   const isOwner = post.profile.id === user?.id;
-  const { id: postId, profile, images, text, tags, likes, commentCount, createdAt } = post;
+  const { id: postId, profile, images, text, tags, likes, _count, createdAt } = post;
   const navigate = useNavigate();
   const location = useLocation();
+  const hasLiked = user ? likes.includes(user.id) : false;
 
   const handleDelete = () => {
     if (location.state?.referrer) {
@@ -76,7 +86,17 @@ export default function PostDetail() {
           <TagButton key={tag + index} tag={tag} />
         ))}
       </div>
-      <PostFooter postId={postId} userId={user?.id} likes={likes} commentCount={commentCount} />
+      <LikeButton
+        postId={postId}
+        postOwnerUsername={post.profile.username}
+        hasLiked={hasLiked}
+        count={_count.likes}
+      />
+      <CommentButton
+        postOwnerUsername={post.profile.username}
+        parentId={postId}
+        count={_count.comments}
+      />
       <Separator className="!my-8" />
 
       <Suspense fallback={<p>Loading comments...</p>}>
@@ -93,3 +113,72 @@ export default function PostDetail() {
     </div>
   );
 }
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const { user, headers } = await redirectIfUnauthenticated(request);
+  const { postId } = params;
+
+  const formData = await request.formData();
+  const _action = formData.get("_action") as ActionType;
+
+  const actionState: ActionState<ActionType> = { _action, message: null, data: null };
+
+  switch (_action) {
+    case "like-unlike": {
+      const res = await fetch(`${envConfig.API_URL}/post/${postId}/like-unlike`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: user.id }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        actionState.message = data.message ?? res.statusText;
+        return json(actionState, { headers });
+      }
+
+      actionState.data = data.data;
+
+      return json(actionState, { headers });
+    }
+
+    case "comment": {
+      formData.set("profileId", user.id);
+
+      const res = await fetch(`${envConfig.API_URL}/post/comment`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        actionState.message = data.message ?? res.statusText;
+        return json(actionState, { headers });
+      }
+
+      actionState.data = data.data;
+
+      return json(actionState, { headers });
+    }
+
+    case "delete": {
+      const res = await fetch(`${envConfig.API_URL}/post/${postId}/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: user.id }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        actionState.message = data.message ?? res.statusText;
+        return json(actionState, { headers });
+      }
+
+      actionState.data = data.data;
+
+      return json(actionState, { headers });
+    }
+  }
+}
+
+type ActionType = "like-unlike" | "comment" | "delete";
