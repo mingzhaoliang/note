@@ -1,4 +1,5 @@
 import { markAsSeen } from "@/features/conversation/services/conversation.service.js";
+import { markNotificationsAsSeen } from "@/features/notification/services/notification.service.js";
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
@@ -22,30 +23,23 @@ io.on("connection", (socket) => {
 
   if (userId) userSocketMap.set(userId, socket.id);
 
-  socket.on(
-    "markMessageAsSeen",
-    async ({
-      conversationId,
-      senderId,
-      recipientId,
-    }: {
-      conversationId: string;
-      senderId: string;
-      recipientId: string;
-    }) => {
-      try {
-        await markAsSeen({ conversationId });
+  socket.on("markMessageAsSeen", async ({ conversationId, senderId, recipientId }) => {
+    try {
+      await markAsSeen({ conversationId });
 
-        const socketIds = [getRecipientSocketId(senderId), getRecipientSocketId(recipientId)];
+      const socketIds = [getRecipientSocketId(senderId), getRecipientSocketId(recipientId)];
 
-        socketIds.forEach((socketId) => {
-          socketId && io.to(socketId).emit("messageSeen", { conversationId, seenAt: new Date() });
-        });
-      } catch (error) {
-        console.error(error);
-      }
+      socketIds.forEach((socketId) => {
+        socketId && io.to(socketId).emit("messageSeen", { conversationId, seenAt: new Date() });
+      });
+    } catch (error) {
+      console.error(error);
     }
-  );
+  });
+
+  socket.on("notification:mark-as-seen", ({ userId }) => {
+    markNotificationsAsSeen({ recipientId: userId });
+  });
 });
 
 export { app, getRecipientSocketId, httpServer, io };

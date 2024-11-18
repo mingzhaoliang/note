@@ -8,6 +8,13 @@ async function create(
   return await prisma.notification.create({ data });
 }
 
+async function findById(id: string) {
+  return await prisma.notification.findUnique({
+    where: { id, sender: { user: { deactivated: false } } },
+    include: { type: true, sender: true },
+  });
+}
+
 async function findMany(
   conditions: Partial<Notification>,
   options: {
@@ -41,6 +48,13 @@ async function findMany(
   return { rows, count };
 }
 
+async function updateMany(conditions: Partial<Notification>, data: Partial<Notification>) {
+  const dbConditions = transformUndefined(conditions);
+  const dbData = transformUndefined(data);
+
+  return await prisma.notification.updateMany({ where: dbConditions, data: dbData });
+}
+
 async function deleteMany(
   conditions: Pick<Notification, "notificationTypeId" | "senderId" | "recipientId" | "relatedId">
 ) {
@@ -49,7 +63,9 @@ async function deleteMany(
 
 const notificationRepository = {
   create,
+  findById,
   findMany,
+  updateMany,
   deleteMany,
 };
 

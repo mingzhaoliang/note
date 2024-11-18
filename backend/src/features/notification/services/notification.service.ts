@@ -6,6 +6,22 @@ function generateNotificationMessage(template: string, data: Record<string, stri
   return message;
 }
 
+export function createNotificationDto(row: any) {
+  const dto: Record<string, any> = {};
+  Object.entries(row).forEach(([key, value]) => {
+    if (key !== "type") {
+      dto[key] = value;
+    }
+  });
+
+  const message = generateNotificationMessage(row.type.template, {
+    username: row.sender?.username,
+  });
+  dto.message = message;
+
+  return dto;
+}
+
 export async function sendNotification(
   notificationTypeId: number,
   senderId: string,
@@ -42,21 +58,17 @@ export async function getNotificationsByRecipientId(body: { recipientId: string;
     { limit: 10, cursorId: last, orderBy: [{ seen: "asc" }, { createdAt: "desc" }] }
   );
 
-  const rowsDto = rows.map((row) => {
-    const dto: Record<string, any> = {};
-    Object.entries(row).forEach(([key, value]) => {
-      if (key !== "type") {
-        dto[key] = value;
-      }
-    });
-
-    const message = generateNotificationMessage(row.type.template, {
-      username: row.sender?.username,
-    });
-    dto.message = message;
-
-    return dto;
-  });
+  const rowsDto = rows.map(createNotificationDto);
 
   return { success: true, data: rowsDto, count };
+}
+
+export async function markNotificationsAsSeen(body: { recipientId: string }) {
+  const { recipientId } = body;
+  const data = await notificationRepository.updateMany(
+    { recipientId, seen: false },
+    { seen: true }
+  );
+
+  return { success: true, data };
 }
