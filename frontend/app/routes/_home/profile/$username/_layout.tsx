@@ -49,7 +49,7 @@ export default function ProfileLayout() {
 
   const allowed =
     !profile.private ||
-    user?.following.some(
+    user?.profile.following.some(
       (following) => following.id === profile.id && following.status === "CONFIRMED"
     ) ||
     user?.id === profile.id;
@@ -101,14 +101,15 @@ export async function action({ params, request }: ActionFunctionArgs) {
       return json(actionState, { headers });
     }
 
-    case "follow": {
+    case "follow":
+    case "unfollow": {
       const toId = formData.get("toId") as string;
       if (toId === user.id) {
         actionState.message = "Cannot follow yourself";
         return json(actionState, { status: 401, headers });
       }
-      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/follow`, {
-        method: "PUT",
+      const response = await fetch(`${envConfig.API_URL}/profile/${user.id}/${_action}`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileId: toId }),
       });
@@ -160,4 +161,10 @@ export async function action({ params, request }: ActionFunctionArgs) {
   return json(actionState, { headers });
 }
 
-type ActionType = "update-profile" | "follow" | "confirm-request" | "decline-request" | null;
+type ActionType =
+  | "update-profile"
+  | "follow"
+  | "unfollow"
+  | "confirm-request"
+  | "decline-request"
+  | null;

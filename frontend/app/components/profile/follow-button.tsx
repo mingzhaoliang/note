@@ -59,7 +59,7 @@ const FollowButton = ({ profile }: FollowButtonProps) => {
     } as const;
   }, [profile.private]);
 
-  const currentStatus = user.following.find(({ id }) => id === profile.id)?.status;
+  const currentStatus = user.profile.following.find(({ id }) => id === profile.id)?.status;
   const relationship = statusToRelationship(currentStatus);
 
   const optimisticRelationship = isSubmitting
@@ -68,7 +68,7 @@ const FollowButton = ({ profile }: FollowButtonProps) => {
 
   const handleClick = () => {
     fetcher.submit(
-      { _action: "follow", toId: profile.id },
+      { _action: relationship === "NOT_FOLLOWING" ? "follow" : "unfollow", toId: profile.id },
       { method: "PUT", action: `/profile/${user.username}` }
     );
   };
