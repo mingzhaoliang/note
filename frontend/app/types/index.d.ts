@@ -30,10 +30,22 @@ type Relationship = BaseRelationship & {
   profile: BaseProfile;
 };
 
-type User = BaseProfile & {
+type User = {
+  id: string;
+  username: string;
   email: string;
-  follower: BaseRelationship[];
-  following: BaseRelationship[];
+  emailVerified: boolean;
+  deactivated: boolean;
+  deactivatedAt: string | null;
+  toBeDeletedAt: string | null;
+  profile: {
+    name: string;
+    avatar: string;
+    bio: string;
+    private: boolean;
+    follower: BaseRelationship[];
+    following: BaseRelationship[];
+  };
 };
 
 type BaseProfile = {
@@ -43,15 +55,13 @@ type BaseProfile = {
   avatar: string | null;
   bio: string | null;
   private: boolean;
-  deactivated: boolean;
-  deactivatedAt: string | null;
-  toBeDeletedAt: string | null;
 };
 
 type Profile = BaseProfile & {
-  followerCount: number;
-  followingCount: number;
-  postCount: number;
+  _count: {
+    follower: number;
+    following: number;
+  };
 };
 
 type PostOverview = {

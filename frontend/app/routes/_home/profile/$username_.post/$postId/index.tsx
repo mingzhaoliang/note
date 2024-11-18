@@ -45,7 +45,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   if (
     postOwner.private &&
-    !user?.following.some(({ id, status }) => id === postOwner.id && status === "CONFIRMED")
+    !user?.profile.following.some(({ id, status }) => id === postOwner.id && status === "CONFIRMED")
   ) {
     return redirect("/", { headers });
   }
