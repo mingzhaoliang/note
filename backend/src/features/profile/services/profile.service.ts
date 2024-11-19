@@ -1,10 +1,10 @@
 import notificationRepository from "@/features/notification/repositories/notification.repository.js";
+import { createNotificationDto } from "@/features/notification/services/notification.service.js";
 import { deleteImage, uploadImage } from "@/features/shared/services/cloudinary.service.js";
 import { getRecipientSocketId, io } from "@/socket/socket.js";
 import fs from "fs";
 import profileRepository from "../repositories/profile.repository.js";
 import profileRelationshipRepository from "../repositories/profileRelationship.repository.js";
-import { createNotificationDto } from "@/features/notification/services/notification.service.js";
 
 export async function getProfileByUsername(username: string) {
   const data = await profileRepository.findOne({ username });
@@ -140,7 +140,7 @@ export async function followProfile({ fromId, toId }: { fromId: string; toId: st
   if (isPrivate) {
     notificationRepository
       .create({
-        notificationTypeId: 3,
+        notificationTypeId: 5,
         senderId: fromId,
         recipientId: toId,
         relatedId: null,
@@ -165,9 +165,10 @@ export async function unfollowProfile({ fromId, toId }: { fromId: string; toId: 
   const data = await profileRelationshipRepository.deleteById(fromId, toId);
   notificationRepository
     .deleteMany({
-      notificationTypeId: 3,
+      notificationTypeId: 5,
       senderId: fromId,
       recipientId: toId,
+      relatedId: null,
     })
     .catch((error) => {
       console.error(error);

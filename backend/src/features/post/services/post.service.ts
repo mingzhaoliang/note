@@ -1,5 +1,8 @@
+import notificationRepository from "@/features/notification/repositories/notification.repository.js";
+import { createNotificationDto } from "@/features/notification/services/notification.service.js";
 import profileRepository from "@/features/profile/repositories/profile.repository.js";
 import { uploadImage } from "@/features/shared/services/cloudinary.service.js";
+import { getRecipientSocketId, io } from "@/socket/socket.js";
 import fs from "fs";
 import postRepository from "../repositories/post.repository.js";
 
@@ -42,8 +45,38 @@ export async function likeUnlikePost({ postId, profileId }: { postId: string; pr
   let data;
   if (hasLiked) {
     data = await postRepository.unlike(postId, profileId);
+    if (post.profileId !== profileId) {
+      const notificationTypeId = post.parentId === null ? 1 : 2;
+      notificationRepository.deleteMany({
+        notificationTypeId,
+        senderId: profileId,
+        recipientId: post.profileId,
+        relatedId: postId,
+      });
+    }
   } else {
     data = await postRepository.like(postId, profileId);
+    if (post.profileId !== profileId) {
+      const notificationTypeId = post.parentId === null ? 1 : 2;
+      notificationRepository
+        .create({
+          notificationTypeId,
+          senderId: profileId,
+          recipientId: post.profileId,
+          relatedId: postId,
+        })
+        .then(({ id }) => notificationRepository.findById(id))
+        .then((notification) => {
+          const dto = createNotificationDto(notification);
+          const socketId = getRecipientSocketId(post.profileId);
+          if (socketId) {
+            io.to(socketId).emit("notification:like", { data: dto });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }
 
   return { success: true, data, message: "ok", statusCode: 200 };
@@ -92,6 +125,28 @@ export async function createComment(body: { profileId: string; text: string; par
 
   const row = await postRepository.findById(id);
   const data = createPostDto(row);
+
+  if (row!.profileId !== profileId) {
+    const notificationTypeId = row!.parentId === null ? 3 : 4;
+    notificationRepository
+      .create({
+        notificationTypeId,
+        senderId: profileId,
+        recipientId: row!.profileId,
+        relatedId: row!.id,
+      })
+      .then(({ id }) => notificationRepository.findById(id))
+      .then((notification) => {
+        const dto = createNotificationDto(notification);
+        const socketId = getRecipientSocketId(row!.profileId);
+        if (socketId) {
+          io.to(socketId).emit("notification:like", { data: dto });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   return { success: true, data };
 }
@@ -163,7 +218,7 @@ export async function getCommentsByProfile({
 }) {
   const profile = await profileRepository.findOne({ username });
   if (!profile) {
-    return { success: false, message: "Profile not found.", statusCode: 404 };
+    return { success: false, message: "Profile not found", statusCode: 404 };
   }
 
   const profileId = profile.id;

@@ -16,11 +16,16 @@ const NotificationItem = forwardRef<HTMLDivElement, Omit<Notification, "id">>(
             <CldAvatar avatar={sender.avatar} name={sender.name} width={120} height={120} />
           </Link>
         )}
-        {notificationTypeId === 3 &&
+        {[1, 2, 3, 4].includes(notificationTypeId) && (
+          <Link to={`/profile/${user!.username}/post/${relatedId}`} className="flex-1">
+            {message}
+          </Link>
+        )}
+        {notificationTypeId === 5 &&
           sender &&
           (user?.profile.follower.some((f) => f.id === sender.id && f.status === "CONFIRMED") ? (
             <>
-              <div className="flex-1">{sender.username} started following you</div>
+              <div className="flex-1">{sender.username} started following you.</div>
               <FollowButton profile={{ id: sender.id, private: sender.private }} />
             </>
           ) : (

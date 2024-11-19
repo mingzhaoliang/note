@@ -24,8 +24,10 @@ const NotificationButton = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("notification:follow-request", ({ data }) => {
-      dispatch(addNotification(data));
+    ["follow-request", "like"].forEach((event) => {
+      socket.on(`notification:${event}`, ({ data }) => {
+        dispatch(addNotification(data));
+      });
     });
   }, [socket]);
 

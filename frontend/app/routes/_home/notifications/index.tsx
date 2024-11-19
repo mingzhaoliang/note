@@ -85,7 +85,7 @@ export default function Index() {
       <h1 className="text-center text-xl font-semibold max-md:px-6 md:mb-6">Notifications</h1>
       <Card className="flex-1 w-full rounded-xl max-md:border-0 md:bg-primary-foreground">
         <CardHeader />
-        <CardContent ref={containerRef} className="flex flex-col gap-y-2">
+        <CardContent ref={containerRef} className="flex flex-col gap-y-4">
           {notifications.length === 0 && (
             <p className="text-center text-muted-foreground">No notifications yet</p>
           )}
