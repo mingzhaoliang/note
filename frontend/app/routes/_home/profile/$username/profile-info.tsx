@@ -1,16 +1,16 @@
 import LoginModal from "@/components/auth/login-modal";
 import FollowButton from "@/components/profile/follow-button";
 import MessageButton from "@/components/profile/message-button";
+import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
 import { Profile } from "@/types";
 import RelationshipDialog from "./relationship-dialog";
-import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 
 export default function ProfileInfo({ profile }: { profile: Profile }) {
   const { user } = useSession();
   const isOwner = user?.id === profile.id;
-  const followerCount = profile.followerCount;
+  const followerCount = profile._count.follower;
 
   return (
     <div className="flex justify-between gap-6">
@@ -31,7 +31,7 @@ export default function ProfileInfo({ profile }: { profile: Profile }) {
             </p>
           </LoginModal>
         )}
-        {user && <RelationshipDialog followerCount={followerCount} />}
+        {user && <RelationshipDialog followerCount={followerCount} isOwner={isOwner} />}
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
         {!isOwner && user && (
           <div className="flex gap-x-2">

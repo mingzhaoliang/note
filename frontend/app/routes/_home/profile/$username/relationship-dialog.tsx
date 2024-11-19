@@ -1,5 +1,6 @@
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils/cn";
 import { resetRelationships } from "@/store/redux/features/relationship-slice";
 import { useAppDispatch } from "@/store/redux/hooks";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -9,7 +10,13 @@ import FollowerList from "./follower-list";
 import FollowerRequestList from "./follower-request-list";
 import FollowingList from "./following-list";
 
-const RelationshipDialog = ({ followerCount }: { followerCount: number }) => {
+const RelationshipDialog = ({
+  followerCount,
+  isOwner,
+}: {
+  followerCount: number;
+  isOwner: boolean;
+}) => {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
@@ -35,16 +42,20 @@ const RelationshipDialog = ({ followerCount }: { followerCount: number }) => {
                 <Title>Followers and Following</Title>
                 <Description />
               </VisuallyHidden>
-              <TabsList className="!mt-0 grid w-full grid-cols-3">
+              <TabsList
+                className={cn("!mt-0 grid w-full", isOwner ? "grid-cols-3" : "grid-cols-2")}
+              >
                 <TabsTrigger value="followers" className="md:text-base">
                   Followers
                 </TabsTrigger>
                 <TabsTrigger value="following" className="md:text-base">
                   Following
                 </TabsTrigger>
-                <TabsTrigger value="requests" className="md:text-base">
-                  Requests
-                </TabsTrigger>
+                {isOwner && (
+                  <TabsTrigger value="requests" className="md:text-base">
+                    Requests
+                  </TabsTrigger>
+                )}
               </TabsList>
             </Header>
             <TabsContent value="followers">
@@ -53,9 +64,11 @@ const RelationshipDialog = ({ followerCount }: { followerCount: number }) => {
             <TabsContent value="following">
               <FollowingList />
             </TabsContent>
-            <TabsContent value="requests">
-              <FollowerRequestList />
-            </TabsContent>
+            {isOwner && (
+              <TabsContent value="requests">
+                <FollowerRequestList />
+              </TabsContent>
+            )}
           </Content>
         </Tabs>
       )}
