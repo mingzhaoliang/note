@@ -12,7 +12,7 @@ const initialConfig = {
 };
 
 type LexicalComposerProps = {
-  editorConfig?: any;
+  editorConfig?: Partial<React.ComponentPropsWithoutRef<typeof Provider>["initialConfig"]>;
 };
 
 const LexicalComposer = ({
