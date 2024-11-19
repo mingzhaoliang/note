@@ -16,10 +16,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     `${envConfig.API_URL}/profile/${username}/${relationship}?` + searchParams.toString()
   );
 
-  if (!response.ok) {
-    console.error(await response.text());
-    throw new Error("Oops! Something went wrong!");
-  }
+  if (!response.ok) throw new Error("Oops! Something went wrong!");
 
   const data = await response.json();
   const relationships: Relationship[] = data.data;

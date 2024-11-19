@@ -2,22 +2,25 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 import { action } from "@/routes/_home/profile/$username/_layout";
 import { useSession } from "@/store/context/session.context";
-import { removeFollowerRequest, setFollowers } from "@/store/redux/features/relationship-slice";
-import { useAppDispatch } from "@/store/redux/hooks";
 import { useFetcher } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 import { Button } from "../ui/button";
 
 type RequestHandlerProps = {
   requestingProfileId: string;
+  onConfirmSuccess?: (data: any) => void;
+  onDeclineSuccess?: () => void;
 };
 
-const FollowRequestHandler = ({ requestingProfileId }: RequestHandlerProps) => {
+const FollowRequestHandler = ({
+  requestingProfileId,
+  onConfirmSuccess,
+  onDeclineSuccess,
+}: RequestHandlerProps) => {
   const { user } = useSession();
   const username = user?.username;
   const { toast } = useToast();
   const fetcher = useFetcher<typeof action>();
-  const dispatch = useAppDispatch();
 
   const handleDecline = useCallback(() => {
     fetcher.submit(
@@ -42,19 +45,12 @@ const FollowRequestHandler = ({ requestingProfileId }: RequestHandlerProps) => {
       toast({ variant: "primary", title: message });
     } else {
       if (_action === "confirm-request") {
-        dispatch(
-          setFollowers([
-            {
-              id: data.from.id,
-              status: data.status,
-              profile: data.from,
-            },
-          ])
-        );
+        onConfirmSuccess?.(data);
+      } else {
+        onDeclineSuccess?.();
       }
-      dispatch(removeFollowerRequest(requestingProfileId));
     }
-  }, [fetcher.data, fetcher.state, requestingProfileId, dispatch, toast]);
+  }, [fetcher.data, fetcher.state, onConfirmSuccess, onDeclineSuccess, toast]);
 
   return (
     <div className={cn("flex items-center gap-x-2", fetcher.state !== "idle" && "hidden")}>

@@ -1,14 +1,17 @@
 import FollowButton from "@/components/profile/follow-button";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
+import { removeFollowerRequest, setFollowers } from "@/store/redux/features/relationship-slice";
+import { useAppDispatch } from "@/store/redux/hooks";
 import { BaseProfile } from "@/types";
 import { Link } from "@remix-run/react";
 import { LockIcon } from "lucide-react";
+import { useCallback } from "react";
 import { Skeleton } from "../ui/skeleton";
 import FollowRequestHandler from "./follow-request-handler";
 
 type ProfileListItemProps = {
-  profile: Omit<BaseProfile, "bio">;
+  profile: BaseProfile;
   isFollowRequest?: boolean;
 };
 
@@ -36,8 +39,41 @@ const ProfileListItem = ({ profile, isFollowRequest }: ProfileListItemProps) => 
       {profile.id !== user?.id && !isFollowRequest && (
         <FollowButton profile={{ id: profile.id, private: profile.private }} />
       )}
-      {isFollowRequest && <FollowRequestHandler requestingProfileId={profile.id} />}
+      {isFollowRequest && <FollowRequestButtons requestingProfile={profile} />}
     </div>
+  );
+};
+
+const FollowRequestButtons = ({ requestingProfile }: { requestingProfile: BaseProfile }) => {
+  const dispatch = useAppDispatch();
+
+  const onConfirmSuccess = useCallback(
+    (data: any) => {
+      dispatch(
+        setFollowers([
+          {
+            id: data.fromId,
+            status: data.status,
+            profile: requestingProfile,
+          },
+        ])
+      );
+
+      dispatch(removeFollowerRequest(requestingProfile.id));
+    },
+    [dispatch, requestingProfile.id]
+  );
+
+  const onDeclineSuccess = useCallback(() => {
+    dispatch(removeFollowerRequest(requestingProfile.id));
+  }, [dispatch, requestingProfile.id]);
+
+  return (
+    <FollowRequestHandler
+      requestingProfileId={requestingProfile.id}
+      onConfirmSuccess={onConfirmSuccess}
+      onDeclineSuccess={onDeclineSuccess}
+    />
   );
 };
 
