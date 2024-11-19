@@ -44,6 +44,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     .then((data) => data.data);
 
   if (
+    postOwner.id !== user?.id &&
     postOwner.private &&
     !user?.profile.following.some(({ id, status }) => id === postOwner.id && status === "CONFIRMED")
   ) {
