@@ -17,6 +17,7 @@ import { useFetcher } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
 import LoginModal from "../auth/login-modal";
+import ReactiveAccountDialog from "@/routes/_home/settings/account/reactivate-account-dialog";
 
 type CommentButtonProps = {
   postOwnerUsername: string;
@@ -27,18 +28,20 @@ type CommentButtonProps = {
 
 const CommentButton = ({ postOwnerUsername, parentId, count, onAction }: CommentButtonProps) => {
   const { user } = useSession();
-  if (!user) {
+  if (!user || user.deactivated) {
+    const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
     return (
       <div className="flex items-center space-x-2">
-        <LoginModal>
+        <Comp>
           <Comment className="text-inactive w-5 h-5">{count}</Comment>
-        </LoginModal>
+        </Comp>
         <div className="min-w-3">
           {count > 0 && <p className="text-inactive text-sm">{count}</p>}
         </div>
       </div>
     );
   }
+
   const fetcher = useFetcher<typeof action>();
   const isSubmitting = fetcher.state !== "idle";
   const optimisticCount = isSubmitting ? count + 1 : count;

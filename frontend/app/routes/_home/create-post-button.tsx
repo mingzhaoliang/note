@@ -3,6 +3,7 @@ import CreatePostDialog from "@/components/post/create-post-dialog";
 import { useSession } from "@/store/context/session.context";
 import { PlusIcon } from "lucide-react";
 import NavIcon from "./nav-icon";
+import ReactiveAccountDialog from "./settings/account/reactivate-account-dialog";
 
 export default function CreatePostButton() {
   const { user } = useSession();
@@ -15,10 +16,10 @@ export default function CreatePostButton() {
     />
   );
 
-  return (
-    <>
-      {user && <CreatePostDialog>{postButton}</CreatePostDialog>}
-      {!user && <LoginModal>{postButton}</LoginModal>}
-    </>
-  );
+  if (!user || user.deactivated) {
+    const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
+    return <Comp>{postButton}</Comp>;
+  }
+
+  return <CreatePostDialog>{postButton}</CreatePostDialog>;
 }

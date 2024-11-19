@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { action } from "@/routes/_home/profile/$username/_layout";
+import ReactiveAccountDialog from "@/routes/_home/settings/account/reactivate-account-dialog";
 import { useSession } from "@/store/context/session.context";
 import { BaseRelationship, Profile } from "@/types";
 import { Slot } from "@radix-ui/react-slot";
@@ -40,14 +41,15 @@ const FollowButton = ({ profile }: FollowButtonProps) => {
   const isSubmitting = fetcher.state !== "idle";
   const { user } = useSession();
 
-  if (!user) {
+  if (!user || user.deactivated) {
+    const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
     return (
-      <LoginModal asChild>
+      <Comp asChild>
         <Button size="sm" className="space-x-2 rounded-xl">
           <p>Follow</p>
           <UserRoundPlusIcon className="w-4 h-4" />
         </Button>
-      </LoginModal>
+      </Comp>
     );
   }
 

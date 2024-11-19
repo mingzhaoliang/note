@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { ResponsiveDialog, ResponsiveDialogChildren } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
-import { ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { action } from ".";
 
-const ReactiveAccountDialog = ({ toBeDeletedAt }: { toBeDeletedAt?: Date }) => {
+const ReactiveAccountDialog = ({
+  toBeDeletedAt,
+  ...props
+}: React.ComponentPropsWithoutRef<ResponsiveDialogChildren["Trigger"]> & {
+  toBeDeletedAt?: Date;
+}) => {
   const navigation = useNavigation();
   const actionData = useActionData<typeof action>();
   const { toast } = useToast();
@@ -41,10 +45,7 @@ const ReactiveAccountDialog = ({ toBeDeletedAt }: { toBeDeletedAt?: Date }) => {
     <ResponsiveDialog query="(min-width: 768px)" open={open} onOpenChange={setOpen}>
       {({ Header, Title, Content, Description, Trigger }) => (
         <>
-          <Trigger className="flex-between my-2">
-            <p>Reactivate account</p>
-            <ChevronRightIcon />
-          </Trigger>
+          <Trigger {...props} />
           <Content className="responsive-dialog-content">
             <Header>
               <Title className="mb-2">Reactivate account</Title>

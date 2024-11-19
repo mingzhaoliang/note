@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils/cn";
 import { useSession } from "@/store/context/session.context";
 import { NavLink } from "@remix-run/react";
 import NavIcon from "./nav-icon";
+import ReactiveAccountDialog from "./settings/account/reactivate-account-dialog";
 
 interface NavItemProps extends React.ComponentPropsWithoutRef<typeof NavLink> {
   DefaultIcon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -20,22 +21,24 @@ export default function NavItem({
   ...props
 }: NavItemProps) {
   const { user } = useSession();
+
+  if (isProtected && (!user || user.deactivated)) {
+    const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
+    return (
+      <Comp>
+        <NavIcon Icon={DefaultIcon} className={className} />
+      </Comp>
+    );
+  }
+
   return (
-    <>
-      {isProtected && !user ? (
-        <LoginModal>
-          <NavIcon Icon={DefaultIcon} className={className} />
-        </LoginModal>
-      ) : (
-        <NavLink to={to} className="w-full flex-center" {...props}>
-          {({ isActive }) => (
-            <NavIcon
-              Icon={isActive ? ActiveIcon || DefaultIcon : DefaultIcon}
-              className={cn(isActive ? "text-primary" : "", className)}
-            />
-          )}
-        </NavLink>
+    <NavLink to={to} className="w-full flex-center" {...props}>
+      {({ isActive }) => (
+        <NavIcon
+          Icon={isActive ? ActiveIcon || DefaultIcon : DefaultIcon}
+          className={cn(isActive ? "text-primary" : "", className)}
+        />
       )}
-    </>
+    </NavLink>
   );
 }

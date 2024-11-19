@@ -1,6 +1,7 @@
 import { Like, LikeFilled } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { action } from "@/routes/_home/profile/$username_.post/$postId";
+import ReactiveAccountDialog from "@/routes/_home/settings/account/reactivate-account-dialog";
 import { useSession } from "@/store/context/session.context";
 import { useFetcher } from "@remix-run/react";
 import { useEffect } from "react";
@@ -17,12 +18,13 @@ type PostLikesProps = {
 
 const LikeButton = ({ postId, postOwnerUsername, hasLiked, count, onAction }: PostLikesProps) => {
   const { user } = useSession();
-  if (!user) {
+  if (!user || user.deactivated) {
+    const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
     return (
       <div className="flex items-center space-x-2">
-        <LoginModal>
+        <Comp>
           <Like className="text-inactive w-5 h-5">{count}</Like>
-        </LoginModal>
+        </Comp>
         <div className="min-w-3">
           {count > 0 && <p className="text-inactive text-sm">{count}</p>}
         </div>

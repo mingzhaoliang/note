@@ -5,12 +5,30 @@ import ProfileEditDialog from "@/components/profile/profile-edit-dialog";
 import CldAvatar from "@/components/shared/cld-avatar";
 import { useSession } from "@/store/context/session.context";
 import { Profile } from "@/types";
+import { useCallback } from "react";
+import ReactiveAccountDialog from "../../settings/account/reactivate-account-dialog";
 import RelationshipDialog from "./relationship-dialog";
 
 export default function ProfileInfo({ profile }: { profile: Profile }) {
   const { user } = useSession();
   const isOwner = user?.id === profile.id;
   const followerCount = profile._count.follower;
+
+  const Guard = useCallback(() => {
+    if (!user || user.deactivated) {
+      const Comp = user?.deactivated ? ReactiveAccountDialog : LoginModal;
+
+      return (
+        <Comp>
+          <p className="text-start text-sm text-muted-foreground">
+            {followerCount} {followerCount <= 1 ? "Follower" : "Followers"}
+          </p>
+        </Comp>
+      );
+    }
+
+    return null;
+  }, [user, followerCount]);
 
   return (
     <div className="flex justify-between gap-6">
@@ -24,13 +42,7 @@ export default function ProfileInfo({ profile }: { profile: Profile }) {
           </div>
           <p className="text-muted-foreground">{"@" + profile.username}</p>
         </div>
-        {!user && (
-          <LoginModal>
-            <p className="text-start text-sm text-muted-foreground">
-              {followerCount} {followerCount <= 1 ? "Follower" : "Followers"}
-            </p>
-          </LoginModal>
-        )}
+        <Guard />
         {user && <RelationshipDialog followerCount={followerCount} isOwner={isOwner} />}
         {profile.bio && <p className="text-muted-foreground whitespace-pre-line">{profile.bio}</p>}
         {!isOwner && user && (

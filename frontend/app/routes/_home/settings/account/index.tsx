@@ -3,6 +3,7 @@ import { redirectIfUnauthenticated } from "@/session/guard.server";
 import { ActionState } from "@/types";
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { ChevronRightIcon } from "lucide-react";
 import DeactivateAccountDialog from "./deactivate-account-dialog";
 import ReactiveAccountDialog from "./reactivate-account-dialog";
 import UpdatePasswordDialog from "./update-password-dialog";
@@ -29,7 +30,12 @@ export default function Index() {
       <div className="flex flex-col">
         <ReactiveAccountDialog
           toBeDeletedAt={user.toBeDeletedAt ? new Date(user.toBeDeletedAt) : undefined}
-        />
+        >
+          <div className="flex-between my-2">
+            <p>Reactivate account</p>
+            <ChevronRightIcon />
+          </div>
+        </ReactiveAccountDialog>
       </div>
     );
   }
