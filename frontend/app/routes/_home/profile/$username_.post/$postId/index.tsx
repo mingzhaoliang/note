@@ -98,13 +98,13 @@ export default function Index() {
         parentId={postId}
         count={_count.comments}
       />
-      <Separator className="!my-8" />
 
       <Suspense fallback={<p>Loading comments...</p>}>
         <Await resolve={comments}>
           {(comments) => {
             return (
               <div className="flex flex-col gap-y-3">
+                {comments.length > 0 && <Separator className="!my-8" />}
                 <CommentGroups comments={comments} user={user} />
               </div>
             );
