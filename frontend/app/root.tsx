@@ -1,14 +1,24 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import clsx from "clsx";
 import { Provider as ReduxProvider } from "react-redux";
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
+import { PreventFlashOnWrongTheme, Theme, ThemeProvider, useTheme } from "remix-themes";
 import { Toaster } from "./components/ui/toaster";
 import envConfig from "./config/env.config.server";
 import { themeSessionResolver } from "./session/theme-session.server";
 import { PublicEnvProvider } from "./store/context/public-env.context";
 import { store } from "./store/redux/store";
 
+import { ArrowRightIcon } from "lucide-react";
+import { Button } from "./components/ui/button";
 import "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -45,12 +55,17 @@ export default function AppWithProviders() {
   );
 }
 
-function Document({ children }: { children: React.ReactNode }) {
-  const { theme: ssrTheme } = useLoaderData<typeof loader>();
-  const [theme] = useTheme();
-
+function Document({
+  children,
+  theme,
+  ssrTheme,
+}: {
+  children: React.ReactNode;
+  theme?: Theme | null;
+  ssrTheme?: Theme | null;
+}) {
   return (
-    <html lang="en" className={clsx(theme)}>
+    <html lang="en" className={theme ? clsx(theme) : ""}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -72,14 +87,39 @@ function Document({ children }: { children: React.ReactNode }) {
 function App() {
   const { ENV } = useLoaderData<typeof loader>();
 
+  const { theme: ssrTheme } = useLoaderData<typeof loader>();
+  const [theme] = useTheme();
+
   return (
-    <Document>
+    <Document theme={theme} ssrTheme={ssrTheme}>
       <ReduxProvider store={store}>
         <PublicEnvProvider {...ENV}>
           <Outlet />
         </PublicEnvProvider>
         <Toaster />
       </ReduxProvider>
+    </Document>
+  );
+}
+
+export function ErrorBoundary() {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/");
+  };
+
+  return (
+    <Document>
+      <div className="h-screen flex-center flex-col">
+        <h1 className="text-2xl">Oops! Something went wrong!</h1>
+        <div className="flex items-center">
+          <p className="text-lg">Please try again later.</p>
+          <Button variant="ghost" size="icon" className="ml-1 rounded-full" onClick={handleClick}>
+            <ArrowRightIcon />
+          </Button>
+        </div>
+      </div>
     </Document>
   );
 }
