@@ -18,8 +18,10 @@ const feedSlice = createSlice({
           state[postIndex].likes = state[postIndex].likes.filter(
             (id) => id !== action.payload.profileId
           );
+          state[postIndex]._count.likes -= 1;
         } else {
           state[postIndex].likes.push(action.payload.profileId);
+          state[postIndex]._count.likes += 1;
         }
       }
     },
