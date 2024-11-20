@@ -7,8 +7,8 @@ const ExploreNavbar = () => {
 
   return (
     <NavTab>
-      <NavTabItem to={`posts?q=${query}`}>Posts</NavTabItem>
-      <NavTabItem to={`users?q=${query}`}>Users</NavTabItem>
+      <NavTabItem to={"/explore/posts?" + new URLSearchParams({ q: query })}>Posts</NavTabItem>
+      <NavTabItem to={"/explore/users?" + new URLSearchParams({ q: query })}>Users</NavTabItem>
     </NavTab>
   );
 };

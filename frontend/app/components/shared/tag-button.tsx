@@ -14,7 +14,7 @@ const TagButton = ({ tag, variant, className, size, onClick, ...props }: TagButt
     event.stopPropagation();
 
     onClick?.(event);
-    navigate("/explore?" + new URLSearchParams({ q: tag }).toString());
+    navigate("/explore/posts?" + new URLSearchParams({ q: tag }).toString());
   };
 
   return (

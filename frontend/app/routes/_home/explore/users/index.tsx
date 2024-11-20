@@ -14,15 +14,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const searchParams = new URL(request.url).searchParams;
   const q = searchParams.get("q");
-  const lastUserId = searchParams.get("last");
+  const last = searchParams.get("last");
 
-  if (!q) {
-    return redirect("/explore", { headers });
-  }
+  if (!q) return redirect("/explore", { headers });
 
   const response = await fetch(
     `${envConfig.API_URL}/profile/search?` +
-      new URLSearchParams({ q, ...(lastUserId && { last: lastUserId }) }).toString()
+      new URLSearchParams({ q, ...(last && { last }) }).toString()
   );
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");

@@ -13,12 +13,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { user, headers } = await requireUser(request);
 
   const searchParams = new URL(request.url).searchParams;
-
   const q = searchParams.get("q");
+  const last = searchParams.get("last");
+
   if (!q) return redirect("/explore", { headers });
 
   if (user) searchParams.append("userId", user.id);
-  const response = await fetch(`${envConfig.API_URL}/post/search?` + searchParams.toString());
+  const response = await fetch(
+    `${envConfig.API_URL}/post/search?` +
+      new URLSearchParams({ q, ...(last && { last }) }).toString()
+  );
 
   if (!response.ok) throw new Error("Oops! Something went wrong!");
 
