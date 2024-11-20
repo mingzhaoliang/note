@@ -17,7 +17,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { useFetcher, useNavigate } from "@remix-run/react";
 import { EditorState, LexicalEditor } from "lexical";
-import { HashIcon, MapPinIcon } from "lucide-react";
+import { HashIcon } from "lucide-react";
 import { useRef } from "react";
 import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import PostImagesSection from "./post-images-section";
@@ -123,7 +123,6 @@ export default function PostForm({ className, setOpen }: PostFormProps) {
               <GalleryAdd className="w-6 h-6" />
             </button>
             <HashIcon className="w-6 h-6 clickable" onClick={handleTagEdit} />
-            <MapPinIcon className="w-6 h-6 clickable" />
           </div>
         </div>
         <div className="flex-between">
