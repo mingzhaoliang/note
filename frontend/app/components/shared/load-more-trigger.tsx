@@ -2,7 +2,7 @@ import { useInView } from "@/hooks/use-in-view";
 import { cn } from "@/lib/utils/cn";
 import { useFetcher } from "@remix-run/react";
 import { LoaderIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 type LoadMoreTriggerProps = {
   loaderComponent?: React.ReactNode;
@@ -28,10 +28,10 @@ const LoadMoreTrigger = ({
   }, [inView, nextPageUrl, fetcher.load]);
 
   useEffect(() => {
-    if (!fetcher.data || fetcher.state !== "idle") return;
+    if (!inView || !fetcher.data || fetcher.state !== "idle") return;
     const data = fetcher.data as any;
     onLoad(data);
-  }, [fetcher.data, fetcher.state, onLoad]);
+  }, [inView, fetcher.data, fetcher.state, onLoad]);
 
   if (!hasMore) return null;
 
