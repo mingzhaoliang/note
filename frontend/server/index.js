@@ -15,6 +15,7 @@ const socketProxy = createProxyMiddleware({
   changeOrigin: true,
   ws: true,
   pathFilter: "/socket.io",
+  ...(process.env.NODE_ENV === "production" && { protocol: "https:" }),
 });
 
 const viteDevServer =
