@@ -9,9 +9,6 @@ const envConfigSchema = z.object({
   NM_GMAIL_FROM: z.string(),
   NM_GMAIL_APP_PASSWORD: z.string(),
   CLOUDINARY_CLOUD_NAME: z.string(),
-  UPLOAD_PRESET: z.string(),
-  CLOUDINARY_API_KEY: z.string(),
-  CLOUDINARY_API_SECRET: z.string(),
 });
 
 const envConfig = envConfigSchema.parse(process.env);
