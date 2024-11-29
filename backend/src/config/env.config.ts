@@ -6,6 +6,7 @@ const envConfigSchema = z.object({
   OAUTH_GOOGLE_CLIENT_ID: z.string(),
   OAUTH_GOOGLE_CLIENT_SECRET: z.string(),
   APP_URL: z.string(),
+  SERVER_URL: z.string(),
   CLOUDINARY_CLOUD_NAME: z.string(),
   UPLOAD_PRESET: z.string(),
   CLOUDINARY_API_KEY: z.string(),

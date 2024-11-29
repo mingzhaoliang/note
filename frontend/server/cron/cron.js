@@ -1,15 +1,13 @@
-import envConfig from "@/config/env.config.js";
-import { removeDeletedUsers } from "@/features/auth/services/auth.service.js";
 import { CronJob } from "cron";
 import https from "https";
 
-const deleteUsers = new CronJob("0 0 */24 * * *", () => {
-  removeDeletedUsers();
-});
-
 const ping = new CronJob("*/14 * * * * *", () => {
+  if (!process.env.APP_URL) {
+    console.error("APP_URL is not defined");
+    return;
+  }
   https
-    .get(envConfig.SERVER_URL + "/health", (res) => {
+    .get(process.env.APP_URL, (res) => {
       if (res.statusCode === 200) {
         console.log("GET request sent successfully");
       } else {
@@ -22,8 +20,7 @@ const ping = new CronJob("*/14 * * * * *", () => {
 });
 
 const startCron = () => {
-  deleteUsers.start();
-  if (envConfig.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production") {
     ping.start();
   }
 };

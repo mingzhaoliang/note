@@ -46,6 +46,7 @@
     "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "compression": "^1.7.4",
+    "cron": "^3.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "embla-carousel": "^8.3.0",

@@ -5,6 +5,7 @@ import express from "express";
 import http from "http";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import morgan from "morgan";
+import { startCron } from "./cron/cron.js";
 
 const app = express();
 
@@ -56,6 +57,9 @@ app.use(socketProxy);
 
 // handle SSR requests
 app.all("*", remixHandler);
+
+// Cron Job
+startCron();
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => console.log(`Express server listening at http://localhost:${port}`));
