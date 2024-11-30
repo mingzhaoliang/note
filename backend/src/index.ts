@@ -8,6 +8,7 @@ import PrettyError from "pretty-error";
 import envConfig from "./config/env.config.js";
 import { startCron } from "./cron/cron.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import ipFilter from "./middleware/ipFilter.js";
 import { prisma } from "./prisma/client.js";
 import route from "./routes/index.js";
 import { app, httpServer } from "./socket/socket.js";
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// * File Upload
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -32,11 +34,15 @@ app.use(
   })
 );
 
+// * IP Filter
+app.set("trust proxy", true);
+app.use(ipFilter);
+
 // * Route
-app.use(route);
 app.get("/health", (_, res) => {
   res.status(200).send("OK");
 });
+app.use(route);
 
 // * Custom Error Handler
 app.use(errorHandler);

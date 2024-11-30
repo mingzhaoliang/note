@@ -11,6 +11,10 @@ const envConfigSchema = z.object({
   UPLOAD_PRESET: z.string(),
   CLOUDINARY_API_KEY: z.string(),
   CLOUDINARY_API_SECRET: z.string(),
+  ALLOWED_IPS: z
+    .string()
+    .default("")
+    .transform((s) => s.split(",")),
 });
 
 const envConfig = envConfigSchema.parse(process.env);
