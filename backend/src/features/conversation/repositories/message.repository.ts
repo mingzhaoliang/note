@@ -22,6 +22,7 @@ async function findMany(
 
   const rows = await prisma.message.findMany({
     where,
+    include: { sender: true },
     take: limit,
     skip: offset,
     cursor,
